@@ -12,10 +12,13 @@ import PostAddIcon from '@mui/icons-material/PostAdd';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import RuleIcon from '@mui/icons-material/Rule';
 import RuleFolderIcon from '@mui/icons-material/RuleFolder';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
-import FindInPageIcon from '@mui/icons-material/FindInPage';
-import FilePresentIcon from '@mui/icons-material/FilePresent';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import InsertLinkIcon from '@mui/icons-material/InsertLink';
+import FolderIcon from '@mui/icons-material/Folder';
+import Filter9PlusIcon from '@mui/icons-material/Filter9Plus';
 //========================================================== axios 라이브러리 import
 import axios from 'axios';
 //========================================================== cookie 라이브러리 import
@@ -32,6 +35,8 @@ import EditAccount from './Account/EditAccount';
 import MngUserAuth from './Auth/MngUserAuth';
 
 import AddDocNo from './MngDoc/AddDocNo'
+import AddDocNoPattern from './MngDoc/AddDocNoPattern'
+import MngDocNoPattern from './MngDoc/MngDocNoPattern'
 
 import AuditTrail from './AuditTrail/AuditTrail'
 import MyPage from './Account/MyPage';
@@ -136,7 +141,18 @@ function App() {
         </ListItem>
       </List>
       <Divider />
-      <List> 
+      <List>
+       <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/adddocnopattern")
+            }}>
+            <ListItemIcon>
+              <RuleIcon /> 
+            </ListItemIcon>
+            <ListItemText primary={"문서번호 패턴 추가"} />
+          </ListItemButton>
+        </ListItem>
         <ListItem disablePadding>
           <ListItemButton onClick={()=>{
             LoginCheck()
@@ -146,6 +162,20 @@ function App() {
               <RuleFolderIcon /> 
             </ListItemIcon>
             <ListItemText primary={"문서번호 패턴관리"} />
+          </ListItemButton>
+        </ListItem>
+      </List>
+      <Divider />
+      <List>
+        <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/adddocno")
+            }}>
+            <ListItemIcon>
+              <Filter9PlusIcon /> 
+            </ListItemIcon>
+            <ListItemText primary={"문서 번호 추가"} />
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
@@ -161,16 +191,16 @@ function App() {
         </ListItem>
       </List>
       <Divider />  
-      <List> 
+      <List>
         <ListItem disablePadding>
           <ListItemButton onClick={()=>{
             LoginCheck()
             navigate("/mngdocno")
             }}>
             <ListItemIcon>
-              <FindInPageIcon /> 
+              <InventoryIcon /> 
             </ListItemIcon>
-            <ListItemText primary={"문서 목록 관리"} />
+            <ListItemText primary={"문서 인벤토리"} />
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
@@ -179,9 +209,20 @@ function App() {
             navigate("/mngdocno")
             }}>
             <ListItemIcon>
-              <FilePresentIcon /> 
+              <InsertLinkIcon /> 
             </ListItemIcon>
-            <ListItemText primary={"문서 속성 관리"} />
+            <ListItemText primary={"문서 관계 관리"} />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/mngdocno")
+            }}>
+            <ListItemIcon>
+              <FolderIcon /> 
+            </ListItemIcon>
+            <ListItemText primary={"바인더 인벤토리"} />
           </ListItemButton>
         </ListItem>
       </List>   
@@ -302,8 +343,9 @@ function App() {
             <Route path='/mngaccount' element={<MngAccount/>}/>
             <Route path='/editaccount' element={<EditAccount/>}/>
             <Route path='/mnguserauth' element={<MngUserAuth/>}/>
-            <Route path='/adddocnopattern' element={ <div>adddocnopattern</div>  }/>
-            <Route path='/mngdocnopattern' element={ <div>mngdocnopattern</div> }/>
+            <Route path='/adddocnopattern' element={ <AddDocNoPattern/>  }/>
+            <Route path='/mngdocnopattern' element={ <MngDocNoPattern/> }/>
+            <Route path='/editdocnopattern' element={ <div>editdocnopattern</div> }/>
             <Route path='/adddocno' element={ <AddDocNo/> }/>
             <Route path='/mngdocno' element={ <div>mngdocno</div> }/>
             <Route path='/audittrail' element={ <AuditTrail/> }/>

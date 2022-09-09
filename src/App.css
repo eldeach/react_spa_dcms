@@ -124,7 +124,7 @@ h1{
 
   .info-item{
     overflow-y: auto;
-    font-size: 1vw;
+    font-size: min(16px, 1vw);
     width: 8vw;
     height: 6vh;
     display: flex;
@@ -135,6 +135,7 @@ h1{
   .info-item-content{
     overflow-y: auto;
     font-size: 1vw;
+    font-size: min(16px, 1vw);
     width: 300px;
     height: 6vh;
     display: flex;
@@ -144,10 +145,24 @@ h1{
     overflow-wrap: break-word;
   }
 
-  .info-item-content-long{
+  .select-item{
     overflow-y: auto;
-    width: 500px;
-    max-height: 200px;
+    font-size: min(16px, 1vw);
+    width: 8vw;
+    display: flex;
+    align-items : center;
+    overflow-wrap: break-word;
+  }
+
+  .select-item-content{
+    overflow-y: auto;
+    font-size: min(16px, 1vw);
+    width: 300px;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items : center;
+    align-content : center;
     overflow-wrap: break-word;
   }
 

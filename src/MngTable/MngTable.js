@@ -152,6 +152,12 @@ function MngTable(props) {
         searchKeyWord : para.searchKeyWord,
       }
     }
+    else if(props.getUrlStr=="/getmngdocnopattern")
+    {
+      allParams={
+        searchKeyWord : para.searchKeyWord,
+      }
+    }
 
     let ajaxData = await axios({
       method:"get",
@@ -189,18 +195,35 @@ function MngTable(props) {
             headerName: 'Action',
             sortable: false,
             renderCell:(cellValues) => {
-              return (
-                <Button
-                  variant="contained"
-                  onClick={(event) => {
-                    navigate('/editaccount',{state: {
-                      rowObj: cellValues.row,
-                    },})
-                  }}
-                >
-                  <EditIcon fontSize="small"/>
-                </Button>
-              )}
+              if(props.getUrlStr=="/getmngaccount"){
+                return (
+                  <Button
+                    variant="contained"
+                    onClick={(event) => {
+                      navigate('/editaccount',{state: {
+                        rowObj: cellValues.row,
+                      },})
+                    }}
+                  >
+                    <EditIcon fontSize="small"/>
+                  </Button>
+                )
+              }
+              else if(props.getUrlStr=="/getmngdocnopattern"){
+                return (
+                  <Button
+                    variant="contained"
+                    onClick={(event) => {
+                      navigate('/editdocnopattern',{state: {
+                        rowObj: cellValues.row,
+                      },})
+                    }}
+                  >
+                    <EditIcon fontSize="small"/>
+                  </Button>
+                )
+              }
+            }
           })
         }
 
@@ -436,6 +459,13 @@ function MngTable(props) {
                   InitializeTbl ()
                   setDelRowBt(addRowBt=>false)
                 }
+                else if (props.getUrlStr=="/getmngdocnopattern"&&delRowBt)
+                {
+                  let reqResult = await DeleteDocNoPattern(pickRows)
+                  if(!reqResult.success) alert(reqResult.result)
+                  InitializeTbl ()
+                  setDelRowBt(delRowBt=>false)
+                }
                 setOpenModalBackDrop(false)
                 setIsModalSubmitting(false)
                 handleModalClose()
@@ -592,6 +622,29 @@ async function DeleteOneUser(pickRows){
   let ajaxData =  await axios({
     method:"delete",
     url:"/deleteaccount",
+    params:para,
+    headers:{
+      'Content-Type':'application/json'
+    }})
+    .then((res)=>res.data)
+    .catch((err)=>console.log(err))
+    return ajaxData
+}
+
+
+async function DeleteDocNoPattern(pickRows){
+  let targetRows=[]
+  pickRows.map((oneRow,i)=>{
+    targetRows.push({doc_no_pattern:oneRow.doc_no_pattern, uuid_binary:oneRow.uuid_binary, delete_by:cookies.load('userInfo').user_account})
+  })
+
+  let para={
+    targetRows:targetRows
+  }
+  
+  let ajaxData =  await axios({
+    method:"delete",
+    url:"/deletedocnopattern",
     params:para,
     headers:{
       'Content-Type':'application/json'

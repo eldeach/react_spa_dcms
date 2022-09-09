@@ -189,190 +189,195 @@ function AddAccount() {
               <Box
               id="postform"
               component="form"
-              sx={{ width: 500, display: 'flex', flexWrap: 'wrap' }}
+              sx={{ width: '100vw', display: 'flex', flexWrap: 'wrap',justifyContent:'center'}}
               noValidate
               onSubmit={handleSubmit}
               autoComplete="off"
               >
-                <TextField
-                  required
-                  variant="standard"
-                  id="user_account"
-                  name="user_account"
-                  label="User Account"
-                  value={values.user_account}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  helperText={touched.user_account ? errors.user_account : ""}
-                  error={touched.user_account && Boolean(errors.user_account)}
-                  margin="dense"
-                  fullWidth
-                />
+                <div style={{width:'35vw'}}>
+                  <TextField
+                    required
+                    variant="standard"
+                    id="user_account"
+                    name="user_account"
+                    label="User Account"
+                    value={values.user_account}
+                    onChange={(e)=>{
+                      handleChange(e)
+                      setUniqueIdCheck(false)
+                    }}
+                    onBlur={handleBlur}
+                    helperText={touched.user_account ? errors.user_account : ""}
+                    error={touched.user_account && Boolean(errors.user_account)}
+                    margin="dense"
+                    fullWidth
+                  />
+                  <div style={{width:'100%', display:'flex', justifyContent:'flex-end'}}>
+                    <Button variant="outlined" size="small" disabled={isIdConfirming} onClick={async ()=>{
+                      setUniqueIdCheck(true)
+                      setIsIdConfirming(isIdConfirming=>true)
 
-                <Button variant="outlined" disabled={isIdConfirming} onClick={async ()=>{
-                  setUniqueIdCheck(true)
-                  setIsIdConfirming(uniqueId=>true)
+                      let body={
+                        user_account : values.user_account
+                      }
 
-                  let body={
-                    user_account : values.user_account
-                  }
+                      let ajaxData=await axios.post('/duplicatedaccountCheck',body)
+                      .then((res)=>res.data)
+                      .catch((err)=>err)
+                      
+                      if(ajaxData.success){
+                        if(ajaxData.result.length<1) setUniqueId(uniqueId=>true)
+                        else setUniqueId(uniqueId=>false)
+                      }
+                      else{
+                        alert(ajaxData.result)
+                      }
+                      await new Promise((r) => setTimeout(r, 1000));
+                      validateField('user_account')
+                      setIsIdConfirming(isIdConfirming=>false)
+                      LoginCheck()
+                    }}>Confirm</Button>
+                  </div>
+                  <TextField
+                    required
+                    variant="standard"
+                    id="user_pw"
+                    name="user_pw"
+                    label="Password"
+                    type="password"
+                    value={values.user_pw}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    helperText={touched.user_pw ? errors.user_pw : ""}
+                    error={touched.user_pw && Boolean(errors.user_pw)}
+                    margin="dense"
+                    fullWidth
+                  />
 
-                  let ajaxData=await axios.post('/duplicatedaccountCheck',body)
-                  .then((res)=>res.data)
-                  .catch((err)=>err)
-                  
-                  if(ajaxData.success){
-                    if(ajaxData.result.length<1) setUniqueId(uniqueId=>true)
-                    else setUniqueId(uniqueId=>false)
-                  }
-                  else{
-                    alert(ajaxData.result)
-                  }
-                  await new Promise((r) => setTimeout(r, 1000));
-                  validateField('user_account')
-                  setIsIdConfirming(uniqueId=>false)
-                  LoginCheck()
-                }}>Confirm</Button>
+                  <TextField
+                    required
+                    variant="standard"
+                    id="user_pw_check"
+                    name="user_pw_check"
+                    label="Password Check"
+                    type="password"
+                    value={values.user_pw_check}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    helperText={touched.user_pw_check ? errors.user_pw_check : ""}
+                    error={touched.user_pw_check && Boolean(errors.user_pw_check)}
+                    margin="dense"
+                    fullWidth
+                  />
 
-                <TextField
-                  required
-                  variant="standard"
-                  id="user_pw"
-                  name="user_pw"
-                  label="Password"
-                  type="password"
-                  value={values.user_pw}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  helperText={touched.user_pw ? errors.user_pw : ""}
-                  error={touched.user_pw && Boolean(errors.user_pw)}
-                  margin="dense"
-                  fullWidth
-                />
+                  <TextField
+                    required
+                    variant="standard"
+                    id="user_name"
+                    name="user_name"
+                    label="User Name"
+                    // type="text"
+                    value={values.user_name}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    helperText={touched.user_name ? errors.user_name : ""}
+                    error={touched.user_name && Boolean(errors.user_name)}
+                    margin="dense"
+                    fullWidth
+                  />
+                  <TextField
+                    variant="standard"
+                    id="user_position"
+                    name="user_position"
+                    label="Position"
+                    // type="text"
+                    value={values.user_position}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    helperText={touched.user_position ? errors.user_position : ""}
+                    error={touched.user_position && Boolean(errors.user_position)}
+                    margin="dense"
+                    fullWidth
+                  />
 
-                <TextField
-                  required
-                  variant="standard"
-                  id="user_pw_check"
-                  name="user_pw_check"
-                  label="Password Check"
-                  type="password"
-                  value={values.user_pw_check}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  helperText={touched.user_pw_check ? errors.user_pw_check : ""}
-                  error={touched.user_pw_check && Boolean(errors.user_pw_check)}
-                  margin="dense"
-                  fullWidth
-                />
+                  <TextField
+                    required
+                    variant="standard"
+                    id="user_team"
+                    name="user_team"
+                    label="Team"
+                    // type="text"
+                    value={values.user_team}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    helperText={touched.user_team ? errors.user_team : ""}
+                    error={touched.user_team && Boolean(errors.user_team)}
+                    margin="dense"
+                    fullWidth
+                  />
 
-                <TextField
-                  required
-                  variant="standard"
-                  id="user_name"
-                  name="user_name"
-                  label="User Name"
-                  // type="text"
-                  value={values.user_name}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  helperText={touched.user_name ? errors.user_name : ""}
-                  error={touched.user_name && Boolean(errors.user_name)}
-                  margin="dense"
-                  fullWidth
-                />
-                <TextField
-                  variant="standard"
-                  id="user_position"
-                  name="user_position"
-                  label="Position"
-                  // type="text"
-                  value={values.user_position}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  helperText={touched.user_position ? errors.user_position : ""}
-                  error={touched.user_position && Boolean(errors.user_position)}
-                  margin="dense"
-                  fullWidth
-                />
+                  <TextField
+                    required
+                    variant="standard"
+                    id="user_company"
+                    name="user_company"
+                    label="Company"
+                    // type="text"
+                    value={values.user_company}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    helperText={touched.user_company ? errors.user_company : ""}
+                    error={touched.user_company && Boolean(errors.user_company)}
+                    margin="dense"
+                    fullWidth
+                  />
 
-                <TextField
-                  required
-                  variant="standard"
-                  id="user_team"
-                  name="user_team"
-                  label="Team"
-                  // type="text"
-                  value={values.user_team}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  helperText={touched.user_team ? errors.user_team : ""}
-                  error={touched.user_team && Boolean(errors.user_team)}
-                  margin="dense"
-                  fullWidth
-                />
+                  <TextField
+                    required
+                    variant="standard"
+                    id="user_email"
+                    name="user_email"
+                    label="E-Mail"
+                    // type="email"
+                    value={values.user_email}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    helperText={touched.user_email ? errors.user_email : ""}
+                    error={touched.user_email && Boolean(errors.user_email)}
+                    margin="dense"
+                    fullWidth
+                  />
+                  <TextField
+                    variant="standard"
+                    id="user_phone"
+                    name="user_phone"
+                    label="Phone Number"
+                    // type="tel"
+                    value={values.user_phone}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    helperText={touched.user_phone ? errors.user_phone : ""}
+                    error={touched.user_phone && Boolean(errors.user_phone)}
+                    margin="dense"
+                    fullWidth
+                  />
 
-                <TextField
-                  required
-                  variant="standard"
-                  id="user_company"
-                  name="user_company"
-                  label="Company"
-                  // type="text"
-                  value={values.user_company}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  helperText={touched.user_company ? errors.user_company : ""}
-                  error={touched.user_company && Boolean(errors.user_company)}
-                  margin="dense"
-                  fullWidth
-                />
-
-                <TextField
-                  required
-                  variant="standard"
-                  id="user_email"
-                  name="user_email"
-                  label="E-Mail"
-                  // type="email"
-                  value={values.user_email}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  helperText={touched.user_email ? errors.user_email : ""}
-                  error={touched.user_email && Boolean(errors.user_email)}
-                  margin="dense"
-                  fullWidth
-                />
-                <TextField
-                  variant="standard"
-                  id="user_phone"
-                  name="user_phone"
-                  label="Phone Number"
-                  // type="tel"
-                  value={values.user_phone}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  helperText={touched.user_phone ? errors.user_phone : ""}
-                  error={touched.user_phone && Boolean(errors.user_phone)}
-                  margin="dense"
-                  fullWidth
-                />
-
-                <TextField
-                  variant="standard"
-                  id="remark"
-                  name="remark"
-                  label="Remark"
-                  multiline
-                  rows={4}
-                  value={values.remark}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  helperText={touched.remark ? errors.remark : ""}
-                  error={touched.remark && Boolean(errors.remark)}
-                  margin="dense"
-                  fullWidth
-                />
+                  <TextField
+                    variant="standard"
+                    id="remark"
+                    name="remark"
+                    label="Remark"
+                    multiline
+                    rows={4}
+                    value={values.remark}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    helperText={touched.remark ? errors.remark : ""}
+                    error={touched.remark && Boolean(errors.remark)}
+                    margin="dense"
+                    fullWidth
+                  />
+                </div>
               </Box>
               <div className='content-middle'>
                 <Stack spacing={2} direction="row">
