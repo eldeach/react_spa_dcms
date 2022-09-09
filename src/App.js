@@ -12,6 +12,10 @@ import PostAddIcon from '@mui/icons-material/PostAdd';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import RuleFolderIcon from '@mui/icons-material/RuleFolder';
+import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
+import FindInPageIcon from '@mui/icons-material/FindInPage';
+import FilePresentIcon from '@mui/icons-material/FilePresent';
 //========================================================== axios 라이브러리 import
 import axios from 'axios';
 //========================================================== cookie 라이브러리 import
@@ -21,10 +25,14 @@ import { useDispatch, useSelector } from "react-redux"
 import { setLoginExpireTime } from "./store.js"
 //========================================================== 라우트할 import
 import UserLogin from './Account/UserLogin';
+
 import MngAccount from './Account/MngAccount';
 import AddAccount from './Account/AddAccount';
 import EditAccount from './Account/EditAccount';
 import MngUserAuth from './Auth/MngUserAuth';
+
+import AddDocNo from './MngDoc/AddDocNo'
+
 import AuditTrail from './AuditTrail/AuditTrail'
 import MyPage from './Account/MyPage';
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
@@ -128,6 +136,56 @@ function App() {
         </ListItem>
       </List>
       <Divider />
+      <List> 
+        <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/mngdocnopattern")
+            }}>
+            <ListItemIcon>
+              <RuleFolderIcon /> 
+            </ListItemIcon>
+            <ListItemText primary={"문서번호 패턴관리"} />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/mngdocno")
+            }}>
+            <ListItemIcon>
+              <FormatListNumberedIcon /> 
+            </ListItemIcon>
+            <ListItemText primary={"문서번호관리"} />
+          </ListItemButton>
+        </ListItem>
+      </List>
+      <Divider />  
+      <List> 
+        <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/mngdocno")
+            }}>
+            <ListItemIcon>
+              <FindInPageIcon /> 
+            </ListItemIcon>
+            <ListItemText primary={"문서 목록 관리"} />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/mngdocno")
+            }}>
+            <ListItemIcon>
+              <FilePresentIcon /> 
+            </ListItemIcon>
+            <ListItemText primary={"문서 속성 관리"} />
+          </ListItemButton>
+        </ListItem>
+      </List>   
+      <Divider />
       <List>
         <ListItem disablePadding>
           <ListItemButton onClick={()=>{
@@ -162,7 +220,7 @@ function App() {
             <ListItemText primary={"유저권한관리"} />
           </ListItemButton>
         </ListItem>
-      </List>
+      </List> 
       <Divider />
       <List>
         <ListItem disablePadding>
@@ -205,7 +263,7 @@ function App() {
                   </Drawer>
 
                 <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                  React SPA Foundation
+                  DCMS
                 </Typography>
 
                 {
@@ -243,7 +301,11 @@ function App() {
             <Route path='/addaccount' element={<AddAccount/>}/>
             <Route path='/mngaccount' element={<MngAccount/>}/>
             <Route path='/editaccount' element={<EditAccount/>}/>
-            <Route path='/Mnguserauth' element={<MngUserAuth/>}/>
+            <Route path='/mnguserauth' element={<MngUserAuth/>}/>
+            <Route path='/adddocnopattern' element={ <div>adddocnopattern</div>  }/>
+            <Route path='/mngdocnopattern' element={ <div>mngdocnopattern</div> }/>
+            <Route path='/adddocno' element={ <AddDocNo/> }/>
+            <Route path='/mngdocno' element={ <div>mngdocno</div> }/>
             <Route path='/audittrail' element={ <AuditTrail/> }/>
             <Route path='/mypage' element={ <MyPage />}/>
             <Route path='/userlogin' element={<UserLogin/>}/>
