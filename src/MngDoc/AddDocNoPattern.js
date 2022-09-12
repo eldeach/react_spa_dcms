@@ -7,6 +7,7 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import Autocomplete from '@mui/material/Autocomplete';
 import RuleIcon from '@mui/icons-material/Rule';
 //========================================================== Formik & Yup 라이브러리 import
 import { Formik } from 'formik';
@@ -38,6 +39,17 @@ function AddDocNoPattern() {
   let [isPatternNameConfirming, setIsPatternNameConfirming] = useState(false); // pattern_name Confirm 중복 클릭 방지
   let [uniquePatternNameCheck,setUniquePatternNameCheck] = useState(false); // pattern_name 유일성 점검을 한적이 있는지 체크
   let [uniquePatternName,setUniquePatternName] = useState(false); // pattern_name 유일성이 확보되어 있는지 체크
+  let [pos1st,setPos1st]=useState('');
+  let [pos2nd,setPos2nd]=useState('');
+  let [pos3rd,setPos3rd]=useState('');
+  let [pos4th,setPos4th]=useState('');
+  let [pos5th,setPos5th]=useState('');
+
+  const patternCode = [
+    {elementName:"-"},
+    {elementName:"{2_year}"},
+    {elementName:"{3_serial_per_year}"}
+  ]
 
   //========================================================== Formik & yup Validation schema
   const schema = yup.object().shape({
@@ -82,6 +94,16 @@ function AddDocNoPattern() {
       (value, context) => uniquePatternName
     ),
     pattern_description: yup.string().required('이 패턴에 대해 설명해주세요.'),
+    serial_pool:yup.string()
+    .test(
+      'serial_pool_blank_check',
+      "공백은 없어야 합니다. 공백대신 underscore(언더바, _ )를 제안합니다.",
+      function(value){
+          if(typeof(value)=="string"){
+              return !value.includes(" ")
+          }
+      }
+    ),
   });
 
   //========================================================== useEffect 코드
@@ -142,12 +164,19 @@ function AddDocNoPattern() {
                 ref_sop_rev:values.ref_sop_rev,
                 pattern_name:values.pattern_name,
                 pattern_description:values.pattern_description,
+                pattern_pair_code:values.pattern_pair_code,
+                serial_pool:values.serial_pool,
                 remark:values.remark,                
                 insert_by:cookies.load('userInfo').user_account
             }
             setIsSubmitting(true);
             await postAddDocPattern(qryBody)
             resetForm()
+            setPos1st('');
+            setPos2nd('');
+            setPos3rd('');
+            setPos4th('');
+            setPos5th('');
             setIsSubmitting(false);
             LoginCheck()
           }}
@@ -158,6 +187,8 @@ function AddDocNoPattern() {
             ref_sop_rev: '',
             pattern_name: '',
             pattern_description: '',
+            pattern_pair_code:'',
+            serial_pool:'',
             remark: ''
           }}
         >
@@ -186,6 +217,68 @@ function AddDocNoPattern() {
               onSubmit={handleSubmit}
               autoComplete="off"
               >
+                <div style={{width:'100vw', display:'flex', flexWrap: 'wrap', justifyContent:'center', marginLeft:'5px', marginRight:'5px'}}>
+                  <Autocomplete
+                    id="Pos_1st"
+                    style={{minWidth:'200px',margin:'5px'}}
+                    freeSolo
+                    onChange={(event, newValue) => {
+                      setUniquePatternCheck(false)
+                      setPos1st(newValue);
+                    }}
+                    value={pos1st}
+                    options={patternCode.map((option) => option.elementName)}
+                    renderInput={(params) => <TextField {...params} label="Pos. 1st" />}
+                  />
+                  <Autocomplete
+                    id="Pos_2nd"
+                    style={{minWidth:'200px',margin:'5px'}}
+                    freeSolo
+                    onChange={(event, newValue) => {
+                      setUniquePatternCheck(false)
+                      setPos2nd(newValue);
+                    }}
+                    value={pos2nd}
+                    options={patternCode.map((option) => option.elementName)}
+                    renderInput={(params) => <TextField {...params} label="Pos. 2nd" />}
+                  />
+                  <Autocomplete
+                    id="Pos_3rd"
+                    style={{minWidth:'200px',margin:'5px'}}
+                    freeSolo
+                    onChange={(event, newValue) => {
+                      setUniquePatternCheck(false)
+                      setPos3rd(newValue);
+                    }}
+                    value={pos3rd}
+                    options={patternCode.map((option) => option.elementName)}
+                    renderInput={(params) => <TextField {...params} label="Pos. 3rd" />}
+                  />
+                  <Autocomplete
+                    id="Pos_4th"
+                    style={{minWidth:'200px',margin:'5px'}}
+                    freeSolo
+                    onChange={(event, newValue) => {
+                      setUniquePatternCheck(false)
+                      setPos4th(newValue);
+                    }}
+                    value={pos4th}
+                    options={patternCode.map((option) => option.elementName)}
+                    renderInput={(params) => <TextField {...params} label="Pos. 4th" />}
+                  />
+                  <Autocomplete
+                    id="Pos_5th"
+                    style={{minWidth:'200px',margin:'5px'}}
+                    freeSolo
+                    onChange={(event, newValue) => {
+                      setUniquePatternCheck(false)
+                      setPos5th(newValue);
+                    }}
+                    value={pos5th}
+                    options={patternCode.map((option) => option.elementName)}
+                    renderInput={(params) => <TextField {...params} label="Pos. 5th" />}
+                  />
+                </div>
                 <div style={{width:'35vw'}}>
                   <TextField
                     required
@@ -193,7 +286,7 @@ function AddDocNoPattern() {
                     id="doc_no_pattern"
                     name="doc_no_pattern"
                     label="Document Number Pattern"
-                    value={values.doc_no_pattern}
+                    value={values.doc_no_pattern=pos1st+pos2nd+pos3rd+pos4th+pos5th}
                     onChange={(e)=>{
                       handleChange(e)
                       setUniquePatternCheck(false)
@@ -333,7 +426,36 @@ function AddDocNoPattern() {
                     margin="dense"
                     fullWidth
                   />
-
+                  <TextField
+                    required
+                    variant="standard"
+                    id="pattern_pair_code"
+                    name="pattern_pair_code"
+                    label="Pair Code"
+                    // type="text"
+                    value={values.pattern_pair_code}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    helperText={touched.pattern_pair_code ? errors.pattern_pair_code : ""}
+                    error={touched.pattern_pair_code && Boolean(errors.pattern_pair_code)}
+                    margin="dense"
+                    fullWidth
+                  />
+                  <TextField
+                    required
+                    variant="standard"
+                    id="serial_pool"
+                    name="serial_pool"
+                    label="Serial Pool"
+                    // type="text"
+                    value={values.serial_pool}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    helperText={touched.serial_pool ? errors.serial_pool : ""}
+                    error={touched.serial_pool && Boolean(errors.serial_pool)}
+                    margin="dense"
+                    fullWidth
+                  />
                   <TextField
                     variant="standard"
                     id="remark"

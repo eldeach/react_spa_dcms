@@ -28,7 +28,7 @@ import moment from 'moment';
 import 'moment/locale/ko';	//대한민국
 //========================================================== Redux import
 import { useDispatch, useSelector } from "react-redux"
-import { setSel_tb_user, setLoginExpireTime} from "./../store.js"
+import { setSel_tb_user,setSel_doc_pattern, setSel_doc_pattern_cols, setLoginExpireTime} from "./../store.js"
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
 import LoginSessionCheck from './../Account/LoginSessionCheck.js';
 
@@ -107,6 +107,7 @@ function MngTable(props) {
   let [cols,setCols] = useState([]); // Material UI Col 정의 State
   let [rows,setRows] = useState([]); // Material UI Row 정의 State
   let [pickRows,setPickRows]= useState([]);
+  let [clickRow,setClickRow]=useState();
 
   //========================================================== [함수][테이블] 검색어 없는 상태로 조회하여 컬럼, 행 데이터 state에 저장
   async function InitializeTbl (){
@@ -158,6 +159,14 @@ function MngTable(props) {
         searchKeyWord : para.searchKeyWord,
       }
     }
+
+    else if(props.getUrlStr=="/adddocno_getmngdocnopattern")
+    {
+      allParams={
+        searchKeyWord : para.searchKeyWord,
+      }
+    }
+    
 
     let ajaxData = await axios({
       method:"get",
@@ -382,6 +391,10 @@ function MngTable(props) {
                       alert("한 명의 사용자가 선택되어야 합니다.")
                     }
                   }
+                  else if(props.getUrlStr=="/adddocno_getmngdocnopattern"){   
+                    dispatch(setSel_doc_pattern(pickRows))
+                    dispatch(setSel_doc_pattern_cols(cols))
+                  }
                   else{
                   }
                 }}><CheckIcon/></Button>:<div></div>
@@ -404,7 +417,26 @@ function MngTable(props) {
                 checkboxSelection = {props.chkSel}
                 getRowHeight={() => rowHtAuto?'auto':''}
                 components={{ Toolbar:CustomToolbar}}
+                onCellClick={(GridCellParams,event)=>{
+                  setClickRow(clickRow=>GridCellParams.id)
+                }}
                 onSelectionModelChange={(selectionModel,details)=>{
+                  if(props.getUrlStr=="/adddocno_getmngdocnopattern"){
+                    let forceSelect=[]
+                    selectionModel.map((oneRowId,i)=>{
+                      rows.map((oneRow,j)=>{
+                        if(oneRow.pattern_pair_code ==rows[oneRowId-1].pattern_pair_code){
+                          forceSelect.push(oneRow.id)
+                        }
+                      })
+                    })
+
+                    forceSelect.map((oneItem,i)=>{
+                      if(selectionModel.indexOf(oneItem)==(-1)){
+                        selectionModel.push(oneItem)
+                      }
+                    })
+                  }
                   let tempPickRow=[]
                   selectionModel.map((oneRowId,i)=>{
                     tempPickRow.push(rows[oneRowId-1])
@@ -419,8 +451,8 @@ function MngTable(props) {
       <Modal open={openModal} onClose={handleModalClose}>
         <Paper style={modalStyle} elevation={5}>
           <Formik
-          validationSchema={paperschema}
-          onSubmit={async (values)=>{
+            validationSchema={paperschema}
+            onSubmit={async (values)=>{
             setIsModalSubmitting(true)
             setOpenModalBackDrop(true)
             let user_sign =  await axios({
