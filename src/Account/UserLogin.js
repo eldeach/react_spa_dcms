@@ -3,13 +3,9 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import {  useNavigate } from 'react-router-dom';
 //========================================================== Material UI 라이브러리 import
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
+
 import LockIcon from '@mui/icons-material/Lock';
-import Backdrop from '@mui/material/Backdrop';
-import CircularProgress from '@mui/material/CircularProgress';
+import {Box,TextField,Button,Paper, Stack, Backdrop, CircularProgress, Typography, Chip} from '@mui/material/';
 //========================================================== Formik & Yup 라이브러리 import
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -77,108 +73,103 @@ function UserLogin() {
   }
 
   return (
-      <div className="content-middle">
-        <Formik
-          validationSchema={schema}
-          onSubmit={async (values, {resetForm})=>{
-            setOpenBackDrop(true)
-            let qryBody = {
-              id: values.user_account,
-              pw:values.user_pw
-            }
-            setIsSubmitting(true);
-            await LoginCheck(qryBody)
-            resetForm()
-            setIsSubmitting(false);
-            setOpenBackDrop(false)
-          }}
-          initialValues={{
-            user_account: '',
-            user_pw:'',
-          }}
+    <div style={{padding:'1vw'}}>
+      <Formik
+        validationSchema={schema}
+        onSubmit={async (values, {resetForm})=>{
+          setOpenBackDrop(true)
+          let qryBody = {
+            id: values.user_account,
+            pw:values.user_pw
+          }
+          setIsSubmitting(true);
+          await LoginCheck(qryBody)
+          resetForm()
+          setIsSubmitting(false);
+          setOpenBackDrop(false)
+        }}
+        initialValues={{
+          user_account: '',
+          user_pw:'',
+        }}
+      >
+      {({
+        handleSubmit,
+        handleChange,
+        handleBlur,
+        validateField,
+        values,
+        touched,
+        resetForm,
+        isValid,
+        errors,
+      })=>(
+        <Box
+        id="UserLogin"
+        component="form"
+        noValidate
+        onSubmit={handleSubmit}
+        autoComplete="off"
         >
-        {({
-          handleSubmit,
-          handleChange,
-          handleBlur,
-          validateField,
-          values,
-          touched,
-          resetForm,
-          isValid,
-          errors,
-        })=>(
-            <div style={{width:'48vw', minWidth : '300px', padding:'10px', margin:'1vw', overflowY:'auto', boxSizing:'border-box', alignItems:"center", textAlign:"center"}}>
-                <div style={{height: "40px"}}></div>
-                <div style={{fontSize: "100px"}}><LockIcon fontSize ="inherit" color="primary"/></div>
-                <div style={{fontSize: "40px"}}>LOGIN</div>
-                <div style={{height: "40px"}}></div>
-                <Stack spacing={2}>
-                    <Box
-                    id="postform"
-                    component="form"
-                    // sx={{
-                    //   '& .MuiTextField-root': { m: 1, width: '25ch' },
-                    // }}
-                    //
-                    sx={{ width: '100%', display: 'flex', flexWrap: 'wrap' }}
-                    noValidate
-                    onSubmit={handleSubmit}
-                    autoComplete="off"
-                    >
-                    <TextField
-                    required
-                    variant="standard"
-                    id="user_account"
-                    name="user_account"
-                    label="User Account"
-                    value={values.user_account}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    helperText={touched.user_account ? errors.user_account : ""}
-                    error={touched.user_account && Boolean(errors.user_account)}
-                    margin="dense"
-                    fullWidth
-                    />
-
-                    <TextField
-                    required
-                    variant="standard"
-                    id="user_pw"
-                    name="user_pw"
-                    label="Password"
-                    type="password"
-                    value={values.user_pw}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    helperText={touched.user_pw ? errors.user_pw : ""}
-                    error={touched.user_pw && Boolean(errors.user_pw)}
-                    margin="dense"
-                    fullWidth
-                    />
-                    </Box>
-                    <div className='content-middle'>
-                    <Stack spacing={2} direction="row">
-                        <Button variant="contained" type="submit" form="postform" disabled={isSubmitting}>Submit</Button>
-                        <Button variant="outlined" type="reset" disabled={isResetting} onClick={async ()=>{
-                        setIsResetting(true)
-                        resetForm()
-                        setIsResetting(false)
-                        }}>Reset</Button>
-                    </Stack>
-                    </div>
-                </Stack>
-            </div>
-        )}
-        </Formik>
-        <Backdrop
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={openBackDrop}
-        // onClick={handleClose}
+          <div style={{width:'100%', height:'70vh', display:'flex', flexWrap:'wrap', justifyContent:'center', alignItems:'center'}}>
+            <Paper className="seperate-paper" elevation={3}>
+              <Stack spacing={2}>
+                <Chip label="로그인 계정 입력" color="primary"/>
+                <div style={{height:'42px'}}></div>
+                <TextField
+                required
+                variant="standard"
+                id="user_account"
+                name="user_account"
+                label="User Account"
+                value={values.user_account}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                helperText={touched.user_account ? errors.user_account : ""}
+                error={touched.user_account && Boolean(errors.user_account)}
+                margin="dense"
+                fullWidth
+                />
+                <TextField
+                required
+                variant="standard"
+                id="user_pw"
+                name="user_pw"
+                label="Password"
+                type="password"
+                value={values.user_pw}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                helperText={touched.user_pw ? errors.user_pw : ""}
+                error={touched.user_pw && Boolean(errors.user_pw)}
+                margin="dense"
+                fullWidth
+                />
+              </Stack>
+            </Paper>
+            <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding:'10px' }} elevation={6}>
+                <div style={{width:'100%', display:'flex', alignItems:'center', backdropFilter:'blur(10px)'}}>
+                    <LockIcon color="primary"/>
+                    <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>사용자 로그인</Typography>
+                    <Button size="small" variant="contained" type="submit" form="UserLogin" disabled={isSubmitting}>Submit</Button>
+                    <Button style={{marginLeft:'1vw'}} size="small" variant="contained" onClick={async ()=>{
+                    setIsResetting(true)
+                    resetForm()
+                    setIsResetting(false)
+                    }}>Reset</Button>
+                </div>
+            </Paper>
+          </div>
+        </Box>
+      )}
+      </Formik>
+      <Backdrop
+      sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      open={openBackDrop}
       >
         <CircularProgress color="inherit" />
       </Backdrop>
-      </div>     
+    </div> 
   );
 }
 

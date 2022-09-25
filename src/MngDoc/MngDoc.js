@@ -7,7 +7,7 @@ import cookies from 'react-cookies'
 import MngTable from './../MngTable/MngTable'
 
 
-function MngDocNoPattern(){
+function MngDoc(){
     let [tblCtrl,setTblCtrl]=useState(true)
 
 //========================================================== useNaviagte 선언
@@ -40,10 +40,10 @@ useEffect(() => {
 
     return(
         <div>
-            <MngTable getUrlStr={'/getmngdocnopattern'} targetPk={{}} heightValue={'80vh'} tblCtrl={tblCtrl} chkSel={true} deleteButton={true} addToListButton={false} editable={true} selectButton={false}/>
+            <MngTable getUrlStr={'/getmngdoc'} targetPk={{}} heightValue={'80vh'} tblCtrl={tblCtrl} chkSel={true} deleteButton={true} addToListButton={false} editable={true} selectButton={false}/>
         </div>
 
     )
 }
 
-export default MngDocNoPattern
+export default MngDoc

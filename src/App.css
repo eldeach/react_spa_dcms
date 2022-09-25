@@ -180,3 +180,24 @@ h1{
     font-size: 0.6vw;
   }
   
+
+  .seperate-paper{
+    width:30vw;
+    min-width : 300px;
+    height:440px;
+    padding:20px;
+    margin:0.5vw;
+    overflow-y:auto;
+    box-sizing:border-box
+  }
+
+  .incell-div-value{
+    color:white;
+    background-color: darkcyan;
+    border-radius: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    word-break:break-all
+  }

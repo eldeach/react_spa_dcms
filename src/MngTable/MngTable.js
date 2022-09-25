@@ -3,8 +3,8 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 //========================================================== Material UI 라이브러리 import
-import { DataGrid, GridToolbar, GridExportCsvOptions, GridToolbarExport } from '@mui/x-data-grid';
-import {Box,TextField,Button,Paper, Modal, Divider} from '@mui/material/';
+import { DataGrid, GridToolbarExport } from '@mui/x-data-grid';
+import {PropTypes, Box,TextField,Button,Paper, Modal, Divider, Typography, Stack, Tooltip , CircularProgress, Backdrop} from '@mui/material/';
 //---------------------------------------------------------- Material Icons
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -14,8 +14,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import CheckIcon from '@mui/icons-material/Check';
-import Backdrop from '@mui/material/Backdrop';
-import CircularProgress from '@mui/material/CircularProgress';
 //========================================================== Formik & Yup 라이브러리 import
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -31,6 +29,9 @@ import { useDispatch, useSelector } from "react-redux"
 import { setSel_tb_user,setSel_doc_pattern, setSel_doc_pattern_cols, setLoginExpireTime, setSel_doc_no, setSelTmmsWholeAsset, setSelSapZmmr1010, setSelEqmsAtemplate } from "./../store.js"
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
 import LoginSessionCheck from './../Account/LoginSessionCheck.js';
+import { COLUMNS_DIMENSION_PROPERTIES } from '@mui/x-data-grid/hooks/features/columns/gridColumnsUtils.js';
+import { DisplaySettingsSharp } from '@mui/icons-material';
+import { display } from '@mui/system';
 
 function MngTable(props) {
 //========================================================== [Backdrop] 모달 열기/닫기 및 스타일 정의
@@ -111,16 +112,15 @@ function MngTable(props) {
 
   //========================================================== [함수][테이블] 검색어 없는 상태로 조회하여 컬럼, 행 데이터 state에 저장
   async function InitializeTbl (){
-    setOpenBackDrop(true)
     let tempData = await InitialQry({searchKeyWord : ""})
     setCols(tempData.tempCol)
     setRows(tempData.tempRow)
-    setOpenBackDrop(false)
   }
 
   //========================================================== [함수][테이블] 서버 데이터 조회하여 컬럼 및 행 데이터 생성해줌
   //(테이블 폼에서 검색어 반영기능 포함, get ajax url은 props로 받고 이에 따라 요청 param도 가변)
-  async function InitialQry(para){ 
+  async function InitialQry(para){
+    setOpenBackDrop(true) 
     let allParams={}
     // get URL 및 params 가변 코드 라인 시작
     if (props.getUrlStr=="/edituserauth_getuserauth")
@@ -211,6 +211,13 @@ function MngTable(props) {
       }
     }
 
+    else if(props.getUrlStr=="/getmngdoc")
+    {
+      allParams={
+        searchKeyWord : para.searchKeyWord,
+      }
+    }
+
     let ajaxData = await axios({
       method:"get",
       url:props.getUrlStr,
@@ -223,7 +230,7 @@ function MngTable(props) {
       })
       .catch((err)=>console.log(err))
     // get URL 및 params 가변 코드 라인 끝
-
+    
     let tempCol=[]
     let tempRow =[]
     
@@ -240,8 +247,88 @@ function MngTable(props) {
           if(columName=="uuid_binary") tempMinWidth= 200
           if(columName=="doc_no") tempMinWidth= 200
           if(columName=="req_purpose") tempMinWidth= 300
+
           if(columName=="pr_title") tempMinWidth= 300
-          tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1})
+          if(columName=="create_datetime") tempMinWidth= 200
+          if(columName=="due_date") tempMinWidth= 200
+          if(columName=="date_closed") tempMinWidth= 200
+          if(columName=="written_by") tempMinWidth= 100
+
+          if(columName=="doc_title") tempMinWidth= 400
+          
+          if(columName=="eq_name") tempMinWidth= 200
+          if(columName=="eq_team") tempMinWidth= 200
+          if(columName=="eq_part") tempMinWidth= 200
+          if(columName=="eq_capa") tempMinWidth= 200
+          if(columName=="eq_location") tempMinWidth= 240
+
+          if(columName=="mat_name") tempMinWidth= 300
+
+          if(columName=="qualAtt") tempMinWidth= 400
+          if(columName=="valAtt") tempMinWidth= 400
+          if(columName=="eqAtt") tempMinWidth= 400
+          if(columName=="prodAtt") tempMinWidth= 400
+          if(columName=="eqmsAtt") tempMinWidth= 400
+          if(columName=="relateddoc") tempMinWidth= 400
+
+
+          if (columName=="qualAtt"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <Stack spacing={0.5}>{
+                JSON.parse(params.value).map((oneItem,i)=>{
+                  return <Typography variant="caption" className='incell-div-value'>{oneItem.abb+" : "+oneItem.att_name}</Typography>
+                })
+              }</Stack>
+            )})
+          }
+          else if (columName=="valAtt"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <Stack spacing={0.5}>{
+                JSON.parse(params.value).map((oneItem,i)=>{
+                  return <Typography variant="caption" className='incell-div-value'>{oneItem.abb+" : "+oneItem.att_name}</Typography>
+                })
+              }</Stack>
+            )})
+          }
+          else if (columName=="eqAtt"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <Stack spacing={0.5}>{
+                JSON.parse(params.value).map((oneItem,i)=>{
+                  return <Typography variant="caption" className='incell-div-value'>{oneItem.eq_name+" ("+oneItem.eq_code+" / "+ oneItem.eq_code_alt+")"}</Typography>
+                })
+              }</Stack>
+            )})
+          }
+          else if (columName=="prodAtt"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, display:'flex', flexWrap:'warp', renderCell: (params) => (
+              <Stack spacing={0.5}>{
+              JSON.parse(params.value).map((oneItem,i)=>{
+                return <Typography variant="caption" className='incell-div-value'>{oneItem.mat_code+" ("+oneItem.mat_name+")"}</Typography>
+              })
+            }</Stack>
+            )})
+          }
+          else if (columName=="eqmsAtt"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <div style={{display:'flex', flexWrap:'wrap'}}>{
+                JSON.parse(params.value).map((oneItem,i)=>{
+                  return <Tooltip title={oneItem.project+": "+oneItem.pr_title} arrow><Typography variant="caption" className='incell-div-value'>{oneItem.pr_no}</Typography></Tooltip>
+                })
+              }</div>
+            )})
+          }
+          else if (columName=="relateddoc"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <Stack spacing={0.5}>{
+                JSON.parse(params.value).map((oneItem,i)=>{
+                  return <Typography variant="caption" className='incell-div-value'>{oneItem.docNo+"("+oneItem.revNo+") (Relation: "+oneItem.relation+")"}</Typography>
+                })
+              }</Stack>
+            )})
+          }
+          else{
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1})
+          }
         })
 
         if (props.editable){
@@ -292,6 +379,20 @@ function MngTable(props) {
                   </Button>
                 )
               }
+              else if(props.getUrlStr=="/getmngdoc"){
+                return (
+                  <Button
+                    variant="contained"
+                    onClick={(event) => {
+                      navigate('/editdoc',{state: {
+                        rowObj: cellValues.row,
+                      },})
+                    }}
+                  >
+                    <EditIcon fontSize="small"/>
+                  </Button>
+                )
+              }
             }
           })
         }
@@ -306,10 +407,27 @@ function MngTable(props) {
             if (tempObjs["insert_datetime"]=="1970-01-01 09:00:00") tempObjs["insert_datetime"]=""
             if (tempObjs["update_datetime"]=="1970-01-01 09:00:00") tempObjs["update_datetime"]=""
 
+
+            tempObjs["create_datetime"] = moment(new Date(tempObjs["create_datetime"])).format('YYYY-MM-DD HH:mm:ss');
+            tempObjs["date_closed"] = moment(new Date(tempObjs["date_closed"])).format('YYYY-MM-DD HH:mm:ss');
+            tempObjs["due_date"] = moment(new Date(tempObjs["due_date"])).format('YYYY-MM-DD');
+
+            if (tempObjs["create_datetime"]=="1970-01-01 09:00:00") tempObjs["create_datetime"]=""
+            if (tempObjs["date_closed"]=="1970-01-01 09:00:00") tempObjs["date_closed"]=""
+            if (tempObjs["due_date"]=="1970-01-01") tempObjs["due_date"]=""
+
+
+            tempObjs["approval_date"] = moment(new Date(tempObjs["approval_date"])).format('YYYY-MM-DD');
+            tempObjs["invalid_date"] = moment(new Date(tempObjs["invalid_date"])).format('YYYY-MM-DD');
+
+            if (tempObjs["approval_date"]=="1970-01-01") tempObjs["approval_date"]=""
+            if (tempObjs["invalid_date"]=="1970-01-01") tempObjs["invalid_date"]=""
+
             tempRow.push(tempObjs)
         })
       }
       // 컬럼 및 행 데이터 분류 종료
+      setOpenBackDrop(false)
     }
 
 
@@ -328,7 +446,6 @@ function MngTable(props) {
       <Formik
         validationSchema={schema}
         onSubmit={async (values, {resetForm})=>{
-          setOpenBackDrop(true)
           let para = {
             searchKeyWord: values.searchKeyWord,
           }
@@ -338,7 +455,6 @@ function MngTable(props) {
           setRows(tempData.tempRow)
           resetForm()
           setIsSubmitting(false);
-          setOpenBackDrop(false)
           // LoginCheck()
         }}
         initialValues={{
@@ -359,16 +475,13 @@ function MngTable(props) {
           <Box
           id={props.getUrlStr}
           component="form"
-          // sx={{
-          //   '& .MuiTextField-root': { m: 1, width: '25ch' },
-          // }}
-          sx={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent:'center' }}
+          style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent:'center' }}
           noValidate
           onSubmit={handleSubmit}
           autoComplete="off"
           >
             <TextField
-              style={{width:'30%'}}
+              style={{width:'300px'}}
               required
               variant="standard"
               id="searchKeyWord"
@@ -382,7 +495,7 @@ function MngTable(props) {
               margin="dense"
               fullWidth
             />
-            <div style={{display:'flex', marginTop:'5px',alignItems:'center'}}>
+            <div style={{display:'flex', marginTop:'4px',marginBottom:'4px',alignItems:'center'}}>
               <Button style={{marginLeft:'5px'}} size="small" variant="contained" type="submit" form={props.getUrlStr} disabled={isSubmitting}><SearchIcon/></Button>
               <Button style={{marginLeft:'5px'}} size="small" variant="outlined" type="reset" disabled={isResetting} onClick={async ()=>{
                 setIsResetting(true)
@@ -458,9 +571,11 @@ function MngTable(props) {
                   else if(props.getUrlStr=="/adddoc_getmngdocno"){
                     if(pickRows.length==1){
                       let tempRow = pickRows[0]
-                      if(!tempRow.last_rev_no) tempRow.last_rev_no=parseInt(pickRows[0].start_rev_no)
-                      else tempRow.last_rev_no= parseInt(tempRow.last_rev_no)+1
-                      dispatch(setSel_doc_no(tempRow))
+                      let newRevNo
+                      if(!tempRow.last_rev_no&&tempRow.last_rev_no!=0) newRevNo=parseInt(pickRows[0].start_rev_no)
+                      else newRevNo=(parseInt(tempRow.last_rev_no)+1)
+                      console.log(newRevNo)
+                      dispatch(setSel_doc_no({doc_no:tempRow.doc_no, newRevNo:newRevNo}))
                       
                     }
                     else
@@ -514,7 +629,7 @@ function MngTable(props) {
                           if(oneItem.pr_no == onePick.pr_no) dupCheck = true
                         })
                       }
-                      if (!dupCheck) selRows.push({pr_no:onePick.pr_no, pr_title:onePick.pr_title })
+                      if (!dupCheck) selRows.push({pr_no:onePick.pr_no, project:onePick.project, pr_title:onePick.pr_title })
                     })
                     
                     temp.push.apply(temp, selRows)
@@ -532,49 +647,45 @@ function MngTable(props) {
       )}
       </Formik>
   {/* 테이블 폼 및 선택된 Row를 pickRows state에 저장할 수 있음 */}
-      <div style={{ height: props.heightValue, width: '100%' }}>
-        <div style={{ display: 'flex', height: '100%' }}>
-          <div style={{ flexGrow: 1 }}>
-              <DataGrid
-                rows={rows}
-                columns={cols}
-                pageSize={pageSize}
-                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                rowsPerPageOptions={[1, 10, 20]}
-                pagination
-                checkboxSelection = {props.chkSel}
-                getRowHeight={() => rowHtAuto?'auto':''}
-                components={{ Toolbar:CustomToolbar}}
-                onCellClick={(GridCellParams,event)=>{
-                  setClickRow(clickRow=>GridCellParams.id)
-                }}
-                onSelectionModelChange={(selectionModel,details)=>{
-                  if(props.getUrlStr=="/adddocno_getmngdocnopattern"){
-                    let forceSelect=[]
-                    selectionModel.map((oneRowId,i)=>{
-                      rows.map((oneRow,j)=>{
-                        if(oneRow.pattern_pair_code ==rows[oneRowId-1].pattern_pair_code){
-                          forceSelect.push(oneRow.id)
-                        }
-                      })
-                    })
-
-                    forceSelect.map((oneItem,i)=>{
-                      if(selectionModel.indexOf(oneItem)==(-1)){
-                        selectionModel.push(oneItem)
-                      }
-                    })
-                  }
-                  let tempPickRow=[]
-                  selectionModel.map((oneRowId,i)=>{
-                    tempPickRow.push(rows[oneRowId-1])
+      <div style={{ flexGrow: 1, display: 'flex', height: props.heightValue }}>
+          <DataGrid
+            rows={rows}
+            columns={cols}
+            pageSize={pageSize}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            rowsPerPageOptions={[1, 10, 20]}
+            pagination
+            checkboxSelection = {props.chkSel}
+            getRowHeight={() => rowHtAuto?'auto':''}
+            components={{ Toolbar:CustomToolbar}}
+            onCellClick={(GridCellParams,event)=>{
+              setClickRow(clickRow=>GridCellParams.id)
+            }}
+            onSelectionModelChange={(selectionModel,details)=>{
+              if(props.getUrlStr=="/adddocno_getmngdocnopattern"){
+                let forceSelect=[]
+                selectionModel.map((oneRowId,i)=>{
+                  rows.map((oneRow,j)=>{
+                    if(oneRow.pattern_pair_code ==rows[oneRowId-1].pattern_pair_code){
+                      forceSelect.push(oneRow.id)
+                    }
                   })
-                  setPickRows(tempPickRow)
-                }}
-              />
-          </div>
-        </div> 
-      </div>
+                })
+
+                forceSelect.map((oneItem,i)=>{
+                  if(selectionModel.indexOf(oneItem)==(-1)){
+                    selectionModel.push(oneItem)
+                  }
+                })
+              }
+              let tempPickRow=[]
+              selectionModel.map((oneRowId,i)=>{
+                tempPickRow.push(rows[oneRowId-1])
+              })
+              setPickRows(tempPickRow)
+            }}
+          />
+        </div>
       {/* 전자서명 및 데이터 핸들링 Modal, 테이블과 같은 컴포넌트 아래 있어야 Row 데이터와 props로 전달받은 pk등 데이터를 ajax func에 전달 할 수 있음*/}
       <Modal open={openModal} onClose={handleModalClose}>
         <Paper style={modalStyle} elevation={5}>

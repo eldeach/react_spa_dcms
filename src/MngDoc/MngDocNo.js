@@ -40,7 +40,7 @@ useEffect(() => {
 
     return(
         <div>
-            <MngTable getUrlStr={'/getmngdocno'} targetPk={{}} heightValue={'76vh'} tblCtrl={tblCtrl} chkSel={true} deleteButton={true} addToListButton={false} editable={true} selectButton={false}/>
+            <MngTable getUrlStr={'/getmngdocno'} targetPk={{}} heightValue={'80vh'} tblCtrl={tblCtrl} chkSel={true} deleteButton={true} addToListButton={false} editable={true} selectButton={false}/>
         </div>
 
     )

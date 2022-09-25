@@ -37,6 +37,7 @@ import MngUserAuth from './Auth/MngUserAuth';
 import AddDocNo from './MngDoc/AddDocNo'
 import MngDocNo from './MngDoc/MngDocNo'
 import AddDoc from './MngDoc/AddDoc'
+import MngDoc from './MngDoc/MngDoc'
 import AddDocNoPattern from './MngDoc/AddDocNoPattern'
 import MngDocNoPattern from './MngDoc/MngDocNoPattern'
 
@@ -202,7 +203,7 @@ function App() {
         <ListItem disablePadding>
           <ListItemButton onClick={()=>{
             LoginCheck()
-            navigate("/mngdocno")
+            navigate("/mngdoc")
             }}>
             <ListItemIcon>
               <InventoryIcon /> 
@@ -385,6 +386,8 @@ function App() {
             <Route path='/editdocno' element={ <div>editdocno</div> }/>
 
             <Route path='/adddoc' element={<AddDoc/>}/>
+            <Route path='/mngdoc' element={ <MngDoc/> }/>
+            <Route path='/editdoc' element={ <div>editdoc</div> }/>
             
             <Route path='/audittrail' element={ <AuditTrail/> }/>
             

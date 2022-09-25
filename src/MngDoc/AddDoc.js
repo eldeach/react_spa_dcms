@@ -4,28 +4,22 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import {  useNavigate } from 'react-router-dom';
 //========================================================== Material UI 라이브러리 import
-import {PropTypes, Autocomplete, TextField, IconButton,ListItemAvatar,Avatar, Tabs, Tab, Box, Typography, Chip, Button, Stack, Paper,Divider,Modal, Checkbox, ListItemIcon, ListItemText, ListItem, CardHeader, Card, List, Grid} from '@mui/material/';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import {PropTypes, Autocomplete, Checkbox, FormControlLabel, TextField, IconButton, Box, Typography, Chip, Button, Stack, Paper,Divider,Modal, ListItemIcon, ListItemText, ListItem, List } from '@mui/material/';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import PostAddIcon from '@mui/icons-material/PostAdd';
-import FolderIcon from '@mui/icons-material/Folder';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
-import BottomNavigation from '@mui/material/BottomNavigation';
-import BottomNavigationAction from '@mui/material/BottomNavigationAction';
-import RestoreIcon from '@mui/icons-material/Restore';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
+//========================================================== Moment 라이브러리 import
+import moment from 'moment';
+import 'moment/locale/ko';	//대한민국
 //========================================================== cookie 라이브러리 import
 import cookies from 'react-cookies'
 //========================================================== Slide Popup 컴포넌트 & Redux import
 import { useDispatch, useSelector } from "react-redux"
-import { setSel_tb_user,setLoginExpireTime, setSelTmmsWholeAsset, setSelSapZmmr1010, setSelEqmsAtemplate } from "./../store.js"
+import { setSel_tb_user,setLoginExpireTime, setSel_doc_no, setSelTmmsWholeAsset, setSelSapZmmr1010, setSelEqmsAtemplate } from "./../store.js"
 //========================================================== MngTable 컴포넌트 import
 import MngTable from './../MngTable/MngTable'
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
@@ -33,6 +27,8 @@ import LoginSessionCheck from './../Account/LoginSessionCheck.js';
 //========================================================== Formik & Yup 라이브러리 import
 import { Formik } from 'formik';
 import * as yup from 'yup';
+//========================================================== axios 라이브러리 import
+import axios from 'axios';
 
 function AddDoc() {
 
@@ -92,7 +88,7 @@ function AddDoc() {
 
       //========================================================== Formik & yup Validation schema
   const schema = yup.object().shape({
-    title: yup.string()
+    doc_title: yup.string()
     .required('문서제목을 입력해주세요.')
     .test(
         'title_return',
@@ -154,8 +150,8 @@ function AddDoc() {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '60vw',
-    height:'80vh',
+    width: '90vw',
+    height:'90vh',
     overflow:'auto',
     padding:'20px'
   };
@@ -178,9 +174,12 @@ function AddDoc() {
     // 이 페이지의 권한 유무 확인
     authCheck()
 
-    //유저 선택 redux 초기화
+    //redux 값 초기화
+    dispatch(setSel_doc_no({}))
     dispatch(setSel_tb_user({}))
     dispatch(setSelTmmsWholeAsset([]))
+    dispatch(setSelSapZmmr1010([]))
+    dispatch(setSelEqmsAtemplate([]))
   },[]);
 
   async function LoginCheck(){
@@ -212,47 +211,61 @@ function AddDoc() {
     }
   }
 
+  async function postAddDoc(qryBody){
+    let ajaxData = await axios.post("/postAddDoc",qryBody)
+    .then((res)=>res.data)
+    .catch((err)=>{
+      console.log(err)
+    })
+
+    if(ajaxData.success) return ajaxData.result
+    else alert(ajaxData)
+  }
+
   return (
-    <div style={{padding:'1vw'}}>
+    <div style={{padding:'0.5vw'}}>
         <Formik
         validationSchema={schema}
         onSubmit={async (values, {resetForm})=>{
-            // let qryBody = {
-            //     doc_no:rdx.sel_doc_pattern,
-            //     rev_no:values.req_purpose,
-            //     title:values.title,
-            //     written_by:rdx.sel_tb_user.user_account,
-            //     written_by_team:rdx.sel_tb_user.user_team,
-            //     approval_date:"2022-10-10",
-            //     invalid_date:"2022-10-10",
-            //     qualAtt: qualAtt,
-            //     valAtt: valAtt,
-            //     eqAtt: rdx.selTmmsWholeAsset,
-            //     prodAtt: rdx.selSapZmmr1010,
-            //     eqmsAtt: rdx.selEqmsAtemplate,
-            //     isprotocol: false,
-            //     relateddoc: [{docNo:"22-OQP-001",revNo:"00",relation:"protocol"}],
-            //     remark:values.remark,                
-            //     insert_by:cookies.load('userInfo').user_account
-            // }
+            let isProtocolStr=""
+            if(values.isprotocol) isProtocolStr="isprotocol"
+            let qryBody = {
+                doc_no:rdx.sel_doc_no.doc_no,
+                rev_no:rdx.sel_doc_no.newRevNo,
+                doc_title:values.doc_title,
+                written_by:rdx.sel_tb_user.user_account,
+                written_by_team:rdx.sel_tb_user.user_team,
+                approval_date:moment(new Date(appDate)).format('YYYY-MM-DD'),
+                invalid_date:moment(new Date(invDate)).format('YYYY-MM-DD'),
+                qualAtt: JSON.stringify(qualAtt),
+                valAtt: JSON.stringify(valAtt),
+                eqAtt: JSON.stringify(rdx.selTmmsWholeAsset),
+                prodAtt: JSON.stringify(rdx.selSapZmmr1010),
+                eqmsAtt: JSON.stringify(rdx.selEqmsAtemplate),
+                isprotocol: isProtocolStr,
+                relateddoc: JSON.stringify([{docNo:"22-OQP-001",revNo:"00",relation:"protocol"}]),
+                remark:values.remark,
+                insert_by:cookies.load('userInfo').user_account
+            }
             setIsSubmitting(true);
-            // if(qryBody.pattenrs.length>0 && qryBody.req_user.length>0 ){
-            // let ajaxData = await postAddDocNo(qryBody)
-            // alert("발번된 문서번호는 다음과 같습니다. \n" + ajaxData)
-            // dispatch(setSel_tb_user({}))
-            // dispatch(setSel_doc_pattern([]))
-            // resetForm()
-            // }
-            // else{
-            // alert("요청자와 문서번호 패턴이 선택되어야 합니다.")
-            // }
+            let ajaxData = await postAddDoc(qryBody)
+            console.log(ajaxData)
+
+            resetForm()
+            setValAttFiled([])
+            setValAtt([])
+            dispatch(setSel_doc_no({}))
+            dispatch(setSel_tb_user({}))
+            dispatch(setSelTmmsWholeAsset([]))
+            dispatch(setSelSapZmmr1010([]))
+            dispatch(setSelEqmsAtemplate([]))
+
             setIsSubmitting(false);
             LoginCheck()
         }}
         initialValues={{
-            title:'',
-            approval_date:'', 
-            invalid_date: '',
+            isprotocol:false,
+            doc_title:'',
             remark:''
         }}
         >
@@ -275,7 +288,7 @@ function AddDoc() {
             autoComplete="off"
             >
                 <div style={{width:'100%', display:'flex', flexWrap:'wrap', justifyContent:'center'}}>
-                    <Paper style={{width:'30vw', minWidth : '300px', height:'360px', padding:'10px', margin:'0.5vw', overflowY:'auto', boxSizing:'border-box'}} elevation={3}>   
+                    <Paper className="seperate-paper" elevation={3}>   
                         <Stack spacing={2}>
                             <Button size="small" variant="contained" onClick={()=>{
                             setPopUpPage(0)
@@ -289,46 +302,53 @@ function AddDoc() {
                             </Stack>
                             <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
                                 <Chip label="개정번호" color="primary"/>
-                                <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{rdx.sel_doc_no.last_rev_no}</div></div>
+                                <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{rdx.sel_doc_no.newRevNo}</div></div>
                             </Stack>
+                            <div style={{height:"10px"}}/>
                             <Button size="small" variant="contained" onClick={()=>{
                             setPopUpPage(4) 
                             setModalTitle("요창자 선택")
                             handleModalOpen()
                             LoginCheck()
-                            }}>요청자 선택</Button>
-
+                            }}>작성자 선택</Button>
                             <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
                                 <Chip label="작성자" color="primary"/>
-                                <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{rdx.sel_tb_user.user_account}{
-                                rdx.sel_tb_user.user_name?" ("+rdx.sel_tb_user.user_name+")":""}</div></div>
+                                <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{rdx.sel_tb_user.user_account}{rdx.sel_tb_user.user_name?" ("+rdx.sel_tb_user.user_name+")":""}</div></div>
                             </Stack>
                             <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
                                 <Chip label="작성팀" color="primary"/>
                                 <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{rdx.sel_tb_user.user_team}</div></div>
                             </Stack>
+                            <FormControlLabel control={
+                            <Checkbox
+                            id="isprotocol"
+                            name="isprotocol"
+                            checked={values.isprotocol}
+                            onChange={handleChange}
+                            inputProps={{ 'aria-label': 'controlled' }}
+                            />} label="이 문서는 계획서 입니다." />
                         </Stack>
                     </Paper>
-                    <Paper style={{width:'30vw', minWidth : '300px', height:'360px', padding:'10px', margin:'0.5vw', overflowY:'auto', boxSizing:'border-box'}} elevation={3}>
+                    <Paper className="seperate-paper" elevation={3}>
                         <Stack spacing={2}>
                             <Chip label="문서 승인정보 입력" color="primary"/>
                             <TextField
                             required
                             variant="standard"
-                            id="title"
-                            name="title"
+                            id="doc_title"
+                            name="doc_title"
                             label="Title"
                             multiline
                             rows={2}
-                            value={values.title}
+                            value={values.doc_title}
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            helperText={touched.title ? errors.title : ""}
-                            error={touched.title && Boolean(errors.title)}
+                            helperText={touched.doc_title ? errors.doc_title : ""}
+                            error={touched.doc_title && Boolean(errors.doc_title)}
                             margin="dense"
                             fullWidth
                             />
-                            <div style={{width:'100%',display:'flex', marginTop:'10px'}}>
+                            <div style={{width:'100%',display:'flex', marginTop:'20px'}}>
                                 <div style={{ flexGrow:1, display:'block', marginRight:'10px'}}>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DatePicker
@@ -350,7 +370,7 @@ function AddDoc() {
                                     }}>오늘</Button>
                                 </div>
                             </div>
-                            <div style={{width:'100%',display:'flex', marginTop:'10px'}}>
+                            <div style={{width:'100%',display:'flex', marginTop:'20px'}}>
                                 <div style={{ flexGrow:1, display:'block', marginRight:'10px'}}>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DatePicker
@@ -390,7 +410,7 @@ function AddDoc() {
                             />
                         </Stack>
                     </Paper>
-                    <Paper style={{width:'30vw', minWidth : '300px', height:'360px', padding:'10px', margin:'0.5vw', overflowY:'auto', boxSizing:'border-box'}} elevation={3}>
+                    <Paper className="seperate-paper" elevation={3}>
                         <Stack spacing={2}>
                             <div style={{width:'100%',display:'flex'}}>
                                 <Autocomplete
@@ -417,7 +437,7 @@ function AddDoc() {
                                     }}>추가</Button>
                                 </div>
                             </div>
-                            <div style={{width:'100%', height:'280px', overflowY:'auto', boxSizing:'border-box'}}>
+                            <div style={{width:'100%', height:'300px', overflowY:'auto', boxSizing:'border-box'}}>
                                 <List>
                                     {
                                         valAtt.map((oneAtt,i)=>{
@@ -449,7 +469,7 @@ function AddDoc() {
                             </div>
                         </Stack>
                     </Paper>
-                    <Paper style={{width:'30vw', minWidth : '300px', height:'360px', padding:'10px', margin:'0.5vw', overflowY:'auto', boxSizing:'border-box'}} elevation={3}>
+                    <Paper className="seperate-paper" elevation={3}>
                         <Stack spacing={2}>
                             <div style={{width:'100%',display:'flex'}}>
                                 <Autocomplete
@@ -476,7 +496,7 @@ function AddDoc() {
                                     }}>추가</Button>
                                 </div>
                             </div>
-                            <div style={{width:'100%', height:'280px', overflowY:'auto', boxSizing:'border-box'}}>
+                            <div style={{width:'100%', height:'300px', overflowY:'auto', boxSizing:'border-box'}}>
                                 <List>
                                     {
                                         qualAtt.map((oneAtt,i)=>{
@@ -508,7 +528,7 @@ function AddDoc() {
                             </div>
                         </Stack>
                     </Paper>
-                    <Paper style={{width:'30vw', minWidth : '300px', height:'360px', padding:'10px', margin:'0.5vw', overflowY:'auto', boxSizing:'border-box'}} elevation={3}>
+                    <Paper className="seperate-paper" elevation={3}>
                         <Stack spacing={2}>
                             <Button size="small" variant="contained" onClick={()=>{
                             setPopUpPage(1)
@@ -516,7 +536,7 @@ function AddDoc() {
                             handleModalOpen()
                             LoginCheck()
                             }}>설비선택</Button>
-                            <div style={{width:'100%', height:'280px', overflowY:'auto', boxSizing:'border-box'}}>
+                            <div style={{width:'100%', height:'300px', overflowY:'auto', boxSizing:'border-box'}}>
                                 <List>
                                     {
                                         rdx.selTmmsWholeAsset.map((oneAtt,i)=>{
@@ -545,9 +565,12 @@ function AddDoc() {
                                     }
                                 </List>
                             </div>
+                            <Button size="small" variant="contained" onClick={()=>{
+                                dispatch(setSelTmmsWholeAsset([]))
+                            }}>비우기{" ("+rdx.selTmmsWholeAsset.length+")"}</Button>
                         </Stack>
                     </Paper>
-                    <Paper style={{width:'30vw', minWidth : '300px', height:'360px', padding:'10px', margin:'0.5vw', overflowY:'auto', boxSizing:'border-box'}} elevation={3}>
+                    <Paper className="seperate-paper" elevation={3}>
                         <Stack spacing={2}>
                             <Button size="small" variant="contained" onClick={()=>{
                                 setPopUpPage(2)
@@ -555,7 +578,7 @@ function AddDoc() {
                                 handleModalOpen()
                                 LoginCheck()
                                 }}>제품선택</Button>
-                            <div style={{width:'100%', height:'280px', overflowY:'auto', boxSizing:'border-box'}}>
+                            <div style={{width:'100%', height:'300px', overflowY:'auto', boxSizing:'border-box'}}>
                                 <List>
                                     {
                                         rdx.selSapZmmr1010.map((oneAtt,i)=>{
@@ -585,9 +608,12 @@ function AddDoc() {
                                     }
                                 </List>
                             </div>
+                            <Button size="small" variant="contained" onClick={()=>{
+                                dispatch(setSelSapZmmr1010([]))
+                            }}>비우기{" ("+rdx.selSapZmmr1010.length+")"}</Button>
                         </Stack>
                     </Paper>
-                    <Paper style={{width:'30vw', minWidth : '300px', display:'block', height:'360px', padding:'10px', margin:'0.5vw', overflowY:'auto', boxSizing:'border-box'}} elevation={3}>
+                    <Paper className="seperate-paper" elevation={3}>
                         <Stack spacing={2}>
                             <Button size="small" variant="contained" onClick={()=>{
                                 setPopUpPage(3)
@@ -595,7 +621,7 @@ function AddDoc() {
                                 handleModalOpen()
                                 LoginCheck()
                                 }}>eQMS 모듈 선택</Button>
-                            <div style={{width:'100%', height:'240px', overflowY:'auto', boxSizing:'border-box'}}>
+                            <div style={{width:'100%', height:'300px', overflowY:'auto', boxSizing:'border-box'}}>
                                 <List>
                                     {
                                         rdx.selEqmsAtemplate.map((oneAtt,i)=>{
@@ -617,7 +643,7 @@ function AddDoc() {
                                                 </ListItemIcon>
                                                 <ListItemText
                                                     primary={oneAtt.pr_no}
-                                                    secondary={oneAtt.pr_title}
+                                                    secondary={oneAtt.project + " / " + oneAtt.pr_title}
                                                 />
                                                 </ListItem>
                                             )
@@ -627,15 +653,15 @@ function AddDoc() {
                             </div>
                             <Button size="small" variant="contained" onClick={()=>{
                                 dispatch(setSelEqmsAtemplate([]))
-                                }}>비우기</Button>
+                            }}>비우기{" ("+rdx.selEqmsAtemplate.length+")"}</Button>
                         </Stack>
                     </Paper>
                 </div>
-                <div style={{height:'48px'}}>Page controller is here</div>
+                <div style={{height:'48px'}}/>
                 <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding:'10px' }} elevation={6}>
                     <div style={{width:'100%', display:'flex', alignItems:'center', backdropFilter:'blur(10px)'}}>
                         <PostAddIcon color="primary"/>
-                        <div style={{flexGrow:1, fontWeight:'bold', marginLeft:'4px'}}>문서추가</div>
+                        <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>문서추가</Typography>
                         <Button size="small" variant="contained" type="submit" form="postAddDoc" disabled={isSubmitting}>Submit</Button>
                         <Button style={{marginLeft:'1vw'}} size="small" variant="contained" onClick={async ()=>{
                         LoginCheck()
@@ -662,16 +688,14 @@ function AddDoc() {
                     </div>
                 </div>
                 <Divider style={{marginTop:'5px',marginBottom:'10px'}}/>
-                <div style={{display:'block', height:'550px', overflow:"auto"}}>
-                    {
-                        popUpPage==0?<MngTable getUrlStr={'/adddoc_getmngdocno'} targetPk={{}} heightValue={480} tblCtrl={true} chkSel={false} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
-                        popUpPage==1?<MngTable getUrlStr={'/adddoc_getextdatatmmswholeasset'} targetPk={{}} heightValue={480} tblCtrl={true} chkSel={true} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
-                        popUpPage==2?<MngTable getUrlStr={'/adddoc_getextdatasapzmmr1010'} targetPk={{}} heightValue={480} tblCtrl={true} chkSel={true} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
-                        popUpPage==3?<MngTable getUrlStr={'/adddoc_getextdataeqmsatemplate'} targetPk={{}} heightValue={480} tblCtrl={true} chkSel={true} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
-                        popUpPage==4?<MngTable getUrlStr={'/edituserauth_getuser'} targetPk={{}} heightValue={480} tblCtrl={true} chkSel={false} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
-                        <div></div>
-                    }                    
-                </div>
+                {
+                    popUpPage==0?<MngTable getUrlStr={'/adddoc_getmngdocno'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={false} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
+                    popUpPage==1?<MngTable getUrlStr={'/adddoc_getextdatatmmswholeasset'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={true} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
+                    popUpPage==2?<MngTable getUrlStr={'/adddoc_getextdatasapzmmr1010'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={true} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
+                    popUpPage==3?<MngTable getUrlStr={'/adddoc_getextdataeqmsatemplate'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={true} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
+                    popUpPage==4?<MngTable getUrlStr={'/edituserauth_getuser'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={false} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
+                    <div></div>
+                }                    
                 </div>
             </Paper>
         </Modal>
