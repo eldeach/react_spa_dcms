@@ -67,7 +67,7 @@ function LoginTimer(){
   }
 
   return(
-      <Chip label={"Login Expire in "+minutes+":"+seconds} size="small" color="loginTimer" variant="outlined"/>
+      <Chip label={minutes+":"+seconds} size="small" color="loginTimer" variant="outlined"/>
   )
 }
 

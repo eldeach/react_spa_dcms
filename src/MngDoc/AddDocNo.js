@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import {  useNavigate } from 'react-router-dom';
 //========================================================== Material UI 라이브러리 import
-import {PropTypes, Tabs, Tab, TextField, Box, Typography, Chip, Button, Stack, Paper,Divider,Modal, Checkbox, ListItemIcon, ListItemText, ListItem, CardHeader, Card, List, Grid} from '@mui/material/';
+import {PropTypes, Tabs, Tab, Alert, TextField, Box, Typography, Chip, Button, Stack, Paper,Divider,Modal, Checkbox, ListItemIcon, ListItemText, ListItem, CardHeader, Card, List, Grid} from '@mui/material/';
 import { DataGrid, GridToolbar, GridExportCsvOptions, GridToolbarExport } from '@mui/x-data-grid';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -140,7 +140,8 @@ function AddDocNo() {
             }
             setIsSubmitting(true);
             if(qryBody.pattenrs.length>0 && qryBody.req_user.length>0 ){
-              await postAddDocNo(qryBody)
+              let ajaxData = await postAddDocNo(qryBody)
+              alert("발번된 문서번호는 다음과 같습니다. \n" + ajaxData)
               dispatch(setSel_tb_user({}))
               dispatch(setSel_doc_pattern([]))
               resetForm()

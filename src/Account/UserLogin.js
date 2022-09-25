@@ -108,7 +108,7 @@ function UserLogin() {
           isValid,
           errors,
         })=>(
-            <div style={{alignItems:"center", textAlign:"center"}}>
+            <div style={{width:'48vw', minWidth : '300px', padding:'10px', margin:'1vw', overflowY:'auto', boxSizing:'border-box', alignItems:"center", textAlign:"center"}}>
                 <div style={{height: "40px"}}></div>
                 <div style={{fontSize: "100px"}}><LockIcon fontSize ="inherit" color="primary"/></div>
                 <div style={{fontSize: "40px"}}>LOGIN</div>
@@ -120,7 +120,8 @@ function UserLogin() {
                     // sx={{
                     //   '& .MuiTextField-root': { m: 1, width: '25ch' },
                     // }}
-                    sx={{ width: 500, display: 'flex', flexWrap: 'wrap' }}
+                    //
+                    sx={{ width: '100%', display: 'flex', flexWrap: 'wrap' }}
                     noValidate
                     onSubmit={handleSubmit}
                     autoComplete="off"

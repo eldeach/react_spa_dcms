@@ -35,10 +35,14 @@ import EditAccount from './Account/EditAccount';
 import MngUserAuth from './Auth/MngUserAuth';
 
 import AddDocNo from './MngDoc/AddDocNo'
+import MngDocNo from './MngDoc/MngDocNo'
+import AddDoc from './MngDoc/AddDoc'
 import AddDocNoPattern from './MngDoc/AddDocNoPattern'
 import MngDocNoPattern from './MngDoc/MngDocNoPattern'
 
-import AuditTrail from './AuditTrail/AuditTrail'
+import AuditTrail from './SystemPage/AuditTrail'
+import ImportTmmsWholeAsset from './ExtData/ImportTmmsWholeAsset'
+import ExtDataImport from './ExtData/ExtDataImport'
 import MyPage from './Account/MyPage';
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
 import LoginSessionCheck from './Account/LoginSessionCheck.js';
@@ -47,6 +51,9 @@ import LoginTimer from './Account/LoginTimer';
 import { BrowserView, MobileView } from 'react-device-detect';
 
 import { createTheme , ThemeProvider} from '@mui/material/styles';
+import { RedoSharp } from '@mui/icons-material';
+
+
 
 
 const theme = createTheme({
@@ -206,12 +213,12 @@ function App() {
         <ListItem disablePadding>
           <ListItemButton onClick={()=>{
             LoginCheck()
-            navigate("/mngdocno")
+            navigate("/adddoc")
             }}>
             <ListItemIcon>
-              <InsertLinkIcon /> 
+              <PostAddIcon /> 
             </ListItemIcon>
-            <ListItemText primary={"문서 관계 관리"} />
+            <ListItemText primary={"문서 추가"} />
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
@@ -276,6 +283,31 @@ function App() {
           </ListItemButton>
         </ListItem>
       </List>
+      <Divider />
+      <List>
+        <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/importtmmswholeasset")
+            }}>
+            <ListItemIcon>
+              <ManageSearchIcon /> 
+            </ListItemIcon>
+            <ListItemText primary={"Ext. TMMS DATA"} />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/extdataimport")
+            }}>
+            <ListItemIcon>
+              <ManageSearchIcon /> 
+            </ListItemIcon>
+            <ListItemText primary={"Ext. Data Import"} />
+          </ListItemButton>
+        </ListItem>
+      </List>
     </Box>
   );
 
@@ -302,14 +334,15 @@ function App() {
                   >
                     {list(anchor)}
                   </Drawer>
-
-                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                  DCMS
-                </Typography>
-
+                  {/* <div style={{fontWeight:'bold', flexGrow: 1, overflow:'hidden'}}>DCMS</div> */}
+                  <Typography variant="h6" component="div" sx={{ flexGrow: 1, overflow:'hidden' }}>
+                    DCMS
+                  </Typography>
                 {
                   cookies.load('loginStat') ? 
-                  <LoginTimer/>
+                  <div style={{marginLeft:'6px' }}>
+                    <LoginTimer/>
+                  </div>
                   :null
                 }
                 {
@@ -319,7 +352,6 @@ function App() {
                   }}>Extend Login</Button>
                   :null
                 }
-                
                 <Button style={{marginLeft:'6px'}} size="small" color="inherit" onClick={()=>{
                   axios.get("/logout")
                   .then((res)=>{
@@ -343,12 +375,22 @@ function App() {
             <Route path='/mngaccount' element={<MngAccount/>}/>
             <Route path='/editaccount' element={<EditAccount/>}/>
             <Route path='/mnguserauth' element={<MngUserAuth/>}/>
+
             <Route path='/adddocnopattern' element={ <AddDocNoPattern/>  }/>
             <Route path='/mngdocnopattern' element={ <MngDocNoPattern/> }/>
             <Route path='/editdocnopattern' element={ <div>editdocnopattern</div> }/>
+
             <Route path='/adddocno' element={ <AddDocNo/> }/>
-            <Route path='/mngdocno' element={ <div>mngdocno</div> }/>
+            <Route path='/mngdocno' element={ <MngDocNo/> }/>
+            <Route path='/editdocno' element={ <div>editdocno</div> }/>
+
+            <Route path='/adddoc' element={<AddDoc/>}/>
+            
             <Route path='/audittrail' element={ <AuditTrail/> }/>
+            
+            <Route path='/importtmmswholeasset' element={ <ImportTmmsWholeAsset/> }/>
+            <Route path='/extdataimport' element={ <ExtDataImport/> }/>
+
             <Route path='/mypage' element={ <MyPage />}/>
             <Route path='/userlogin' element={<UserLogin/>}/>
             <Route path='/login' element={<UserLogin/>}/>

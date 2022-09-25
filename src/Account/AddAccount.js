@@ -17,7 +17,7 @@ import axios from 'axios';
 import cookies from 'react-cookies'
 //========================================================== Slide Popup 컴포넌트 & Redux import
 import { useDispatch, useSelector } from "react-redux"
-import { setLoginExpireTime } from "./../store.js"
+import { setLoginExpireTime, setFuncTitle } from "./../store.js"
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
 import LoginSessionCheck from './LoginSessionCheck.js';
 

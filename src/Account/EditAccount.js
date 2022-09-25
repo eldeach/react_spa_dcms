@@ -50,6 +50,7 @@ function EditAccount() {
   //========================================================== [ADD form에서 추가] 수정할 row Oject state 넘겨받기 위한 코드
   const location = useLocation();
   const targetRowObj= (!location.state ? "N/A" : location.state.rowObj)
+  console.log(location.state.rowObj)
 
   //========================================================== useEffect 코드
   useEffect(() => {

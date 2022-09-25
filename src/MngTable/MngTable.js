@@ -28,7 +28,7 @@ import moment from 'moment';
 import 'moment/locale/ko';	//대한민국
 //========================================================== Redux import
 import { useDispatch, useSelector } from "react-redux"
-import { setSel_tb_user,setSel_doc_pattern, setSel_doc_pattern_cols, setLoginExpireTime} from "./../store.js"
+import { setSel_tb_user,setSel_doc_pattern, setSel_doc_pattern_cols, setLoginExpireTime, setSel_doc_no, setSelTmmsWholeAsset, setSelSapZmmr1010, setSelEqmsAtemplate } from "./../store.js"
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
 import LoginSessionCheck from './../Account/LoginSessionCheck.js';
 
@@ -111,9 +111,11 @@ function MngTable(props) {
 
   //========================================================== [함수][테이블] 검색어 없는 상태로 조회하여 컬럼, 행 데이터 state에 저장
   async function InitializeTbl (){
+    setOpenBackDrop(true)
     let tempData = await InitialQry({searchKeyWord : ""})
     setCols(tempData.tempCol)
     setRows(tempData.tempRow)
+    setOpenBackDrop(false)
   }
 
   //========================================================== [함수][테이블] 서버 데이터 조회하여 컬럼 및 행 데이터 생성해줌
@@ -167,6 +169,47 @@ function MngTable(props) {
       }
     }
     
+    else if(props.getUrlStr=="/getmngdocno")
+    {
+      allParams={
+        searchKeyWord : para.searchKeyWord,
+      }
+    }
+
+    else if(props.getUrlStr=="/adddoc_getmngdocno")
+    {
+      allParams={
+        searchKeyWord : para.searchKeyWord,
+      }
+    }
+
+    else if(props.getUrlStr=="/getextdatatmmswholeasset")
+    {
+      allParams={
+        searchKeyWord : para.searchKeyWord,
+      }
+    }
+
+    else if(props.getUrlStr=="/adddoc_getextdatatmmswholeasset")
+    {
+      allParams={
+        searchKeyWord : para.searchKeyWord,
+      }
+    }
+
+    else if(props.getUrlStr=="/adddoc_getextdatasapzmmr1010")
+    {
+      allParams={
+        searchKeyWord : para.searchKeyWord,
+      }
+    }
+
+    else if(props.getUrlStr=="/adddoc_getextdataeqmsatemplate")
+    {
+      allParams={
+        searchKeyWord : para.searchKeyWord,
+      }
+    }
 
     let ajaxData = await axios({
       method:"get",
@@ -193,8 +236,11 @@ function MngTable(props) {
       {    
         Object.keys(ajaxData.result[0]).map((columName,i)=>{
           let tempMinWidth = columName.length*14
-          if(columName=="remark") tempMinWidth= 200
+          if(columName=="remark") tempMinWidth= 300
           if(columName=="uuid_binary") tempMinWidth= 200
+          if(columName=="doc_no") tempMinWidth= 200
+          if(columName=="req_purpose") tempMinWidth= 300
+          if(columName=="pr_title") tempMinWidth= 300
           tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1})
         })
 
@@ -224,6 +270,20 @@ function MngTable(props) {
                     variant="contained"
                     onClick={(event) => {
                       navigate('/editdocnopattern',{state: {
+                        rowObj: cellValues.row,
+                      },})
+                    }}
+                  >
+                    <EditIcon fontSize="small"/>
+                  </Button>
+                )
+              }
+              else if(props.getUrlStr=="/getmngdocno"){
+                return (
+                  <Button
+                    variant="contained"
+                    onClick={(event) => {
+                      navigate('/editdocno',{state: {
                         rowObj: cellValues.row,
                       },})
                     }}
@@ -395,7 +455,75 @@ function MngTable(props) {
                     dispatch(setSel_doc_pattern(pickRows))
                     dispatch(setSel_doc_pattern_cols(cols))
                   }
+                  else if(props.getUrlStr=="/adddoc_getmngdocno"){
+                    if(pickRows.length==1){
+                      let tempRow = pickRows[0]
+                      if(!tempRow.last_rev_no) tempRow.last_rev_no=parseInt(pickRows[0].start_rev_no)
+                      else tempRow.last_rev_no= parseInt(tempRow.last_rev_no)+1
+                      dispatch(setSel_doc_no(tempRow))
+                      
+                    }
+                    else
+                    {
+                      alert("한 개의 문서번호가 선택되어야 합니다.")
+                    }
+                  }
+                  else if(props.getUrlStr=="/adddoc_getextdatatmmswholeasset"){
+                    let temp = [...rdx.selTmmsWholeAsset]
+                    let selRows=[]
+                    pickRows.map((onePick,i)=>{
+                      let dupCheck=false
+                      if (temp.length>0){
+                        temp.map((oneItem,j)=>{
+                          if(oneItem.eq_code == onePick.eq_code) dupCheck = true
+                        })
+                      }
+                      if (!dupCheck) selRows.push({eq_code:onePick.eq_code, eq_code_alt:onePick.eq_code_alt, eq_name:onePick.eq_name})
+                    })
+                    
+                    temp.push.apply(temp, selRows)
+                    let set = new Set(temp);
+                    temp = [...set];
+                    dispatch(setSelTmmsWholeAsset(temp))
+                  }
+                  else if(props.getUrlStr=="/adddoc_getextdatasapzmmr1010"){
+                    let temp = [...rdx.selSapZmmr1010]
+                    let selRows=[]
+                    pickRows.map((onePick,i)=>{
+                      let dupCheck=false
+                      if (temp.length>0){
+                        temp.map((oneItem,j)=>{
+                          if(oneItem.mat_code == onePick.mat_code) dupCheck = true
+                        })
+                      }
+                      if (!dupCheck) selRows.push({mat_code:onePick.mat_code, mat_name:onePick.mat_name })
+                    })
+                    
+                    temp.push.apply(temp, selRows)
+                    let set = new Set(temp);
+                    temp = [...set];
+                    dispatch(setSelSapZmmr1010(temp))
+                  }
+                  else if(props.getUrlStr=="/adddoc_getextdataeqmsatemplate"){
+                    let temp = [...rdx.selEqmsAtemplate]
+                    let selRows=[]
+                    pickRows.map((onePick,i)=>{
+                      let dupCheck=false
+                      if (temp.length>0){
+                        temp.map((oneItem,j)=>{
+                          if(oneItem.pr_no == onePick.pr_no) dupCheck = true
+                        })
+                      }
+                      if (!dupCheck) selRows.push({pr_no:onePick.pr_no, pr_title:onePick.pr_title })
+                    })
+                    
+                    temp.push.apply(temp, selRows)
+                    let set = new Set(temp);
+                    temp = [...set];
+                    dispatch(setSelEqmsAtemplate(temp))
+                  }
                   else{
+                    
                   }
                 }}><CheckIcon/></Button>:<div></div>
               }
@@ -498,6 +626,14 @@ function MngTable(props) {
                   InitializeTbl ()
                   setDelRowBt(delRowBt=>false)
                 }
+                else if (props.getUrlStr=="/getmngdocno"&&delRowBt)
+                {
+                  let reqResult = await DeleteDocNo(pickRows)
+                  if(!reqResult.success) alert(reqResult.result)
+                  InitializeTbl ()
+                  setDelRowBt(delRowBt=>false)
+                }
+
                 setOpenModalBackDrop(false)
                 setIsModalSubmitting(false)
                 handleModalClose()
@@ -677,6 +813,28 @@ async function DeleteDocNoPattern(pickRows){
   let ajaxData =  await axios({
     method:"delete",
     url:"/deletedocnopattern",
+    params:para,
+    headers:{
+      'Content-Type':'application/json'
+    }})
+    .then((res)=>res.data)
+    .catch((err)=>console.log(err))
+    return ajaxData
+}
+
+async function DeleteDocNo(pickRows){
+  let targetRows=[]
+  pickRows.map((oneRow,i)=>{
+    targetRows.push({doc_no:oneRow.doc_no, uuid_binary:oneRow.uuid_binary, delete_by:cookies.load('userInfo').user_account})
+  })
+
+  let para={
+    targetRows:targetRows
+  }
+  
+  let ajaxData =  await axios({
+    method:"delete",
+    url:"/deletedocno",
     params:para,
     headers:{
       'Content-Type':'application/json'
