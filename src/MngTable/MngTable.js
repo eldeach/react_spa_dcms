@@ -797,6 +797,13 @@ function MngTable(props) {
                   InitializeTbl ()
                   setDelRowBt(delRowBt=>false)
                 }
+                else if (props.getUrlStr=="/getmngdoc"&&delRowBt)
+                {
+                  let reqResult = await DeleteDoc(pickRows)
+                  if(!reqResult.success) alert(reqResult.result)
+                  InitializeTbl ()
+                  setDelRowBt(delRowBt=>false)
+                }
 
                 setOpenModalBackDrop(false)
                 setIsModalSubmitting(false)
@@ -999,6 +1006,28 @@ async function DeleteDocNo(pickRows){
   let ajaxData =  await axios({
     method:"delete",
     url:"/deletedocno",
+    params:para,
+    headers:{
+      'Content-Type':'application/json'
+    }})
+    .then((res)=>res.data)
+    .catch((err)=>console.log(err))
+    return ajaxData
+}
+
+async function DeleteDoc(pickRows){
+  let targetRows=[]
+  pickRows.map((oneRow,i)=>{
+    targetRows.push({doc_no:oneRow.doc_no, rev_no:oneRow.rev_no, doc_title:oneRow.doc_title, uuid_binary:oneRow.uuid_binary, delete_by:cookies.load('userInfo').user_account})
+  })
+
+  let para={
+    targetRows:targetRows
+  }
+  
+  let ajaxData =  await axios({
+    method:"delete",
+    url:"/deletedoc",
     params:para,
     headers:{
       'Content-Type':'application/json'

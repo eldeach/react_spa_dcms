@@ -16,9 +16,8 @@ import RuleIcon from '@mui/icons-material/Rule';
 import RuleFolderIcon from '@mui/icons-material/RuleFolder';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import InventoryIcon from '@mui/icons-material/Inventory';
-import InsertLinkIcon from '@mui/icons-material/InsertLink';
+import AddIcon from '@mui/icons-material/Add';
 import FolderIcon from '@mui/icons-material/Folder';
-import Filter9PlusIcon from '@mui/icons-material/Filter9Plus';
 //========================================================== axios 라이브러리 import
 import axios from 'axios';
 //========================================================== cookie 라이브러리 import
@@ -36,9 +35,11 @@ import MngUserAuth from './Auth/MngUserAuth';
 
 import AddDocNo from './MngDoc/AddDocNo'
 import MngDocNo from './MngDoc/MngDocNo'
+import AddDocNo_clone from './MngDoc/AddDocNo_clone'
+
 import AddDoc from './MngDoc/AddDoc'
 import MngDoc from './MngDoc/MngDoc'
-// import EditDoc from './MngDoc/EditDoc'
+import AddDoc_clone from './MngDoc/AddDoc_clone'
 
 import AddDocNoPattern from './MngDoc/AddDocNoPattern'
 import MngDocNoPattern from './MngDoc/MngDocNoPattern'
@@ -150,7 +151,7 @@ function App() {
             navigate("/mypage")
             }}>
             <ListItemIcon>
-              <AccountCircleIcon /> 
+              <AccountCircleIcon color="primary"/> 
             </ListItemIcon>
             <ListItemText primary={cookies.load('loginStat') ? cookies.load('userInfo').user_name : ""} />
           </ListItemButton>
@@ -158,26 +159,26 @@ function App() {
       </List>
       <Divider />
       <List>
-       <ListItem disablePadding>
-          <ListItemButton onClick={()=>{
-            LoginCheck()
-            navigate("/adddocnopattern")
-            }}>
-            <ListItemIcon>
-              <RuleIcon /> 
-            </ListItemIcon>
-            <ListItemText primary={"문서번호 패턴 추가"} />
-          </ListItemButton>
-        </ListItem>
         <ListItem disablePadding>
           <ListItemButton onClick={()=>{
             LoginCheck()
             navigate("/mngdocnopattern")
             }}>
             <ListItemIcon>
-              <RuleFolderIcon /> 
+              <RuleFolderIcon color="primary"/> 
             </ListItemIcon>
-            <ListItemText primary={"문서번호 패턴관리"} />
+            <ListItemText primary={"문서번호 패턴 관리"} />
+          </ListItemButton>
+        </ListItem>
+       <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/adddocnopattern")
+            }}>
+            <ListItemIcon>
+              <RuleIcon color="primary"/> 
+            </ListItemIcon>
+            <ListItemText primary={"문서번호 패턴 추가"} />
           </ListItemButton>
         </ListItem>
       </List>
@@ -186,23 +187,23 @@ function App() {
         <ListItem disablePadding>
           <ListItemButton onClick={()=>{
             LoginCheck()
-            navigate("/adddocno")
+            navigate("/mngdocno")
             }}>
             <ListItemIcon>
-              <Filter9PlusIcon /> 
+              <FormatListNumberedIcon color="primary"/> 
             </ListItemIcon>
-            <ListItemText primary={"문서 번호 추가"} />
+            <ListItemText primary={"문서번호 관리"} />
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
           <ListItemButton onClick={()=>{
             LoginCheck()
-            navigate("/mngdocno")
+            navigate("/adddocno")
             }}>
             <ListItemIcon>
-              <FormatListNumberedIcon /> 
+              <AddIcon color="primary"/> 
             </ListItemIcon>
-            <ListItemText primary={"문서번호관리"} />
+            <ListItemText primary={"문서 번호 추가"} />
           </ListItemButton>
         </ListItem>
       </List>
@@ -214,9 +215,9 @@ function App() {
             navigate("/mngdoc")
             }}>
             <ListItemIcon>
-              <InventoryIcon /> 
+              <InventoryIcon color="primary" /> 
             </ListItemIcon>
-            <ListItemText primary={"문서 인벤토리"} />
+            <ListItemText primary={"문서정보 관리"} />
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
@@ -225,18 +226,21 @@ function App() {
             navigate("/adddoc")
             }}>
             <ListItemIcon>
-              <PostAddIcon /> 
+              <PostAddIcon color="primary"/> 
             </ListItemIcon>
-            <ListItemText primary={"문서 추가"} />
+            <ListItemText primary={"문서정보 추가"} />
           </ListItemButton>
         </ListItem>
+      </List>
+      <Divider />  
+      <List>
         <ListItem disablePadding>
           <ListItemButton onClick={()=>{
             LoginCheck()
             navigate("/mngdocno")
             }}>
             <ListItemIcon>
-              <FolderIcon /> 
+              <FolderIcon color="primary"/> 
             </ListItemIcon>
             <ListItemText primary={"바인더 인벤토리"} />
           </ListItemButton>
@@ -286,7 +290,7 @@ function App() {
             navigate("/audittrail")
             }}>
             <ListItemIcon>
-              <ManageSearchIcon /> 
+              <ManageSearchIcon color="primary"/> 
             </ListItemIcon>
             <ListItemText primary={"Audit Trail"} />
           </ListItemButton>
@@ -391,11 +395,11 @@ function App() {
 
             <Route path='/adddocno' element={ <AddDocNo/> }/>
             <Route path='/mngdocno' element={ <MngDocNo/> }/>
-            <Route path='/editdocno' element={ <div>editdocno</div> }/>
+            <Route path='/editdocno' element={ <AddDocNo_clone/> }/>
 
             <Route path='/adddoc' element={<AddDoc/>}/>
             <Route path='/mngdoc' element={ <MngDoc/> }/>
-            <Route path='/editdoc' element={<AddDoc/>}/>
+            <Route path='/editdoc' element={<AddDoc_clone/>}/>
             
             <Route path='/audittrail' element={ <AuditTrail/> }/>
             

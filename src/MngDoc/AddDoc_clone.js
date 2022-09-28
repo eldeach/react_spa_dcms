@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import {  useNavigate, useLocation } from 'react-router-dom';
 //========================================================== Material UI 라이브러리 import
-import {PropTypes, Autocomplete, Checkbox, FormControlLabel, TextField, IconButton, Box, Typography, Chip, Button, Stack, Paper,Divider,Modal, ListItemIcon, ListItemText, ListItem, List } from '@mui/material/';
+import {PropTypes, Autocomplete, Checkbox, Switch, FormControlLabel, TextField, IconButton, Box, Typography, Chip, Button, Stack, Paper,Divider,Modal, ListItemIcon, ListItemText, ListItem, List } from '@mui/material/';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -30,10 +30,13 @@ import * as yup from 'yup';
 //========================================================== axios 라이브러리 import
 import axios from 'axios';
 
-function EditDoc() {
+function AddDoc() {
 
     let [appDate,setAppDate] = useState(null);
     let [invDate,setInvDate] = useState(null);
+
+    let [isProtocol,setIsProtocol] = useState(false);
+    let isProtocolHandleChange = (event) => {setIsProtocol(event.target.checked)}
 
     let [qualAttList,setQualAttList] = useState([
         {abb:"URS", att_name: "User Requirement Specification"},
@@ -101,45 +104,6 @@ function EditDoc() {
     ),
   });
 
-    //========================================================== [Tab] Tab 관련 함수 및 state 정의
-  function TabPanel(props) {
-    const { children, value, index, ...other } = props;
-
-    return (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`simple-tabpanel-${index}`}
-        aria-labelledby={`simple-tab-${index}`}
-        {...other}
-      >
-        {value === index && (
-          <Box sx={{ p: 1 }}>
-            <Typography>{children}</Typography>
-          </Box>
-        )}
-      </div>
-    );
-  }
-
-  TabPanel.propTypes = {
-    children: PropTypes.node,
-    index: PropTypes.number.isRequired,
-    value: PropTypes.number.isRequired,
-  };
-
-  function a11yProps(index) {
-    return {
-      id: `simple-tab-${index}`,
-      'aria-controls': `simple-tabpanel-${index}`,
-    };
-  }
-
-  const [value, setValue] = useState(0);
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
   //========================================================== [Modal] 모달 열기/닫기 및 스타일 정의
   let [openModal, setOpenModal] = useState(false);
   let handleModalOpen = () => setOpenModal(true);
@@ -156,10 +120,7 @@ function EditDoc() {
     padding:'20px'
   };
 
-
-  let [refresh,setRefresh] = useState(false);
   let [popUpPage,setPopUpPage] = useState(0);
-
   let [isSubmitting, setIsSubmitting] = useState(false); // Submit 중복 클릭 방지
 
   //========================================================== [변수, 객체 선언][useNaviagte]
@@ -174,23 +135,35 @@ function EditDoc() {
     // 이 페이지의 권한 유무 확인
     authCheck()
 
-    //redux 값 초기화
-    setAppDate(targetRowObj.approval_date);
-    setInvDate(targetRowObj.invalid_date);
-    setValAtt(JSON.parse(targetRowObj.valAtt))
-    setQualAtt(JSON.parse(targetRowObj.qualAtt))
-    dispatch(setSel_doc_no({doc_no:targetRowObj.doc_no, newRevNo:targetRowObj.rev_no}))
-    dispatch(setSel_tb_user({user_account:targetRowObj.written_by, user_name:targetRowObj.user_name, user_team:targetRowObj.written_by_team }))
-    dispatch(setSelTmmsWholeAsset(JSON.parse(targetRowObj.eqAtt)))
-    dispatch(setSelSapZmmr1010(JSON.parse(targetRowObj.prodAtt)))
-    dispatch(setSelEqmsAtemplate(JSON.parse(targetRowObj.eqmsAtt)))
-    dispatch(setSel_doc(JSON.parse(targetRowObj.relateddoc)))
+    //값 초기화
+    if(targetRowObj=="N/A"){
+        dispatch(setSel_doc_no({}))
+        dispatch(setSel_tb_user({}))
+        dispatch(setSelTmmsWholeAsset([]))
+        dispatch(setSelSapZmmr1010([]))
+        dispatch(setSelEqmsAtemplate([]))
+        dispatch(setSel_doc([]))
+    }
+    else{
+        setAppDate(targetRowObj.approval_date);
+        setInvDate(targetRowObj.invalid_date);
+        if(targetRowObj.isprotocol=='1'){
+            setIsProtocol(isProtocol=>true)
+        }
+        setValAtt(JSON.parse(targetRowObj.valAtt))
+        setQualAtt(JSON.parse(targetRowObj.qualAtt))
+        dispatch(setSel_doc_no({doc_no:targetRowObj.doc_no, newRevNo:targetRowObj.rev_no}))
+        dispatch(setSel_tb_user({user_account:targetRowObj.written_by, user_name:targetRowObj.user_name, user_team:targetRowObj.written_by_team }))
+        dispatch(setSelTmmsWholeAsset(JSON.parse(targetRowObj.eqAtt)))
+        dispatch(setSelSapZmmr1010(JSON.parse(targetRowObj.prodAtt)))
+        dispatch(setSelEqmsAtemplate(JSON.parse(targetRowObj.eqmsAtt)))
+        dispatch(setSel_doc(JSON.parse(targetRowObj.relateddoc)))
+    }
 
   },[]);
   //========================================================== [ADD form에서 추가] 수정할 row Oject state 넘겨받기 위한 코드
   const location = useLocation();
   const targetRowObj= (!location.state ? "N/A" : location.state.rowObj)
-  console.log(location.state.rowObj)
 
   async function LoginCheck(){
     let checkResult = await LoginSessionCheck("check",{})
@@ -221,6 +194,17 @@ function EditDoc() {
     }
   }
 
+  async function postAddDoc(qryBody){
+    let ajaxData = await axios.post("/postAddDoc",qryBody)
+    .then((res)=>res.data)
+    .catch((err)=>{
+      console.log(err)
+    })
+
+    if(ajaxData.success) return ajaxData.result
+    else alert(ajaxData)
+  }
+
   async function putEditDoc(qryBody){
     let ajaxData = await axios.put("/puteditdoc",qryBody)
     .then((res)=>res.data)
@@ -237,32 +221,63 @@ function EditDoc() {
         <Formik
         validationSchema={schema}
         onSubmit={async (values, {resetForm})=>{
-            let qryBody = {
-                doc_no:rdx.sel_doc_no.doc_no,
-                rev_no:rdx.sel_doc_no.newRevNo,
-                doc_title:values.doc_title,
-                written_by:rdx.sel_tb_user.user_account,
-                written_by_team:rdx.sel_tb_user.user_team,
-                approval_date:moment(new Date(appDate)).format('YYYY-MM-DD'),
-                invalid_date:moment(new Date(invDate)).format('YYYY-MM-DD'),
-                qualAtt: JSON.stringify(qualAtt),
-                valAtt: JSON.stringify(valAtt),
-                eqAtt: JSON.stringify(rdx.selTmmsWholeAsset),
-                prodAtt: JSON.stringify(rdx.selSapZmmr1010),
-                eqmsAtt: JSON.stringify(rdx.selEqmsAtemplate),
-                isprotocol: values.isprotocol,
-                relateddoc: JSON.stringify(rdx.sel_doc),
-                remark:values.remark,
-                update_by:cookies.load('userInfo').user_account,
-                uuid_binary:values.uuid_binary
-            }
             setIsSubmitting(true);
-            let ajaxData = await putEditDoc(qryBody)
-            console.log(ajaxData)
+            if(targetRowObj=="N/A"){
+                let qryBody = {
+                    doc_no:rdx.sel_doc_no.doc_no,
+                    rev_no:rdx.sel_doc_no.newRevNo,
+                    doc_title:values.doc_title,
+                    written_by:rdx.sel_tb_user.user_account,
+                    written_by_team:rdx.sel_tb_user.user_team,
+                    approval_date:moment(new Date(appDate)).format('YYYY-MM-DD'),
+                    invalid_date:moment(new Date(invDate)).format('YYYY-MM-DD'),
+                    qualAtt: JSON.stringify(qualAtt),
+                    valAtt: JSON.stringify(valAtt),
+                    eqAtt: JSON.stringify(rdx.selTmmsWholeAsset),
+                    prodAtt: JSON.stringify(rdx.selSapZmmr1010),
+                    eqmsAtt: JSON.stringify(rdx.selEqmsAtemplate),
+                    isprotocol: isProtocol,
+                    relateddoc: JSON.stringify(rdx.sel_doc),
+                    remark:values.remark,
+                    insert_by:cookies.load('userInfo').user_account
+                }
+                
+                let ajaxData = await postAddDoc(qryBody)
+                console.log(ajaxData)
+            }
+            else{
+                let qryBody = {
+                    doc_no:rdx.sel_doc_no.doc_no,
+                    rev_no:rdx.sel_doc_no.newRevNo,
+                    doc_title:values.doc_title,
+                    written_by:rdx.sel_tb_user.user_account,
+                    written_by_team:rdx.sel_tb_user.user_team,
+                    approval_date:moment(new Date(appDate)).format('YYYY-MM-DD'),
+                    invalid_date:moment(new Date(invDate)).format('YYYY-MM-DD'),
+                    qualAtt: JSON.stringify(qualAtt),
+                    valAtt: JSON.stringify(valAtt),
+                    eqAtt: JSON.stringify(rdx.selTmmsWholeAsset),
+                    prodAtt: JSON.stringify(rdx.selSapZmmr1010),
+                    eqmsAtt: JSON.stringify(rdx.selEqmsAtemplate),
+                    isprotocol: isProtocol,
+                    relateddoc: JSON.stringify(rdx.sel_doc),
+                    remark:values.remark,
+                    update_by:cookies.load('userInfo').user_account,
+                    uuid_binary:targetRowObj.uuid_binary
+                }
+                let ajaxData = await putEditDoc(qryBody)
+                console.log(ajaxData)
+            }
+
 
             resetForm()
-            setValAttFiled([])
+            setValAttFiled(null)
             setValAtt([])
+            setQualAttFiled(null)
+            setQualAtt([])
+            setIsProtocol(false)
+            setAppDate(null)
+            setInvDate(null)
             dispatch(setSel_doc_no({}))
             dispatch(setSel_tb_user({}))
             dispatch(setSelTmmsWholeAsset([]))
@@ -272,17 +287,26 @@ function EditDoc() {
 
             setIsSubmitting(false);
             LoginCheck()
+
+            if(targetRowObj=="N/A"){
+
+            }
+            else
+            {
+                navigate(-1)
+            }
         }}
-        initialValues={{
-            isprotocol:targetRowObj.isprotocol,
+        initialValues={!location.state ?{
+            doc_title:'',
+            remark:''
+        }:{
             doc_title:targetRowObj.doc_title,
-            remark:targetRowObj.remark,
-            uuid_binary:targetRowObj.uuid_binary
+            remark:targetRowObj.remark
         }}
         >
         {({
         handleSubmit,
-        handleChange,
+        handleChange={},
         handleBlur,
         validateField,
         values,
@@ -301,7 +325,7 @@ function EditDoc() {
                 <div style={{width:'100%', display:'flex', flexWrap:'wrap', justifyContent:'center'}}>
                     <Paper className="seperate-paper" elevation={3}>   
                         <Stack spacing={2}>
-                            <Button size="small" variant="contained" onClick={()=>{
+                            <Button disabled={!(targetRowObj=="N/A")} size="small" variant="contained" onClick={()=>{
                             setPopUpPage(0)
                             setModalTitle("문서번호 선택")
                             handleModalOpen()
@@ -330,14 +354,12 @@ function EditDoc() {
                                 <Chip label="작성팀" color="primary"/>
                                 <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{rdx.sel_tb_user.user_team}</div></div>
                             </Stack>
-                            <FormControlLabel control={
-                            <Checkbox
-                            id="isprotocol"
-                            name="isprotocol"
-                            checked={values.isprotocol}
-                            onChange={handleChange}
-                            inputProps={{ 'aria-label': 'controlled' }}
-                            />} label="이 문서는 계획서 입니다." />
+                            <FormControlLabel
+                                control={
+                                <Switch checked={isProtocol} onChange={isProtocolHandleChange} name="gilad" />
+                                }
+                                label="이 문서는 계획서 입니다."
+                            />
                         </Stack>
                     </Paper>
                     <Paper className="seperate-paper" elevation={3}>
@@ -345,7 +367,7 @@ function EditDoc() {
                             <Chip label="문서 승인정보 입력" color="primary"/>
                             <TextField
                             required
-                            variant="standard"
+                            variant="outlined"
                             id="doc_title"
                             name="doc_title"
                             label="Title"
@@ -380,6 +402,11 @@ function EditDoc() {
                                         setAppDate(new Date());
                                     }}>오늘</Button>
                                 </div>
+                                <div style={{display:'flex',alignItems:'center',justifyContent:'center', marginLeft:'4px'}}>
+                                    <Button size="small" variant="contained" onClick={()=>{
+                                        setAppDate(null);
+                                    }}>삭제</Button>
+                                </div>
                             </div>
                             <div style={{width:'100%',display:'flex', marginTop:'20px'}}>
                                 <div style={{ flexGrow:1, display:'block', marginRight:'10px'}}>
@@ -402,10 +429,15 @@ function EditDoc() {
                                         setInvDate(new Date());
                                     }}>오늘</Button>
                                 </div>
+                                <div style={{display:'flex',alignItems:'center',justifyContent:'center', marginLeft:'4px'}}>
+                                    <Button size="small" variant="contained" onClick={()=>{
+                                        setInvDate(null);
+                                    }}>삭제</Button>
+                                </div>
                             </div>
                             <TextField
                             required
-                            variant="standard"
+                            variant="outlined"
                             id="remark"
                             name="remark"
                             label="Remark"
@@ -715,7 +747,7 @@ function EditDoc() {
                 <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding:'10px' }} elevation={6}>
                     <div style={{width:'100%', display:'flex', alignItems:'center', backdropFilter:'blur(10px)'}}>
                         <PostAddIcon color="primary"/>
-                        <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>문서추가</Typography>
+                        <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>{(targetRowObj=="N/A")?"문서정보 추가":"문서정보 수정"}</Typography>
                         <Button size="small" variant="contained" type="submit" form="postAddDoc" disabled={isSubmitting}>Submit</Button>
                         <Button style={{marginLeft:'1vw'}} size="small" variant="contained" onClick={async ()=>{
                         LoginCheck()
@@ -758,4 +790,4 @@ function EditDoc() {
   );
 }
 
-export default EditDoc
+export default AddDoc

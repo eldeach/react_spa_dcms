@@ -1,14 +1,11 @@
 //========================================================== React 라이브러리 import
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import {  useNavigate } from 'react-router-dom';
+import {  useLocation, useNavigate } from 'react-router-dom';
 //========================================================== Material UI 라이브러리 import
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import Autocomplete from '@mui/material/Autocomplete';
+import {Autocomplete, Chip, TextField, Box, Typography, Button, Stack, Paper } from '@mui/material/';
 import RuleIcon from '@mui/icons-material/Rule';
+import AddIcon from '@mui/icons-material/Add';
 //========================================================== Formik & Yup 라이브러리 import
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -78,10 +75,12 @@ function AddDocNoPattern() {
     start_rev_no: yup.string()
     .required('이 패턴을 가진 문서가 제정 시 시작될 개정번호를 입력해주세요.')
     .matches(/^\d+$/, '숫자만 입력해주세요.'),
+
     ref_sop_no: yup.string()
     .required('패턴 절차의 근거가 되는 SOP 번호를 입력해주세요.'),
     ref_sop_rev: yup.string().required('패턴 절차의 근거가 되는 SOP의 개정번호를 입력해주세요.')
     .matches(/^\d+$/, '숫자만 입력해주세요.'),
+
     pattern_name : yup.string().required('이 패턴의 명칭을 정의해주세요.')
     .test(
       'is_unique_pattern_name',
@@ -93,8 +92,12 @@ function AddDocNoPattern() {
       '중복된 패턴명입니다.',
       (value, context) => uniquePatternName
     ),
-    pattern_description: yup.string().required('이 패턴에 대해 설명해주세요.'),
+
+    pattern_description: yup.string()
+    .required('이 패턴에 대해 설명해주세요.'),
+
     serial_pool:yup.string()
+    .required('시리얼 번호 부여할 Pool 키워드를 입력해주세요.')
     .test(
       'serial_pool_blank_check',
       "공백은 없어야 합니다. 공백대신 underscore(언더바, _ )를 제안합니다.",
@@ -111,6 +114,10 @@ function AddDocNoPattern() {
     // 이 페이지의 권한 유무 확인
     authCheck()
   },[]);
+
+  //========================================================== [ADD form에서 추가] 수정할 row Oject state 넘겨받기 위한 코드
+  const location = useLocation();
+  const targetRowObj= (!location.state ? "N/A" : location.state.rowObj)
 
   async function LoginCheck(){
     let checkResult = await LoginSessionCheck("check",{})
@@ -153,34 +160,60 @@ function AddDocNoPattern() {
   }
 
   return (
-      <div className="content-middle" style={{paddingBottom:'40px'}}>
+    <div style={{padding:'0.5vw'}}>
         <Formik
           validationSchema={schema}
           onSubmit={async (values, {resetForm})=>{
-            let qryBody = {
-                doc_no_pattern:values.doc_no_pattern,
-                start_rev_no:values.start_rev_no,
-                ref_sop_no:values.ref_sop_no,
-                ref_sop_rev:values.ref_sop_rev,
-                pattern_name:values.pattern_name,
-                pattern_description:values.pattern_description,
-                pattern_pair_code:values.pattern_pair_code,
-                serial_pool:values.serial_pool,
-                remark:values.remark,                
-                insert_by:cookies.load('userInfo').user_account
-            }
             setIsSubmitting(true);
-            await postAddDocPattern(qryBody)
+            if(targetRowObj=="N/A"){
+                let qryBody = {
+                  doc_no_pattern:values.doc_no_pattern,
+                  start_rev_no:values.start_rev_no,
+                  ref_sop_no:values.ref_sop_no,
+                  ref_sop_rev:values.ref_sop_rev,
+                  pattern_name:values.pattern_name,
+                  pattern_description:values.pattern_description,
+                  pattern_pair_code:values.pattern_pair_code,
+                  serial_pool:values.serial_pool,
+                  remark:values.remark,                
+                  insert_by:cookies.load('userInfo').user_account
+              }
+              let ajaxData = await postAddDocPattern(qryBody)
+              console.log(ajaxData)
+            }
+            else{
+
+            }
+
             resetForm()
             setPos1st('');
             setPos2nd('');
             setPos3rd('');
             setPos4th('');
             setPos5th('');
+
             setIsSubmitting(false);
             LoginCheck()
+
+            if(targetRowObj=="N/A"){
+
+            }
+            else
+            {
+                navigate(-1)
+            }
           }}
-          initialValues={{
+          initialValues={!location.state ?{
+            doc_no_pattern: '',
+            start_rev_no: '',
+            ref_sop_no: '',
+            ref_sop_rev: '',
+            pattern_name: '',
+            pattern_description: '',
+            pattern_pair_code:'',
+            serial_pool:'',
+            remark: ''
+          }:{
             doc_no_pattern: '',
             start_rev_no: '',
             ref_sop_no: '',
@@ -203,289 +236,294 @@ function AddDocNoPattern() {
           isValid,
           errors,
         })=>(
-          <div style={{alignItems:"center", textAlign:"center"}}>
-            <div style={{height: "20px"}}></div>
-            <div style={{fontSize: "100px"}}><RuleIcon fontSize ="inherit" color="primary"/></div>
-            <div style={{fontSize: "40px"}}>Add Documnet Number/Code Pattern</div>
-            <div style={{height: "20px"}}></div>
-            <Stack spacing={2}>
-              <Box
-              id="addDocPatternPostForm"
-              component="form"
-              sx={{ width: '100vw', display: 'flex', flexWrap: 'wrap',justifyContent:'center'}}
-              noValidate
-              onSubmit={handleSubmit}
-              autoComplete="off"
-              >
-                <div style={{width:'100vw', display:'flex', flexWrap: 'wrap', justifyContent:'center', marginLeft:'5px', marginRight:'5px'}}>
-                  <Autocomplete
-                    id="Pos_1st"
-                    style={{minWidth:'200px',margin:'5px'}}
-                    freeSolo
-                    onChange={(event, newValue) => {
-                      setUniquePatternCheck(false)
-                      setPos1st(newValue);
-                    }}
-                    value={pos1st}
-                    options={patternCode.map((option) => option.elementName)}
-                    renderInput={(params) => <TextField {...params} label="Pos. 1st" />}
-                  />
-                  <Autocomplete
-                    id="Pos_2nd"
-                    style={{minWidth:'200px',margin:'5px'}}
-                    freeSolo
-                    onChange={(event, newValue) => {
-                      setUniquePatternCheck(false)
-                      setPos2nd(newValue);
-                    }}
-                    value={pos2nd}
-                    options={patternCode.map((option) => option.elementName)}
-                    renderInput={(params) => <TextField {...params} label="Pos. 2nd" />}
-                  />
-                  <Autocomplete
-                    id="Pos_3rd"
-                    style={{minWidth:'200px',margin:'5px'}}
-                    freeSolo
-                    onChange={(event, newValue) => {
-                      setUniquePatternCheck(false)
-                      setPos3rd(newValue);
-                    }}
-                    value={pos3rd}
-                    options={patternCode.map((option) => option.elementName)}
-                    renderInput={(params) => <TextField {...params} label="Pos. 3rd" />}
-                  />
-                  <Autocomplete
-                    id="Pos_4th"
-                    style={{minWidth:'200px',margin:'5px'}}
-                    freeSolo
-                    onChange={(event, newValue) => {
-                      setUniquePatternCheck(false)
-                      setPos4th(newValue);
-                    }}
-                    value={pos4th}
-                    options={patternCode.map((option) => option.elementName)}
-                    renderInput={(params) => <TextField {...params} label="Pos. 4th" />}
-                  />
-                  <Autocomplete
-                    id="Pos_5th"
-                    style={{minWidth:'200px',margin:'5px'}}
-                    freeSolo
-                    onChange={(event, newValue) => {
-                      setUniquePatternCheck(false)
-                      setPos5th(newValue);
-                    }}
-                    value={pos5th}
-                    options={patternCode.map((option) => option.elementName)}
-                    renderInput={(params) => <TextField {...params} label="Pos. 5th" />}
-                  />
-                </div>
-                <div style={{width:'35vw'}}>
-                  <TextField
-                    required
-                    variant="standard"
-                    id="doc_no_pattern"
-                    name="doc_no_pattern"
-                    label="Document Number Pattern"
-                    value={values.doc_no_pattern=pos1st+pos2nd+pos3rd+pos4th+pos5th}
-                    onChange={(e)=>{
-                      handleChange(e)
-                      setUniquePatternCheck(false)
-                    }}
-                    onBlur={handleBlur}
-                    helperText={touched.doc_no_pattern ? errors.doc_no_pattern : ""}
-                    error={touched.doc_no_pattern && Boolean(errors.doc_no_pattern)}
-                    margin="dense"
-                    fullWidth
-                  />
-                  <div style={{width:'100%', display:'flex', justifyContent:'flex-end'}}>
-                    <Button variant="outlined" size="small" disabled={isPatternConfirming} onClick={async ()=>{
-                      setUniquePatternCheck(true)
-                      setIsPatternConfirming(isPatternConfirming=>true)
+          <Box
+          id="addDocPatternPostForm"
+          component="form"
+          noValidate
+          onSubmit={handleSubmit}
+          autoComplete="off"
+          >
+          <div style={{width:'100%', display:'flex', flexWrap:'wrap', justifyContent:'center'}}>
+            <Paper className="seperate-paper" elevation={3}>
+              <Stack spacing={2}>
+                <Chip label="패턴요소 선택" color="primary"/>
+                <Autocomplete
+                id="Pos_1st"
+                freeSolo
+                onChange={(event, newValue) => {
+                  setUniquePatternCheck(false)
+                  setPos1st(newValue);
+                }}
+                value={pos1st}
+                options={patternCode.map((option) => option.elementName)}
+                renderInput={(params) => <TextField {...params} label="첫번째 요소" />}
+                />
+                <Autocomplete
+                  id="Pos_2nd"
+                  freeSolo
+                  onChange={(event, newValue) => {
+                    setUniquePatternCheck(false)
+                    setPos2nd(newValue);
+                  }}
+                  value={pos2nd}
+                  options={patternCode.map((option) => option.elementName)}
+                  renderInput={(params) => <TextField {...params} label="두번째 요소" />}
+                />
+                <Autocomplete
+                  id="Pos_3rd"
+                  freeSolo
+                  onChange={(event, newValue) => {
+                    setUniquePatternCheck(false)
+                    setPos3rd(newValue);
+                  }}
+                  value={pos3rd}
+                  options={patternCode.map((option) => option.elementName)}
+                  renderInput={(params) => <TextField {...params} label="세번째 요소" />}
+                />
+                <Autocomplete
+                  id="Pos_4th"
+                  freeSolo
+                  onChange={(event, newValue) => {
+                    setUniquePatternCheck(false)
+                    setPos4th(newValue);
+                  }}
+                  value={pos4th}
+                  options={patternCode.map((option) => option.elementName)}
+                  renderInput={(params) => <TextField {...params} label="네번째 요소" />}
+                />
+                <Autocomplete
+                  id="Pos_5th"
+                  freeSolo
+                  onChange={(event, newValue) => {
+                    setUniquePatternCheck(false)
+                    setPos5th(newValue);
+                  }}
+                  value={pos5th}
+                  options={patternCode.map((option) => option.elementName)}
+                  renderInput={(params) => <TextField {...params} label="다섯번째 요소" />}
+                />
+              </Stack>
+            </Paper>
+            <Paper className="seperate-paper" elevation={3}>
+              <Stack spacing={2}>
+                <Chip label="패턴 정의" color="primary"/>
+                <TextField
+                required
+                variant="standard"
+                id="doc_no_pattern"
+                name="doc_no_pattern"
+                label="문서번호 패턴 미리보기"
+                value={values.doc_no_pattern=pos1st+pos2nd+pos3rd+pos4th+pos5th}
+                onChange={(e)=>{
+                  handleChange(e)
+                  setUniquePatternCheck(false)
+                }}
+                onBlur={handleBlur}
+                helperText={touched.doc_no_pattern ? errors.doc_no_pattern : ""}
+                error={touched.doc_no_pattern && Boolean(errors.doc_no_pattern)}
+                margin="dense"
+                fullWidth
+                />
+                <Button variant="outlined" size="small" disabled={isPatternConfirming} onClick={async ()=>{
+                  setUniquePatternCheck(true)
+                  setIsPatternConfirming(isPatternConfirming=>true)
 
-                      let body={
-                        doc_no_pattern : values.doc_no_pattern
-                      }
+                  let body={
+                    doc_no_pattern : values.doc_no_pattern
+                  }
 
-                      let ajaxData=await axios.post('/duplicatedocpatterncheck',body)
-                      .then((res)=>res.data)
-                      .catch((err)=>err)
-                      
-                      if(ajaxData.success){
-                        if(ajaxData.result.length<1) setUniquePattern(uniquePattern=>true)
-                        else setUniquePattern(uniquePattern=>false)
-                      }
-                      else{
-                        alert(ajaxData.result)
-                      }
-                      await new Promise((r) => setTimeout(r, 1000));
-                      validateField('doc_no_pattern')
-                      setIsPatternConfirming(isPatternConfirming=>false)
-                      LoginCheck()
-                    }}>Confirm</Button>
-                  </div>
-                  <TextField
-                    required
-                    variant="standard"
-                    id="start_rev_no"
-                    name="start_rev_no"
-                    label="Start Rev No"
-                    value={values.start_rev_no}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    helperText={touched.start_rev_no ? errors.start_rev_no : ""}
-                    error={touched.start_rev_no && Boolean(errors.start_rev_no)}
-                    margin="dense"
-                    fullWidth
-                  />
+                  let ajaxData=await axios.post('/duplicatedocpatterncheck',body)
+                  .then((res)=>res.data)
+                  .catch((err)=>err)
+                  
+                  if(ajaxData.success){
+                    if(ajaxData.result.length<1) setUniquePattern(uniquePattern=>true)
+                    else setUniquePattern(uniquePattern=>false)
+                  }
+                  else{
+                    alert(ajaxData.result)
+                  }
+                  await new Promise((r) => setTimeout(r, 1000));
+                  validateField('doc_no_pattern')
+                  setIsPatternConfirming(isPatternConfirming=>false)
+                  LoginCheck()
+                }}>중복확인</Button>
+                <TextField
+                variant="standard"
+                id="pattern_name"
+                name="pattern_name"
+                label="문서번호 규칙 명칭"
+                // type="text"
+                value={values.pattern_name}
+                onChange={(e)=>{
+                  handleChange(e)
+                  setUniquePatternNameCheck(false)
+                }}
+                onBlur={handleBlur}
+                helperText={touched.pattern_name ? errors.pattern_name : ""}
+                error={touched.pattern_name && Boolean(errors.pattern_name)}
+                margin="dense"
+                fullWidth
+                />
+                <Button variant="outlined" size="small" disabled={isPatternNameConfirming} onClick={async ()=>{
+                  setUniquePatternNameCheck(true)
+                  setIsPatternNameConfirming(isPatternNameConfirming=>true)
 
-                  <TextField
-                    required
-                    variant="standard"
-                    id="ref_sop_no"
-                    name="ref_sop_no"
-                    label="참조 SOP 번호"
-                    value={values.ref_sop_no}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    helperText={touched.ref_sop_no ? errors.ref_sop_no : ""}
-                    error={touched.ref_sop_no && Boolean(errors.ref_sop_no)}
-                    margin="dense"
-                    fullWidth
-                  />
+                  let body={
+                    pattern_name : values.pattern_name
+                  }
 
-                  <TextField
-                    required
-                    variant="standard"
-                    id="ref_sop_rev"
-                    name="ref_sop_rev"
-                    label="참조 SOP 개정번호"
-                    // type="text"
-                    value={values.ref_sop_rev}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    helperText={touched.ref_sop_rev ? errors.ref_sop_rev : ""}
-                    error={touched.ref_sop_rev && Boolean(errors.ref_sop_rev)}
-                    margin="dense"
-                    fullWidth
-                  />
-                  <TextField
-                    variant="standard"
-                    id="pattern_name"
-                    name="pattern_name"
-                    label="문서번호 규칙 명칭"
-                    // type="text"
-                    value={values.pattern_name}
-                    onChange={(e)=>{
-                      handleChange(e)
-                      setUniquePatternNameCheck(false)
-                    }}
-                    onBlur={handleBlur}
-                    helperText={touched.pattern_name ? errors.pattern_name : ""}
-                    error={touched.pattern_name && Boolean(errors.pattern_name)}
-                    margin="dense"
-                    fullWidth
-                  />
-                  <div style={{width:'100%', display:'flex', justifyContent:'flex-end'}}>
-                    <Button variant="outlined" size="small" disabled={isPatternNameConfirming} onClick={async ()=>{
-                      setUniquePatternNameCheck(true)
-                      setIsPatternNameConfirming(isPatternNameConfirming=>true)
-
-                      let body={
-                        pattern_name : values.pattern_name
-                      }
-
-                      let ajaxData=await axios.post('/duplicatedocpatternnamecheck',body)
-                      .then((res)=>res.data)
-                      .catch((err)=>err)
-                      
-                      if(ajaxData.success){
-                        if(ajaxData.result.length<1) setUniquePatternName(uniquePatternName=>true)
-                        else setUniquePatternName(uniquePatternName=>false)
-                      }
-                      else{
-                        alert(ajaxData.result)
-                      }
-                      await new Promise((r) => setTimeout(r, 1000));
-                      validateField('pattern_name')
-                      setIsPatternNameConfirming(isPatternNameConfirming=>false)
-                      LoginCheck()
-                    }}>Confirm</Button>
-                  </div>
-                  <TextField
-                    required
-                    variant="standard"
-                    id="pattern_description"
-                    name="pattern_description"
-                    label="설명"
-                    // type="text"
-                    value={values.pattern_description}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    helperText={touched.pattern_description ? errors.pattern_description : ""}
-                    error={touched.pattern_description && Boolean(errors.pattern_description)}
-                    margin="dense"
-                    fullWidth
-                  />
-                  <TextField
-                    required
-                    variant="standard"
-                    id="pattern_pair_code"
-                    name="pattern_pair_code"
-                    label="Pair Code"
-                    // type="text"
-                    value={values.pattern_pair_code}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    helperText={touched.pattern_pair_code ? errors.pattern_pair_code : ""}
-                    error={touched.pattern_pair_code && Boolean(errors.pattern_pair_code)}
-                    margin="dense"
-                    fullWidth
-                  />
-                  <TextField
-                    required
-                    variant="standard"
-                    id="serial_pool"
-                    name="serial_pool"
-                    label="Serial Pool"
-                    // type="text"
-                    value={values.serial_pool}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    helperText={touched.serial_pool ? errors.serial_pool : ""}
-                    error={touched.serial_pool && Boolean(errors.serial_pool)}
-                    margin="dense"
-                    fullWidth
-                  />
-                  <TextField
-                    variant="standard"
-                    id="remark"
-                    name="remark"
-                    label="Remark"
-                    multiline
-                    rows={4}
-                    value={values.remark}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    helperText={touched.remark ? errors.remark : ""}
-                    error={touched.remark && Boolean(errors.remark)}
-                    margin="dense"
-                    fullWidth
-                  />
-                </div>
-              </Box>
-              <div className='content-middle'>
-                <Stack spacing={2} direction="row">
-                  <Button variant="contained" type="submit" form="addDocPatternPostForm" disabled={isSubmitting}>Submit</Button>
-                  <Button variant="outlined" type="reset" disabled={isResetting} onClick={async ()=>{
-                    setIsResetting(true)
-                    resetForm()
-                    setIsResetting(false)
-                    LoginCheck()
-                    }}>Reset</Button>
-                </Stack>
-              </div>
-            </Stack>
+                  let ajaxData=await axios.post('/duplicatedocpatternnamecheck',body)
+                  .then((res)=>res.data)
+                  .catch((err)=>err)
+                  
+                  if(ajaxData.success){
+                    if(ajaxData.result.length<1) setUniquePatternName(uniquePatternName=>true)
+                    else setUniquePatternName(uniquePatternName=>false)
+                  }
+                  else{
+                    alert(ajaxData.result)
+                  }
+                  await new Promise((r) => setTimeout(r, 1000));
+                  validateField('pattern_name')
+                  setIsPatternNameConfirming(isPatternNameConfirming=>false)
+                  LoginCheck()
+                }}>중복확인</Button>
+              </Stack>
+            </Paper>
+            <Paper className="seperate-paper" elevation={3}>
+              <Stack spacing={2}>
+                <Chip label="패턴 속성 설정" color="primary"/>
+                <TextField
+                required
+                variant="standard"
+                id="start_rev_no"
+                name="start_rev_no"
+                label="시작 개정번호"
+                value={values.start_rev_no}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                helperText={touched.start_rev_no ? errors.start_rev_no : ""}
+                error={touched.start_rev_no && Boolean(errors.start_rev_no)}
+                margin="dense"
+                fullWidth
+                />
+                <TextField
+                required
+                variant="standard"
+                id="pattern_pair_code"
+                name="pattern_pair_code"
+                label="Pair Code"
+                // type="text"
+                value={values.pattern_pair_code}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                helperText={touched.pattern_pair_code ? errors.pattern_pair_code : ""}
+                error={touched.pattern_pair_code && Boolean(errors.pattern_pair_code)}
+                margin="dense"
+                fullWidth
+                />
+                <TextField
+                required
+                variant="standard"
+                id="serial_pool"
+                name="serial_pool"
+                label="Serial Pool"
+                // type="text"
+                value={values.serial_pool}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                helperText={touched.serial_pool ? errors.serial_pool : ""}
+                error={touched.serial_pool && Boolean(errors.serial_pool)}
+                margin="dense"
+                fullWidth
+                />
+              </Stack>
+            </Paper>
+            <Paper className="seperate-paper" elevation={3}>
+              <Stack spacing={2}>
+                <Chip label="패턴 설명" color="primary"/>
+                <TextField
+                required
+                variant="outlined"
+                id="pattern_description"
+                name="pattern_description"
+                label="설명"
+                multiline
+                rows={3}
+                value={values.pattern_description}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                helperText={touched.pattern_description ? errors.pattern_description : ""}
+                error={touched.pattern_description && Boolean(errors.pattern_description)}
+                margin="dense"
+                fullWidth
+                />
+                <TextField
+                variant="outlined"
+                id="remark"
+                name="remark"
+                label="Remark"
+                multiline
+                rows={3}
+                value={values.remark}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                helperText={touched.remark ? errors.remark : ""}
+                error={touched.remark && Boolean(errors.remark)}
+                margin="dense"
+                fullWidth
+                />
+              </Stack>
+            </Paper>
+            <Paper className="seperate-paper" elevation={3}>
+              <Stack spacing={2}>
+                <Chip label="문서번호 패턴 절차" color="primary"/>
+                <TextField
+                required
+                variant="standard"
+                id="ref_sop_no"
+                name="ref_sop_no"
+                label="참조 SOP 번호"
+                value={values.ref_sop_no}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                helperText={touched.ref_sop_no ? errors.ref_sop_no : ""}
+                error={touched.ref_sop_no && Boolean(errors.ref_sop_no)}
+                margin="dense"
+                fullWidth
+                />
+                <TextField
+                required
+                variant="standard"
+                id="ref_sop_rev"
+                name="ref_sop_rev"
+                label="참조 SOP 개정번호"
+                // type="text"
+                value={values.ref_sop_rev}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                helperText={touched.ref_sop_rev ? errors.ref_sop_rev : ""}
+                error={touched.ref_sop_rev && Boolean(errors.ref_sop_rev)}
+                margin="dense"
+                fullWidth
+                />
+              </Stack>
+            </Paper>
           </div>
+            <div style={{height:'48px'}}/>
+            <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding:'10px' }} elevation={6}>
+                <div style={{width:'100%', display:'flex', alignItems:'center', backdropFilter:'blur(10px)'}}>
+                    <AddIcon color="primary"/>
+                    <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>{(targetRowObj=="N/A")?"문서번호 패턴 추가":"패턴정보 수정"}</Typography>
+                    <Button size="small" variant="contained" type="submit" form="addDocPatternPostForm" disabled={isSubmitting}>Submit</Button>
+                    <Button style={{marginLeft:'1vw'}} size="small" variant="contained" onClick={async ()=>{
+                    LoginCheck()
+                    navigate(-1)
+                    }}>Cancel</Button>
+                </div>
+            </Paper>
+          </Box>
         )}
         </Formik>
       </div>     

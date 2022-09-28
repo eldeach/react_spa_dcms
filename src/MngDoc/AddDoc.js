@@ -34,10 +34,9 @@ function AddDoc() {
 
     let [appDate,setAppDate] = useState(null);
     let [invDate,setInvDate] = useState(null);
+
     let [isProtocol,setIsProtocol] = useState(false);
     let isProtocolHandleChange = (event) => {setIsProtocol(event.target.checked)}
-    let [docTitle,setDocTitle]= useState();
-    let [remark,setRemark]= useState();
 
     let [qualAttList,setQualAttList] = useState([
         {abb:"URS", att_name: "User Requirement Specification"},
@@ -121,10 +120,7 @@ function AddDoc() {
     padding:'20px'
   };
 
-
-  let [refresh,setRefresh] = useState(false);
   let [popUpPage,setPopUpPage] = useState(0);
-
   let [isSubmitting, setIsSubmitting] = useState(false); // Submit 중복 클릭 방지
 
   //========================================================== [변수, 객체 선언][useNaviagte]
@@ -139,7 +135,7 @@ function AddDoc() {
     // 이 페이지의 권한 유무 확인
     authCheck()
 
-    //redux 값 초기화
+    //값 초기화
     if(targetRowObj=="N/A"){
         dispatch(setSel_doc_no({}))
         dispatch(setSel_tb_user({}))
@@ -275,8 +271,13 @@ function AddDoc() {
 
 
             resetForm()
-            setValAttFiled([])
+            setValAttFiled(null)
             setValAtt([])
+            setQualAttFiled(null)
+            setQualAtt([])
+            setIsProtocol(false)
+            setAppDate(null)
+            setInvDate(null)
             dispatch(setSel_doc_no({}))
             dispatch(setSel_tb_user({}))
             dispatch(setSelTmmsWholeAsset([]))
@@ -286,13 +287,19 @@ function AddDoc() {
 
             setIsSubmitting(false);
             LoginCheck()
+
+            if(targetRowObj=="N/A"){
+
+            }
+            else
+            {
+                navigate(-1)
+            }
         }}
         initialValues={!location.state ?{
-            isprotocol:false,
             doc_title:'',
             remark:''
         }:{
-            isprotocol:true,
             doc_title:targetRowObj.doc_title,
             remark:targetRowObj.remark
         }}
@@ -318,7 +325,7 @@ function AddDoc() {
                 <div style={{width:'100%', display:'flex', flexWrap:'wrap', justifyContent:'center'}}>
                     <Paper className="seperate-paper" elevation={3}>   
                         <Stack spacing={2}>
-                            <Button size="small" variant="contained" onClick={()=>{
+                            <Button disabled={!(targetRowObj=="N/A")} size="small" variant="contained" onClick={()=>{
                             setPopUpPage(0)
                             setModalTitle("문서번호 선택")
                             handleModalOpen()
@@ -360,7 +367,7 @@ function AddDoc() {
                             <Chip label="문서 승인정보 입력" color="primary"/>
                             <TextField
                             required
-                            variant="standard"
+                            variant="outlined"
                             id="doc_title"
                             name="doc_title"
                             label="Title"
@@ -395,6 +402,11 @@ function AddDoc() {
                                         setAppDate(new Date());
                                     }}>오늘</Button>
                                 </div>
+                                <div style={{display:'flex',alignItems:'center',justifyContent:'center', marginLeft:'4px'}}>
+                                    <Button size="small" variant="contained" onClick={()=>{
+                                        setAppDate(null);
+                                    }}>삭제</Button>
+                                </div>
                             </div>
                             <div style={{width:'100%',display:'flex', marginTop:'20px'}}>
                                 <div style={{ flexGrow:1, display:'block', marginRight:'10px'}}>
@@ -417,10 +429,15 @@ function AddDoc() {
                                         setInvDate(new Date());
                                     }}>오늘</Button>
                                 </div>
+                                <div style={{display:'flex',alignItems:'center',justifyContent:'center', marginLeft:'4px'}}>
+                                    <Button size="small" variant="contained" onClick={()=>{
+                                        setInvDate(null);
+                                    }}>삭제</Button>
+                                </div>
                             </div>
                             <TextField
                             required
-                            variant="standard"
+                            variant="outlined"
                             id="remark"
                             name="remark"
                             label="Remark"
@@ -730,7 +747,7 @@ function AddDoc() {
                 <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding:'10px' }} elevation={6}>
                     <div style={{width:'100%', display:'flex', alignItems:'center', backdropFilter:'blur(10px)'}}>
                         <PostAddIcon color="primary"/>
-                        <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>문서추가</Typography>
+                        <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>{(targetRowObj=="N/A")?"문서정보 추가":"문서정보 수정"}</Typography>
                         <Button size="small" variant="contained" type="submit" form="postAddDoc" disabled={isSubmitting}>Submit</Button>
                         <Button style={{marginLeft:'1vw'}} size="small" variant="contained" onClick={async ()=>{
                         LoginCheck()
