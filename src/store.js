@@ -40,6 +40,16 @@ let sel_doc_no = createSlice({
   }
 })
 
+let sel_doc = createSlice({
+  name : 'sel_doc_no',
+  initialState : [],
+  reducers:{
+    setSel_doc(state,targetRow){
+      return state = targetRow.payload
+    }
+  }
+})
+
 let loginExpireTime = createSlice({
   name : 'loginExpireTime',
   initialState : 0,
@@ -85,6 +95,7 @@ export let {setLoginExpireTime}=loginExpireTime.actions
 export let {setSel_doc_pattern}=sel_doc_pattern.actions
 export let {setSel_doc_pattern_cols}=sel_doc_pattern_cols.actions
 export let {setSel_doc_no}=sel_doc_no.actions
+export let {setSel_doc}=sel_doc.actions
 export let {setSelTmmsWholeAsset} = selTmmsWholeAsset.actions
 export let {setSelSapZmmr1010} = selSapZmmr1010.actions
 export let {setSelEqmsAtemplate} = selEqmsAtemplate.actions
@@ -96,6 +107,7 @@ export default configureStore({
     sel_doc_pattern:sel_doc_pattern.reducer,
     sel_doc_pattern_cols:sel_doc_pattern_cols.reducer,
     sel_doc_no:sel_doc_no.reducer,
+    sel_doc:sel_doc.reducer,
     selTmmsWholeAsset:selTmmsWholeAsset.reducer,
     selSapZmmr1010:selSapZmmr1010.reducer,
     selEqmsAtemplate:selEqmsAtemplate.reducer

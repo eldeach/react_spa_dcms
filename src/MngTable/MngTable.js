@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 //========================================================== Material UI 라이브러리 import
 import { DataGrid, GridToolbarExport } from '@mui/x-data-grid';
-import {PropTypes, Box,TextField,Button,Paper, Modal, Divider, Typography, Stack, Tooltip , CircularProgress, Backdrop} from '@mui/material/';
+import {PropTypes, Box,TextField,Button,Paper, Modal, Divider, Typography, Stack, Chip, Tooltip , CircularProgress, Backdrop} from '@mui/material/';
 //---------------------------------------------------------- Material Icons
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -14,6 +14,12 @@ import SearchIcon from '@mui/icons-material/Search';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import CheckIcon from '@mui/icons-material/Check';
+import SettingsApplicationsOutlinedIcon from '@mui/icons-material/SettingsApplicationsOutlined';
+import FaceOutlinedIcon from '@mui/icons-material/FaceOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import Diversity3OutlinedIcon from '@mui/icons-material/Diversity3Outlined';
+import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
+import UnpublishedOutlinedIcon from '@mui/icons-material/UnpublishedOutlined';
 //========================================================== Formik & Yup 라이브러리 import
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -26,12 +32,9 @@ import moment from 'moment';
 import 'moment/locale/ko';	//대한민국
 //========================================================== Redux import
 import { useDispatch, useSelector } from "react-redux"
-import { setSel_tb_user,setSel_doc_pattern, setSel_doc_pattern_cols, setLoginExpireTime, setSel_doc_no, setSelTmmsWholeAsset, setSelSapZmmr1010, setSelEqmsAtemplate } from "./../store.js"
+import { setSel_tb_user,setSel_doc_pattern, setSel_doc_pattern_cols, setLoginExpireTime, setSel_doc_no, setSel_doc, setSelTmmsWholeAsset, setSelSapZmmr1010, setSelEqmsAtemplate } from "./../store.js"
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
 import LoginSessionCheck from './../Account/LoginSessionCheck.js';
-import { COLUMNS_DIMENSION_PROPERTIES } from '@mui/x-data-grid/hooks/features/columns/gridColumnsUtils.js';
-import { DisplaySettingsSharp } from '@mui/icons-material';
-import { display } from '@mui/system';
 
 function MngTable(props) {
 //========================================================== [Backdrop] 모달 열기/닫기 및 스타일 정의
@@ -218,6 +221,13 @@ function MngTable(props) {
       }
     }
 
+    else if(props.getUrlStr=="/adddoc_getmngdoc")
+    {
+      allParams={
+        searchKeyWord : para.searchKeyWord,
+      }
+    }
+
     let ajaxData = await axios({
       method:"get",
       url:props.getUrlStr,
@@ -264,66 +274,91 @@ function MngTable(props) {
 
           if(columName=="mat_name") tempMinWidth= 300
 
-          if(columName=="qualAtt") tempMinWidth= 400
-          if(columName=="valAtt") tempMinWidth= 400
-          if(columName=="eqAtt") tempMinWidth= 400
-          if(columName=="prodAtt") tempMinWidth= 400
-          if(columName=="eqmsAtt") tempMinWidth= 400
-          if(columName=="relateddoc") tempMinWidth= 400
+          if(columName=="qualAtt") tempMinWidth= 300
+          if(columName=="valAtt") tempMinWidth= 300
+          if(columName=="eqAtt") tempMinWidth= 300
+          if(columName=="prodAtt") tempMinWidth= 300
+          if(columName=="eqmsAtt") tempMinWidth= 300
+          if(columName=="relateddoc") tempMinWidth= 300
+          if(columName=="isprotocol") tempMinWidth= 100
 
-
-          if (columName=="qualAtt"){
+          if (columName=="user_name"){
             tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
-              <Stack spacing={0.5}>{
+              <Chip icon={<FaceOutlinedIcon />} size="small" color="primary" label={params.value}/>
+            )})
+          }
+          else if (columName.indexOf("team")!=(-1)){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              params.value?<Chip icon={<Diversity3OutlinedIcon />} size="small" color="primary" label={params.value}/>:<div></div>
+            )})
+          }
+          else if (columName=="approval_date"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              params.value?<Chip icon={<CheckCircleOutlineOutlinedIcon />} size="small" color="primary" label={params.value}/>:<div></div>
+            )})
+          }
+          else if (columName=="invalid_date"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              params.value?<Chip icon={<UnpublishedOutlinedIcon />} size="small" color="expired" label={params.value}/>:<div></div>
+            )})
+          }
+          else if (columName=="qualAtt"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <div style={{display:'flex', flexWrap:'wrap'}}>{
                 JSON.parse(params.value).map((oneItem,i)=>{
-                  return <Typography variant="caption" className='incell-div-value'>{oneItem.abb+" : "+oneItem.att_name}</Typography>
+                  return <Tooltip title={oneItem.att_name} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.abb}/></Tooltip>
                 })
-              }</Stack>
+              }</div>
             )})
           }
           else if (columName=="valAtt"){
             tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
-              <Stack spacing={0.5}>{
+              <div style={{display:'flex', flexWrap:'wrap'}}>{
                 JSON.parse(params.value).map((oneItem,i)=>{
-                  return <Typography variant="caption" className='incell-div-value'>{oneItem.abb+" : "+oneItem.att_name}</Typography>
+                  return <Tooltip title={oneItem.att_name} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.abb}/></Tooltip>
                 })
-              }</Stack>
+              }</div>
             )})
           }
           else if (columName=="eqAtt"){
             tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
-              <Stack spacing={0.5}>{
+              <div style={{display:'flex', flexWrap:'wrap'}}>{
                 JSON.parse(params.value).map((oneItem,i)=>{
-                  return <Typography variant="caption" className='incell-div-value'>{oneItem.eq_name+" ("+oneItem.eq_code+" / "+ oneItem.eq_code_alt+")"}</Typography>
+                  return <Tooltip title={"("+oneItem.eq_code+" / "+ oneItem.eq_code_alt+")"} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.eq_name}/></Tooltip>
                 })
-              }</Stack>
+              }</div>
             )})
           }
           else if (columName=="prodAtt"){
             tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, display:'flex', flexWrap:'warp', renderCell: (params) => (
-              <Stack spacing={0.5}>{
+              <div style={{display:'flex', flexWrap:'wrap'}}>{
               JSON.parse(params.value).map((oneItem,i)=>{
-                return <Typography variant="caption" className='incell-div-value'>{oneItem.mat_code+" ("+oneItem.mat_name+")"}</Typography>
+                return <Tooltip title={oneItem.mat_name} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.mat_code}/></Tooltip>
               })
-            }</Stack>
+            }</div>
             )})
           }
           else if (columName=="eqmsAtt"){
             tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
               <div style={{display:'flex', flexWrap:'wrap'}}>{
                 JSON.parse(params.value).map((oneItem,i)=>{
-                  return <Tooltip title={oneItem.project+": "+oneItem.pr_title} arrow><Typography variant="caption" className='incell-div-value'>{oneItem.pr_no}</Typography></Tooltip>
+                  return <Tooltip title={oneItem.project+": "+oneItem.pr_title} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.pr_no}/></Tooltip>
                 })
               }</div>
             )})
           }
           else if (columName=="relateddoc"){
             tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
-              <Stack spacing={0.5}>{
+              <div style={{display:'flex', flexWrap:'wrap'}}>{
                 JSON.parse(params.value).map((oneItem,i)=>{
-                  return <Typography variant="caption" className='incell-div-value'>{oneItem.docNo+"("+oneItem.revNo+") (Relation: "+oneItem.relation+")"}</Typography>
+                  return <Tooltip title={oneItem.doc_title} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.doc_no+"("+oneItem.rev_no+")"}/></Tooltip>
                 })
-              }</Stack>
+              }</div>
+            )})
+          }
+          else if (columName=="isprotocol"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              params.value?<Chip icon={<DescriptionOutlinedIcon />} size="small" color="primary" label={params.value}/>:<div></div>
             )})
           }
           else{
@@ -636,6 +671,24 @@ function MngTable(props) {
                     let set = new Set(temp);
                     temp = [...set];
                     dispatch(setSelEqmsAtemplate(temp))
+                  }
+                  else if(props.getUrlStr=="/adddoc_getmngdoc"){
+                    let temp = [...rdx.sel_doc]
+                    let selRows=[]
+                    pickRows.map((onePick,i)=>{
+                      let dupCheck=false
+                      if (temp.length>0){
+                        temp.map((oneItem,j)=>{
+                          if((oneItem.doc_no == onePick.doc_no)&&(oneItem.rev_no == onePick.rev_no)) dupCheck = true
+                        })
+                      }
+                      if (!dupCheck) selRows.push({doc_no:onePick.doc_no, rev_no:onePick.rev_no, doc_title:onePick.doc_title })
+                    })
+                    
+                    temp.push.apply(temp, selRows)
+                    let set = new Set(temp);
+                    temp = [...set];
+                    dispatch(setSel_doc(temp))
                   }
                   else{
                     

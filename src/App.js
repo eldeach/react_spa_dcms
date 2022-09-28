@@ -38,6 +38,8 @@ import AddDocNo from './MngDoc/AddDocNo'
 import MngDocNo from './MngDoc/MngDocNo'
 import AddDoc from './MngDoc/AddDoc'
 import MngDoc from './MngDoc/MngDoc'
+// import EditDoc from './MngDoc/EditDoc'
+
 import AddDocNoPattern from './MngDoc/AddDocNoPattern'
 import MngDocNoPattern from './MngDoc/MngDocNoPattern'
 
@@ -75,6 +77,12 @@ const theme = createTheme({
       light: '#ffffff',
       main: '#ffffff',
       dark: '#ffffff',
+      contrastText: '#ffffff',
+    },
+    expired:{
+      light: '#ff5c8d',
+      main: '#d81b60',
+      dark: '#a00037',
       contrastText: '#ffffff',
     }
   },
@@ -387,7 +395,7 @@ function App() {
 
             <Route path='/adddoc' element={<AddDoc/>}/>
             <Route path='/mngdoc' element={ <MngDoc/> }/>
-            <Route path='/editdoc' element={ <div>editdoc</div> }/>
+            <Route path='/editdoc' element={<AddDoc/>}/>
             
             <Route path='/audittrail' element={ <AuditTrail/> }/>
             
