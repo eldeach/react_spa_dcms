@@ -249,6 +249,7 @@ function AddDocNoPattern() {
                 <Chip label="패턴요소 선택" color="primary"/>
                 <Autocomplete
                 id="Pos_1st"
+                size="small"
                 freeSolo
                 onChange={(event, newValue) => {
                   setUniquePatternCheck(false)
@@ -260,6 +261,7 @@ function AddDocNoPattern() {
                 />
                 <Autocomplete
                   id="Pos_2nd"
+                size="small"
                   freeSolo
                   onChange={(event, newValue) => {
                     setUniquePatternCheck(false)
@@ -271,6 +273,7 @@ function AddDocNoPattern() {
                 />
                 <Autocomplete
                   id="Pos_3rd"
+                size="small"
                   freeSolo
                   onChange={(event, newValue) => {
                     setUniquePatternCheck(false)
@@ -282,6 +285,7 @@ function AddDocNoPattern() {
                 />
                 <Autocomplete
                   id="Pos_4th"
+                size="small"
                   freeSolo
                   onChange={(event, newValue) => {
                     setUniquePatternCheck(false)
@@ -293,6 +297,7 @@ function AddDocNoPattern() {
                 />
                 <Autocomplete
                   id="Pos_5th"
+                size="small"
                   freeSolo
                   onChange={(event, newValue) => {
                     setUniquePatternCheck(false)
