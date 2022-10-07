@@ -180,173 +180,179 @@ function MyPage() {
 
 
   return (
-    <Stack style={{padding:'10px'}} direction='row' spacing={2}>
-      <Paper style={{width:'25%', padding:'20px', marginLeft:'10px',marginRight:'10px', minHeight:'650px', overflowY:'auto', boxSizing:'border-box'}} elevation={3}>
-        <Stack spacing={2}>
-          <div style={{display:'flex', alignContent:'center'}}>
-            <div style={{fontSize:"3.2vw"}}>
-              <AccountCircleIcon fontSize ="inherit" color="primary"/>
-            </div>
-            <div style={{display:'block',  width:"70%", alignContent:'center',paddingLeft:'1vw'}}>
-              <div className="fontbig">{initMyInfo.user_name}</div>
-              <div className="fontnormal">{initMyInfo.user_account}</div>
-            </div>
-          </div>
-          <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
-            <div className='info-item'>직책</div>
-            <div className='info-item-content'>{initMyInfo.user_position}</div>
+    <div style={{padding:'0.5vw'}}>
+      <div style={{width:'100%', display:'flex', flexWrap:'wrap', justifyContent:'center'}}>
+        <Paper className="seperate-paper" elevation={3}>   
+          <Stack spacing={2}>
+            <Chip label="계정 및 소속" color="primary"/>
+              <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
+                <div style={{width:'80px'}}><Chip label="사용자명" color="primary"/></div>
+                <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{initMyInfo.user_name}</div></div>
+              </Stack>
+
+              <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
+                <div style={{width:'80px'}}><Chip label="계정" color="primary"/></div>
+                <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{initMyInfo.user_account}</div></div>
+              </Stack>
+
+              <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
+                <div style={{width:'80px'}}><Chip label="직책" color="primary"/></div>
+                <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{initMyInfo.user_position}</div></div>
+              </Stack>
+
+              <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
+                <div style={{width:'80px'}}><Chip label="팀" color="primary"/></div>
+                <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{initMyInfo.user_team}</div></div>
+              </Stack>
+
+              <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
+                <div style={{width:'80px'}}><Chip label="회사" color="primary"/></div>
+                <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{initMyInfo.user_company}</div></div>
+              </Stack>
           </Stack>
-          <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
-            <div className='info-item'>팀</div>
-            <div className='info-item-content'>{initMyInfo.user_team}</div>
+        </Paper>
+        <Paper className="seperate-paper" elevation={3}>   
+          <Stack spacing={2}>
+            <Chip label="연락처 및 기타 정보" color="primary"/>
+              <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
+                <div style={{width:'80px'}}><Chip label="이메일" color="primary"/></div>
+                <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{initMyInfo.user_email}</div></div>
+              </Stack>
+
+              <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
+                <div style={{width:'80px'}}><Chip label="전화번호" color="primary"/></div>
+                <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{initMyInfo.user_phone}</div></div>
+              </Stack>
+
+              <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
+                <div style={{width:'80px'}}><Chip label="비고" color="primary"/></div>
+                <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{initMyInfo.remark}</div></div>
+              </Stack>
+
+              <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
+                <div style={{minWidth:'80px'}}><Chip label="UUID" color="primary"/></div>
+                <div style={{flexGrow:1, display:'flex', overflowY:'auto', justifyContent:'center', alignItems:'center'}}><div>{initMyInfo.uuid_binary}</div></div>
+              </Stack>
           </Stack>
-          <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
-            <div className='info-item'>회사</div>
-            <div className='info-item-content'>{initMyInfo.user_company}</div>
-          </Stack>
-          <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
-            <div className='info-item'>E-Mail</div>
-            <div className='info-item-content'>{initMyInfo.user_email}</div>
-          </Stack>
-          <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
-            <div className='info-item'>전화</div>
-            <div className='info-item-content'>{initMyInfo.user_phone}</div>
-          </Stack>
-          <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
-            <div className='info-item'>비고</div>
-            <div className='info-item-content'>{initMyInfo.remark}</div>
-          </Stack>
-          <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
-            <div className='info-item'>UUID</div>
-            <div className='info-item-content'>{initMyInfo.uuid_binary}</div>
-          </Stack>
-        </Stack>
-      </Paper>
-      <Paper style={{width:'75%', padding:'20px', marginLeft:'10px',marginRight:'10px', minHeight:'650px', overflowY:'auto', boxSizing:'border-box'}} elevation={3}>
-        <Box sx={{ width: '100%' }}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto" aria-label="My Page Tabs">
-              <Tab icon={<LockResetIcon/>} label="비밀번호 변경" {...a11yProps(0)} />
-            </Tabs>
-          </Box>
-          <TabPanel value={value} index={0}>
-            <div className="content-middle" >
-              <Formik
-                validationSchema={changePwSchema}
-                onSubmit={async (values, {resetForm})=>{
-                  let qryBody = {
-                    before_user_pw:values.before_user_pw,
-                    after_user_pw:values.after_user_pw,
-                    user_account:initMyInfo.user_account,
-                    update_by:cookies.load('userInfo').user_account
-                  }
-                  setIsSubmitting(true);
-                  let ajaxResult=await formPut(qryBody)
-                  if(ajaxResult.success){
-                    alert("비밀번호가 변경되었습니다.")
-                  }
-                  else{
-                    alert(ajaxResult.result)
-                  }
+        </Paper>
+      <Formik
+        validationSchema={changePwSchema}
+        onSubmit={async (values, {resetForm})=>{
+          let qryBody = {
+            before_user_pw:values.before_user_pw,
+            after_user_pw:values.after_user_pw,
+            user_account:initMyInfo.user_account,
+            update_by:cookies.load('userInfo').user_account
+          }
+          setIsSubmitting(true);
+          let ajaxResult=await formPut(qryBody)
+          if(ajaxResult.success){
+            alert("비밀번호가 변경되었습니다.")
+          }
+          else{
+            alert(ajaxResult.result)
+          }
+          resetForm()
+          setIsSubmitting(false);
+          LoginCheck()
+        }}
+        initialValues={{
+          before_user_pw:'',
+          after_user_pw:'',
+          after_user_pw_check:'',
+        }}
+      >
+      {({
+        handleSubmit,
+        handleChange,
+        handleBlur,
+        validateField,
+        values,
+        touched,
+        resetForm,
+        isValid,
+        errors,
+      })=>(
+        <Box
+        id="chagePwForm"
+        component="form"
+        noValidate
+        onSubmit={handleSubmit}
+        autoComplete="off"
+        >
+          <Paper className="seperate-paper" elevation={3}>  
+            <Stack spacing={2}>
+              <Chip label="비밀번호 변경" color="primary"/>
+              <TextField
+              required
+              variant="standard"
+              id="before_user_pw"
+              type="password"
+              name="before_user_pw"
+              label="Current Password"
+              value={values.before_user_pw}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              helperText={touched.before_user_pw ? errors.before_user_pw: ""}
+              error={touched.before_user_pw && Boolean(errors.before_user_pw)}
+              margin="dense"
+              fullWidth
+              />
+              <TextField
+              required
+              variant="standard"
+              id="after_user_pw"
+              type="password"
+              name="after_user_pw"
+              label="New Password"
+              value={values.after_user_pw}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              helperText={touched.after_user_pw ? errors.after_user_pw : ""}
+              error={touched.after_user_pw && Boolean(errors.after_user_pw)}
+              margin="dense"
+              fullWidth
+              />
+              <TextField
+              required
+              variant="standard"
+              id="after_user_pw_check"
+              type="password"
+              name="after_user_pw_check"
+              label="New Password Check"
+              value={values.after_user_pw_check}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              helperText={touched.after_user_pw_check ? errors.after_user_pw_check : ""}
+              error={touched.after_user_pw_check && Boolean(errors.after_user_pw_check)}
+              margin="dense"
+              fullWidth
+              />
+                <Button size="small" variant="contained" type="submit" form="chagePwForm" disabled={isSubmitting}>Submit</Button>
+                <Button size="small" variant="outlined" type="reset" disabled={isResetting} onClick={async ()=>{
+                  setIsResetting(true)
                   resetForm()
-                  setIsSubmitting(false);
+                  setIsResetting(false)
                   LoginCheck()
-                }}
-                initialValues={{
-                  before_user_pw:'',
-                  after_user_pw:'',
-                  after_user_pw_check:'',
-                }}
-              >
-              {({
-                handleSubmit,
-                handleChange,
-                handleBlur,
-                validateField,
-                values,
-                touched,
-                resetForm,
-                isValid,
-                errors,
-              })=>(
-                <div style={{alignItems:"center", textAlign:"center"}}>
-                  <Stack spacing={2}>
-                    <Box
-                    id="chagePwForm"
-                    component="form"
-                    sx={{ width: '100%', display: 'flex', flexWrap: 'wrap',justifyContent:'center' }}
-                    noValidate
-                    onSubmit={handleSubmit}
-                    autoComplete="off"
-                    >
-                      <div style={{width:'40vw',display:'block'}}>
-                        <TextField
-                          required
-                          variant="standard"
-                          id="before_user_pw"
-                          type="password"
-                          name="before_user_pw"
-                          label="Current Password"
-                          value={values.before_user_pw}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          helperText={touched.before_user_pw ? errors.before_user_pw: ""}
-                          error={touched.before_user_pw && Boolean(errors.before_user_pw)}
-                          margin="dense"
-                          fullWidth
-                        />
-                        <TextField
-                          required
-                          variant="standard"
-                          id="after_user_pw"
-                          type="password"
-                          name="after_user_pw"
-                          label="New Password"
-                          value={values.after_user_pw}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          helperText={touched.after_user_pw ? errors.after_user_pw : ""}
-                          error={touched.after_user_pw && Boolean(errors.after_user_pw)}
-                          margin="dense"
-                          fullWidth
-                        />
-                        <TextField
-                          required
-                          variant="standard"
-                          id="after_user_pw_check"
-                          type="password"
-                          name="after_user_pw_check"
-                          label="New Password Check"
-                          value={values.after_user_pw_check}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          helperText={touched.after_user_pw_check ? errors.after_user_pw_check : ""}
-                          error={touched.after_user_pw_check && Boolean(errors.after_user_pw_check)}
-                          margin="dense"
-                          fullWidth
-                        />
-                      </div>
-                    </Box>
-                    <div className='content-middle'>
-                      <Stack spacing={2} direction="row">
-                        <Button variant="contained" type="submit" form="chagePwForm" disabled={isSubmitting}>Submit</Button>
-                        <Button variant="outlined" type="reset" disabled={isResetting} onClick={async ()=>{
-                          setIsResetting(true)
-                          resetForm()
-                          setIsResetting(false)
-                          LoginCheck()
-                          }}>Reset</Button>
-                      </Stack>
-                    </div>
-                  </Stack>
-                </div>
-              )}
-              </Formik>
-            </div>
-          </TabPanel>
+                  }}>Reset</Button>
+            </Stack>
+          </Paper>
         </Box>
-      </Paper>
-    </Stack>
+      )}
+      </Formik>
+      <div style={{height:'48px'}}/>
+          <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding:'10px' }} elevation={6}>
+              <div style={{width:'100%', display:'flex', alignItems:'center', backdropFilter:'blur(10px)'}}>
+                  <AccountCircleIcon color="primary"/>
+                  <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>{"내 계정정보"}</Typography>
+                  <Button style={{marginLeft:'1vw'}} size="small" variant="contained" onClick={async ()=>{
+                  LoginCheck()
+                  navigate(-1)
+                  }}>Cancel</Button>
+              </div>
+          </Paper>
+      </div>
+    </div>
   );
 }
 

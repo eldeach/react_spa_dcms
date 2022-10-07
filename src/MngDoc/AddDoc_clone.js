@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import {  useNavigate, useLocation } from 'react-router-dom';
 //========================================================== Material UI 라이브러리 import
-import {PropTypes, Autocomplete, Checkbox, Switch, FormControlLabel, TextField, IconButton, Box, Typography, Chip, Button, Stack, Paper,Divider,Modal, ListItemIcon, ListItemText, ListItem, List } from '@mui/material/';
+import {PropTypes, Autocomplete, Switch, FormControlLabel, TextField, IconButton, Box, Typography, Chip, Button, Stack, Paper,Divider,Modal, ListItemIcon, ListItemText, ListItem, List } from '@mui/material/';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -19,7 +19,7 @@ import 'moment/locale/ko';	//대한민국
 import cookies from 'react-cookies'
 //========================================================== Slide Popup 컴포넌트 & Redux import
 import { useDispatch, useSelector } from "react-redux"
-import { setSel_tb_user,setLoginExpireTime, setSel_doc_no, setSel_doc, setSelTmmsWholeAsset, setSelSapZmmr1010, setSelEqmsAtemplate } from "./../store.js"
+import { setSel_tb_user,setLoginExpireTime, setSel_doc_no, setSel_doc, setSelTmmsWholeAsset, setSelSapZmmr1010, setSelEqmsAtemplate, setSelTmmsLocation } from "./../store.js"
 //========================================================== MngTable 컴포넌트 import
 import MngTable from './../MngTable/MngTable'
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
@@ -140,6 +140,7 @@ function AddDoc() {
         dispatch(setSel_doc_no({}))
         dispatch(setSel_tb_user({}))
         dispatch(setSelTmmsWholeAsset([]))
+        dispatch(setSelTmmsLocation([]))
         dispatch(setSelSapZmmr1010([]))
         dispatch(setSelEqmsAtemplate([]))
         dispatch(setSel_doc([]))
@@ -150,11 +151,15 @@ function AddDoc() {
         if(targetRowObj.isprotocol=='1'){
             setIsProtocol(isProtocol=>true)
         }
+        else{
+            setIsProtocol(isProtocol=>false)
+        }
         setValAtt(JSON.parse(targetRowObj.valAtt))
         setQualAtt(JSON.parse(targetRowObj.qualAtt))
         dispatch(setSel_doc_no({doc_no:targetRowObj.doc_no, newRevNo:targetRowObj.rev_no}))
         dispatch(setSel_tb_user({user_account:targetRowObj.written_by, user_name:targetRowObj.user_name, user_team:targetRowObj.written_by_team }))
         dispatch(setSelTmmsWholeAsset(JSON.parse(targetRowObj.eqAtt)))
+        dispatch(setSelTmmsLocation(JSON.parse(targetRowObj.locAtt)))
         dispatch(setSelSapZmmr1010(JSON.parse(targetRowObj.prodAtt)))
         dispatch(setSelEqmsAtemplate(JSON.parse(targetRowObj.eqmsAtt)))
         dispatch(setSel_doc(JSON.parse(targetRowObj.relateddoc)))
@@ -213,7 +218,7 @@ function AddDoc() {
     })
 
     if(ajaxData.success) return ajaxData.result
-    else alert(ajaxData)
+    else console.log(ajaxData)
   }
 
   return (
@@ -234,6 +239,7 @@ function AddDoc() {
                     qualAtt: JSON.stringify(qualAtt),
                     valAtt: JSON.stringify(valAtt),
                     eqAtt: JSON.stringify(rdx.selTmmsWholeAsset),
+                    locAtt: JSON.stringify(rdx.selTmmsLocation),
                     prodAtt: JSON.stringify(rdx.selSapZmmr1010),
                     eqmsAtt: JSON.stringify(rdx.selEqmsAtemplate),
                     isprotocol: isProtocol,
@@ -257,6 +263,7 @@ function AddDoc() {
                     qualAtt: JSON.stringify(qualAtt),
                     valAtt: JSON.stringify(valAtt),
                     eqAtt: JSON.stringify(rdx.selTmmsWholeAsset),
+                    locAtt: JSON.stringify(rdx.selTmmsLocation),
                     prodAtt: JSON.stringify(rdx.selSapZmmr1010),
                     eqmsAtt: JSON.stringify(rdx.selEqmsAtemplate),
                     isprotocol: isProtocol,
@@ -281,6 +288,7 @@ function AddDoc() {
             dispatch(setSel_doc_no({}))
             dispatch(setSel_tb_user({}))
             dispatch(setSelTmmsWholeAsset([]))
+            dispatch(setSelTmmsLocation([]))
             dispatch(setSelSapZmmr1010([]))
             dispatch(setSelEqmsAtemplate([]))
             dispatch(setSel_doc([]))
@@ -472,7 +480,6 @@ function AddDoc() {
                                     <Button size="small" variant="contained" onClick={()=>{
                                         if(valAttFiled){
                                             let tempArr = [...valAtt]
-                                            console.log(tempArr.indexOf(valAttFiled))
                                             if(tempArr.indexOf(valAttFiled)==(-1)) tempArr.push(valAttFiled)
                                             setValAtt(tempArr)
                                             LoginCheck()
@@ -531,7 +538,6 @@ function AddDoc() {
                                     <Button size="small" variant="contained" onClick={()=>{
                                         if(qualAttFiled){
                                             let tempArr = [...qualAtt]
-                                            console.log(tempArr.indexOf(qualAttFiled))
                                             if(tempArr.indexOf(qualAttFiled)==(-1)) tempArr.push(qualAttFiled)
                                             setQualAtt(tempArr)
                                             LoginCheck()
@@ -611,6 +617,49 @@ function AddDoc() {
                             <Button size="small" variant="contained" onClick={()=>{
                                 dispatch(setSelTmmsWholeAsset([]))
                             }}>비우기{" ("+rdx.selTmmsWholeAsset.length+")"}</Button>
+                        </Stack>
+                    </Paper>
+                    <Paper className="seperate-paper" elevation={3}>
+                        <Stack spacing={2}>
+                            <Button size="small" variant="contained" onClick={()=>{
+                                setPopUpPage(6)
+                                setModalTitle("관련 위치 선택")
+                                handleModalOpen()
+                                LoginCheck()
+                                }}>관련 위치 선택</Button>
+                            <div style={{width:'100%', height:'300px', overflowY:'auto', boxSizing:'border-box'}}>
+                                <List>
+                                    {
+                                        rdx.selTmmsLocation.map((oneAtt,i)=>{
+                                            return(
+                                                <ListItem
+                                                secondaryAction={
+                                                    <IconButton edge="end" aria-label="delete" onClick={()=>{
+                                                        console.log(rdx.selTmmsLocation[i])
+                                                        let temp = [...rdx.selTmmsLocation]
+                                                        temp.splice(i,1)
+                                                        dispatch(setSelTmmsLocation(temp))
+                                                    }}>
+                                                    <DeleteIcon />
+                                                    </IconButton>
+                                                }
+                                                >
+                                                <ListItemIcon>
+                                                    <SettingsApplicationsIcon color='primary'/>
+                                                </ListItemIcon>
+                                                <ListItemText
+                                                    primary={oneAtt.location_code}
+                                                    secondary={oneAtt.location_name}
+                                                />
+                                                </ListItem>
+                                            )
+                                        })
+                                    }
+                                </List>
+                            </div>
+                            <Button size="small" variant="contained" onClick={()=>{
+                                dispatch(setSelTmmsLocation([]))
+                            }}>비우기{" ("+rdx.selTmmsLocation.length+")"}</Button>
                         </Stack>
                     </Paper>
                     <Paper className="seperate-paper" elevation={3}>
@@ -781,6 +830,7 @@ function AddDoc() {
                     popUpPage==3?<MngTable getUrlStr={'/adddoc_getextdataeqmsatemplate'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={true} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
                     popUpPage==4?<MngTable getUrlStr={'/edituserauth_getuser'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={false} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
                     popUpPage==5?<MngTable getUrlStr={'/adddoc_getmngdoc'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={true} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
+                    popUpPage==6?<MngTable getUrlStr={'/adddoc_getextdatatmmslocation'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={true} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
                     <div></div>
                 }                    
                 </div>

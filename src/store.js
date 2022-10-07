@@ -80,6 +80,16 @@ let selEqmsAtemplate = createSlice({
   }
 })
 
+let selTmmsLocation = createSlice({
+  name : 'selTmmsLocation',
+  initialState : [],
+  reducers:{
+    setSelTmmsLocation(state,newTime){
+      return state = newTime.payload
+    }
+  }
+})
+
 let sel_doc_pattern_cols = createSlice({
   name : 'sel_doc_pattern',
   initialState : [],
@@ -93,13 +103,17 @@ export let {setSel_tb_user}=sel_tb_user.actions
 export let {setLoginExpireTime}=loginExpireTime.actions
 export let {setSel_doc_pattern}=sel_doc_pattern.actions
 
-export let {setSel_doc_pattern_cols}=sel_doc_pattern_cols.actions
+
 
 export let {setSel_doc_no}=sel_doc_no.actions
 export let {setSel_doc}=sel_doc.actions
 export let {setSelTmmsWholeAsset} = selTmmsWholeAsset.actions
 export let {setSelSapZmmr1010} = selSapZmmr1010.actions
 export let {setSelEqmsAtemplate} = selEqmsAtemplate.actions
+export let {setSelTmmsLocation} = selTmmsLocation.actions
+
+
+export let {setSel_doc_pattern_cols}=sel_doc_pattern_cols.actions
 
 export default configureStore({
   reducer: {
@@ -111,6 +125,7 @@ export default configureStore({
     sel_doc:sel_doc.reducer,
     selTmmsWholeAsset:selTmmsWholeAsset.reducer,
     selSapZmmr1010:selSapZmmr1010.reducer,
-    selEqmsAtemplate:selEqmsAtemplate.reducer
+    selEqmsAtemplate:selEqmsAtemplate.reducer,
+    selTmmsLocation:selTmmsLocation.reducer
   }
 }) 

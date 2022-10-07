@@ -20,6 +20,9 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import Diversity3OutlinedIcon from '@mui/icons-material/Diversity3Outlined';
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
 import UnpublishedOutlinedIcon from '@mui/icons-material/UnpublishedOutlined';
+import PrintIcon from '@mui/icons-material/Print';
+import GpsFixedIcon from '@mui/icons-material/GpsFixed';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 //========================================================== Formik & Yup 라이브러리 import
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -32,7 +35,7 @@ import moment from 'moment';
 import 'moment/locale/ko';	//대한민국
 //========================================================== Redux import
 import { useDispatch, useSelector } from "react-redux"
-import { setSel_tb_user,setSel_doc_pattern, setSel_doc_pattern_cols, setLoginExpireTime, setSel_doc_no, setSel_doc, setSelTmmsWholeAsset, setSelSapZmmr1010, setSelEqmsAtemplate } from "./../store.js"
+import { setSel_tb_user,setSel_doc_pattern, setSel_doc_pattern_cols, setLoginExpireTime, setSel_doc_no, setSel_doc, setSelTmmsWholeAsset, setSelSapZmmr1010, setSelEqmsAtemplate, setSelTmmsLocation } from "./../store.js"
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
 import LoginSessionCheck from './../Account/LoginSessionCheck.js';
 
@@ -228,6 +231,20 @@ function MngTable(props) {
       }
     }
 
+    else if(props.getUrlStr=="/adddoc_getextdatatmmslocation")
+    {
+      allParams={
+        searchKeyWord : para.searchKeyWord,
+      }
+    }
+
+    else if(props.getUrlStr=="/getmngbinder")
+    {
+      allParams={
+        searchKeyWord : para.searchKeyWord,
+      }
+    }
+
     let ajaxData = await axios({
       method:"get",
       url:props.getUrlStr,
@@ -250,126 +267,16 @@ function MngTable(props) {
     else{
       // 컬럼 및 행 데이터 분류 시작
       if (ajaxData.result.length>0) // (조회된 데이터가 있는 경우에만 작동)
-      {    
-        Object.keys(ajaxData.result[0]).map((columName,i)=>{
-          let tempMinWidth = columName.length*14
-          if(columName=="remark") tempMinWidth= 300
-          if(columName=="uuid_binary") tempMinWidth= 200
-          if(columName=="doc_no") tempMinWidth= 200
-          if(columName=="req_purpose") tempMinWidth= 300
-
-          if(columName=="pr_title") tempMinWidth= 300
-          if(columName=="create_datetime") tempMinWidth= 200
-          if(columName=="due_date") tempMinWidth= 200
-          if(columName=="date_closed") tempMinWidth= 200
-          if(columName=="written_by") tempMinWidth= 100
-
-          if(columName=="doc_title") tempMinWidth= 400
-          
-          if(columName=="eq_name") tempMinWidth= 200
-          if(columName=="eq_team") tempMinWidth= 200
-          if(columName=="eq_part") tempMinWidth= 200
-          if(columName=="eq_capa") tempMinWidth= 200
-          if(columName=="eq_location") tempMinWidth= 240
-
-          if(columName=="mat_name") tempMinWidth= 300
-
-          if(columName=="qualAtt") tempMinWidth= 300
-          if(columName=="valAtt") tempMinWidth= 300
-          if(columName=="eqAtt") tempMinWidth= 300
-          if(columName=="prodAtt") tempMinWidth= 300
-          if(columName=="eqmsAtt") tempMinWidth= 300
-          if(columName=="relateddoc") tempMinWidth= 300
-          if(columName=="isprotocol") tempMinWidth= 100
-
-          if (columName=="user_name"){
-            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
-              <Chip icon={<FaceOutlinedIcon />} size="small" color="primary" label={params.value}/>
-            )})
-          }
-          else if (columName.indexOf("team")!=(-1)){
-            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
-              params.value?<Chip icon={<Diversity3OutlinedIcon />} size="small" color="primary" label={params.value}/>:<div></div>
-            )})
-          }
-          else if (columName=="approval_date"){
-            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
-              params.value?<Chip icon={<CheckCircleOutlineOutlinedIcon />} size="small" color="primary" label={params.value}/>:<div></div>
-            )})
-          }
-          else if (columName=="invalid_date"){
-            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
-              params.value?<Chip icon={<UnpublishedOutlinedIcon />} size="small" color="expired" label={params.value}/>:<div></div>
-            )})
-          }
-          else if (columName=="qualAtt"){
-            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
-              <div style={{display:'flex', flexWrap:'wrap'}}>{
-                JSON.parse(params.value).map((oneItem,i)=>{
-                  return <Tooltip title={oneItem.att_name} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.abb}/></Tooltip>
-                })
-              }</div>
-            )})
-          }
-          else if (columName=="valAtt"){
-            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
-              <div style={{display:'flex', flexWrap:'wrap'}}>{
-                JSON.parse(params.value).map((oneItem,i)=>{
-                  return <Tooltip title={oneItem.att_name} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.abb}/></Tooltip>
-                })
-              }</div>
-            )})
-          }
-          else if (columName=="eqAtt"){
-            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
-              <div style={{display:'flex', flexWrap:'wrap'}}>{
-                JSON.parse(params.value).map((oneItem,i)=>{
-                  return <Tooltip title={"("+oneItem.eq_code+" / "+ oneItem.eq_code_alt+")"} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.eq_name}/></Tooltip>
-                })
-              }</div>
-            )})
-          }
-          else if (columName=="prodAtt"){
-            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, display:'flex', flexWrap:'warp', renderCell: (params) => (
-              <div style={{display:'flex', flexWrap:'wrap'}}>{
-              JSON.parse(params.value).map((oneItem,i)=>{
-                return <Tooltip title={oneItem.mat_name} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.mat_code}/></Tooltip>
-              })
-            }</div>
-            )})
-          }
-          else if (columName=="eqmsAtt"){
-            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
-              <div style={{display:'flex', flexWrap:'wrap'}}>{
-                JSON.parse(params.value).map((oneItem,i)=>{
-                  return <Tooltip title={oneItem.project+": "+oneItem.pr_title} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.pr_no}/></Tooltip>
-                })
-              }</div>
-            )})
-          }
-          else if (columName=="relateddoc"){
-            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
-              <div style={{display:'flex', flexWrap:'wrap'}}>{
-                JSON.parse(params.value).map((oneItem,i)=>{
-                  return <Tooltip title={oneItem.doc_title} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.doc_no+"("+oneItem.rev_no+")"}/></Tooltip>
-                })
-              }</div>
-            )})
-          }
-          else if (columName=="isprotocol"){
-            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
-              params.value?<Chip icon={<DescriptionOutlinedIcon />} size="small" color="primary" label={params.value}/>:<div></div>
-            )})
-          }
-          else{
-            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1})
-          }
-        })
-
+      {
         if (props.editable){
+          let actionMinWidth
+          if(props.getUrlStr=="/getmngbinder") actionMinWidth=260
+          else actionMinWidth= 100
           tempCol.push({
             field: 'action',
             headerName: 'Action',
+            minWidth:(actionMinWidth),
+            flex:1,
             sortable: false,
             renderCell:(cellValues) => {
               if(props.getUrlStr=="/getmngaccount"){
@@ -428,9 +335,193 @@ function MngTable(props) {
                   </Button>
                 )
               }
+              else if(props.getUrlStr=="/getmngbinder"){
+                return (
+                  <Stack direction='row' spacing={2}>
+                      <Button
+                      variant="contained"
+                      onClick={(event) => {
+                        navigate('/editbinder',{state: {
+                          rowObj: cellValues.row,
+                        },})
+                      }}
+                    >
+                      <EditIcon fontSize="small"/>
+                    </Button>
+                    <Button
+                      variant="contained"
+                      onClick={(event) => {
+                        navigate('/printbinder',{state: {
+                          rowObj: cellValues.row,
+                        },})
+                      }}
+                    >
+                      <PrintIcon fontSize="small"/>
+                    </Button>
+                    <Button
+                      variant="contained"
+                      onClick={(event) => {
+                        navigate('/detectbinder',{state: {
+                          rowObj: cellValues.row,
+                        },})
+                      }}
+                    >
+                      <SearchIcon fontSize="small"/>
+                    </Button>
+                  </Stack>
+                )
+              }
             }
           })
         }
+        
+        Object.keys(ajaxData.result[0]).map((columName,i)=>{
+          let tempMinWidth = columName.length*14
+          if(columName=="remark") tempMinWidth= 300
+          if(columName=="uuid_binary") tempMinWidth= 200
+          if(columName=="doc_no") tempMinWidth= 200
+          if(columName=="req_purpose") tempMinWidth= 300
+
+          if(columName=="pr_title") tempMinWidth= 300
+          if(columName=="create_datetime") tempMinWidth= 200
+          if(columName=="due_date") tempMinWidth= 200
+          if(columName=="date_closed") tempMinWidth= 200
+          if(columName=="written_by") tempMinWidth= 100
+
+          if(columName=="doc_title") tempMinWidth= 400
+          
+          if(columName=="eq_name") tempMinWidth= 200
+          if(columName=="eq_team") tempMinWidth= 200
+          if(columName=="eq_part") tempMinWidth= 200
+          if(columName=="eq_capa") tempMinWidth= 200
+          if(columName=="eq_location") tempMinWidth= 240
+
+          if(columName=="mat_name") tempMinWidth= 300
+
+          if(columName=="qualAtt") tempMinWidth= 300
+          if(columName=="valAtt") tempMinWidth= 300
+          if(columName=="eqAtt") tempMinWidth= 300
+          if(columName=="locAtt") tempMinWidth= 300
+          if(columName=="prodAtt") tempMinWidth= 300
+          if(columName=="eqmsAtt") tempMinWidth= 300
+          if(columName=="relateddoc") tempMinWidth= 300
+          if(columName=="isprotocol") tempMinWidth= 100
+
+          if(columName=="binder_title") tempMinWidth= 400
+          if(columName=="binder_year") tempMinWidth= 100
+
+          if (columName=="user_name"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <Chip icon={<FaceOutlinedIcon />} size="small" color="primary" label={params.value}/>
+            )})
+          }
+          else if (columName.indexOf("team")!=(-1)){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              params.value?<Chip icon={<Diversity3OutlinedIcon />} size="small" color="primary" label={params.value}/>:<div></div>
+            )})
+          }
+          else if (columName=="approval_date"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              params.value?<Chip icon={<CheckCircleOutlineOutlinedIcon />} size="small" color="primary" label={params.value}/>:<div></div>
+            )})
+          }
+          else if (columName=="invalid_date"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              params.value?<Chip icon={<UnpublishedOutlinedIcon />} size="small" color="expired" label={params.value}/>:<div></div>
+            )})
+          }
+          else if (columName=="qualAtt"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <div style={{display:'flex', flexWrap:'wrap'}}>{
+                JSON.parse(params.value).map((oneItem,i)=>{
+                  return <Tooltip title={oneItem.att_name} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.abb}/></Tooltip>
+                })
+              }</div>
+            )})
+          }
+          else if (columName=="valAtt"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <div style={{display:'flex', flexWrap:'wrap'}}>{
+                JSON.parse(params.value).map((oneItem,i)=>{
+                  return <Tooltip title={oneItem.att_name} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.abb}/></Tooltip>
+                })
+              }</div>
+            )})
+          }
+          else if (columName=="eqAtt"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <div style={{display:'flex', flexWrap:'wrap'}}>{
+                JSON.parse(params.value).map((oneItem,i)=>{
+                  return <Tooltip title={"("+oneItem.eq_code+" / "+ oneItem.eq_code_alt+")"} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.eq_name}/></Tooltip>
+                })
+              }</div>
+            )})
+          }
+          else if (columName=="locAtt"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <div style={{display:'flex', flexWrap:'wrap'}}>{
+                JSON.parse(params.value).map((oneItem,i)=>{
+                  return <Tooltip title={oneItem.location_name} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.location_code}/></Tooltip>
+                })
+              }</div>
+            )})
+          }
+          else if (columName=="prodAtt"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, display:'flex', flexWrap:'warp', renderCell: (params) => (
+              <div style={{display:'flex', flexWrap:'wrap'}}>{
+              JSON.parse(params.value).map((oneItem,i)=>{
+                return <Tooltip title={oneItem.mat_name} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.mat_code}/></Tooltip>
+              })
+            }</div>
+            )})
+          }
+          else if (columName=="eqmsAtt"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <div style={{display:'flex', flexWrap:'wrap'}}>{
+                JSON.parse(params.value).map((oneItem,i)=>{
+                  return <Tooltip title={oneItem.project+": "+oneItem.pr_title} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.pr_no}/></Tooltip>
+                })
+              }</div>
+            )})
+          }
+          else if (columName=="relateddoc"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <div style={{display:'flex', flexWrap:'wrap'}}>{
+                JSON.parse(params.value).map((oneItem,i)=>{
+                  return <Tooltip title={oneItem.doc_title} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.doc_no+"("+oneItem.rev_no+")"}/></Tooltip>
+                })
+              }</div>
+            )})
+          }
+          else if (columName=="isprotocol"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              params.value?
+              (params.value==0?
+                <Tooltip title={"값 : " + params.value} placement="top" arrow><Chip icon={<DescriptionOutlinedIcon />} size="small" color="primary" label={"보고서"}/></Tooltip>
+              :<Tooltip title={"값 : " + params.value} placement="top" arrow><Chip icon={<DescriptionOutlinedIcon />} size="small" color="primary" label={"계획서"}/></Tooltip>)
+              :<div></div>
+            )})
+          }
+          else if (columName=="binder_loc"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <Chip icon={<GpsFixedIcon />} size="small" color="primary" label={params.value}/>
+            )})
+          }
+          else if (columName=="current_loc"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              params.value?
+              ((params.value.indexOf("user_account")==-1)?
+                <Chip icon={<GpsFixedIcon />} size="small" color="primary" label={params.value}/>
+                :<Tooltip title={"계정 : " + JSON.parse(params.value).user_account+" ("+JSON.parse(params.value).user_team+")"} placement="top" arrow><Chip icon={<GpsFixedIcon />} size="small" color="primary" label={JSON.parse(params.value).user_name+"님"}/></Tooltip>)
+                :<div/>
+            )})
+          }
+          else{
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1})
+          }
+        })
+
+        
 
         ajaxData.result.map((oneRow,i)=>{ //ajax 데이터 중 datetime 값을 한국시간으로 변경
             let tempObjs = oneRow
@@ -690,6 +781,24 @@ function MngTable(props) {
                     temp = [...set];
                     dispatch(setSel_doc(temp))
                   }
+                  else if(props.getUrlStr=="/adddoc_getextdatatmmslocation"){
+                    let temp = [...rdx.selTmmsLocation]
+                    let selRows=[]
+                    pickRows.map((onePick,i)=>{
+                      let dupCheck=false
+                      if (temp.length>0){
+                        temp.map((oneItem,j)=>{
+                          if(oneItem.location_code == onePick.location_code) dupCheck = true
+                        })
+                      }
+                      if (!dupCheck) selRows.push({location_code:onePick.location_code, location_name:onePick.location_name })
+                    })
+                    
+                    temp.push.apply(temp, selRows)
+                    let set = new Set(temp);
+                    temp = [...set];
+                    dispatch(setSelTmmsLocation(temp))
+                  }
                   else{
                     
                   }
@@ -800,6 +909,13 @@ function MngTable(props) {
                 else if (props.getUrlStr=="/getmngdoc"&&delRowBt)
                 {
                   let reqResult = await DeleteDoc(pickRows)
+                  if(!reqResult.success) alert(reqResult.result)
+                  InitializeTbl ()
+                  setDelRowBt(delRowBt=>false)
+                }
+                else if (props.getUrlStr=="/getmngbinder"&&delRowBt)
+                {
+                  let reqResult = await DeleteBinder(pickRows)
                   if(!reqResult.success) alert(reqResult.result)
                   InitializeTbl ()
                   setDelRowBt(delRowBt=>false)
@@ -1028,6 +1144,28 @@ async function DeleteDoc(pickRows){
   let ajaxData =  await axios({
     method:"delete",
     url:"/deletedoc",
+    params:para,
+    headers:{
+      'Content-Type':'application/json'
+    }})
+    .then((res)=>res.data)
+    .catch((err)=>console.log(err))
+    return ajaxData
+}
+
+async function DeleteBinder(pickRows){
+  let targetRows=[]
+  pickRows.map((oneRow,i)=>{
+    targetRows.push({binder_no:oneRow.binder_no, binder_title:oneRow.binder_title, uuid_binary:oneRow.uuid_binary, delete_by:cookies.load('userInfo').user_account})
+  })
+
+  let para={
+    targetRows:targetRows
+  }
+  
+  let ajaxData =  await axios({
+    method:"delete",
+    url:"/deletebinder",
     params:para,
     headers:{
       'Content-Type':'application/json'

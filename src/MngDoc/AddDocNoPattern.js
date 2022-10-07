@@ -56,19 +56,19 @@ function AddDocNoPattern() {
     .test(
       'is_unique_pattern',
       '패턴 중복체크가 필요합니다.',
-      (value, context) => uniquePatternCheck
+      (value, context) => uniquePatternCheck||!(targetRowObj=="N/A")
     )
     .test(
       'not_dup_pattern',
       '중복된 패턴입니다.',
-      (value, context) => uniquePattern
+      (value, context) => uniquePattern||!(targetRowObj=="N/A")
     )
     .test(
       'pattern_blank_check',
       "공백은 없어야 합니다.",
       function(value){
           if(typeof(value)=="string"){
-              return !value.includes(" ")
+              return !value.includes(" ")||!(targetRowObj=="N/A")
           }
       }
     ),
@@ -85,12 +85,12 @@ function AddDocNoPattern() {
     .test(
       'is_unique_pattern_name',
       '패턴명 중복체크가 필요합니다.',
-      (value, context) => uniquePatternNameCheck
+      (value, context) => uniquePatternNameCheck||!(targetRowObj=="N/A")
     )
     .test(
       'not_dup_pattern_name',
       '중복된 패턴명입니다.',
-      (value, context) => uniquePatternName
+      (value, context) => uniquePatternName||!(targetRowObj=="N/A")
     ),
 
     pattern_description: yup.string()
@@ -113,11 +113,13 @@ function AddDocNoPattern() {
   useEffect(() => {
     // 이 페이지의 권한 유무 확인
     authCheck()
+    
   },[]);
 
   //========================================================== [ADD form에서 추가] 수정할 row Oject state 넘겨받기 위한 코드
   const location = useLocation();
   const targetRowObj= (!location.state ? "N/A" : location.state.rowObj)
+  console.log(targetRowObj)
 
   async function LoginCheck(){
     let checkResult = await LoginSessionCheck("check",{})
@@ -148,7 +150,19 @@ function AddDocNoPattern() {
   }
 
   async function postAddDocPattern(qryBody){
-    let ajaxData = await axios.post("/postAddDocPattern",qryBody)
+    let ajaxData = await axios.post("/postadddocnopattern",qryBody)
+    .then((res)=>res.data)
+    .catch((err)=>{
+      console.log(err)
+    })
+
+    if(ajaxData.success) return ajaxData.result
+    else alert(ajaxData)
+    
+  }
+
+  async function putAddDocPattern(qryBody){
+    let ajaxData = await axios.put("/putadddocnopattern",qryBody)
     .then((res)=>res.data)
     .catch((err)=>{
       console.log(err)
@@ -182,7 +196,21 @@ function AddDocNoPattern() {
               console.log(ajaxData)
             }
             else{
-
+              let qryBody = {
+                doc_no_pattern:values.doc_no_pattern,
+                start_rev_no:values.start_rev_no,
+                ref_sop_no:values.ref_sop_no,
+                ref_sop_rev:values.ref_sop_rev,
+                pattern_name:values.pattern_name,
+                pattern_description:values.pattern_description,
+                pattern_pair_code:values.pattern_pair_code,
+                serial_pool:values.serial_pool,
+                remark:values.remark,                
+                update_by:cookies.load('userInfo').user_account,
+                uuid_binary:targetRowObj.uuid_binary
+            }
+            let ajaxData = await putAddDocPattern(qryBody)
+            console.log(ajaxData)
             }
 
             resetForm()
@@ -214,15 +242,15 @@ function AddDocNoPattern() {
             serial_pool:'',
             remark: ''
           }:{
-            doc_no_pattern: '',
-            start_rev_no: '',
-            ref_sop_no: '',
-            ref_sop_rev: '',
-            pattern_name: '',
-            pattern_description: '',
-            pattern_pair_code:'',
-            serial_pool:'',
-            remark: ''
+            doc_no_pattern: targetRowObj.doc_no_pattern,
+            start_rev_no: targetRowObj.start_rev_no,
+            ref_sop_no: targetRowObj.ref_sop_no,
+            ref_sop_rev: targetRowObj.ref_sop_rev,
+            pattern_name: targetRowObj.pattern_name,
+            pattern_description: targetRowObj.pattern_description,
+            pattern_pair_code:targetRowObj.pattern_pair_code,
+            serial_pool:targetRowObj.serial_pool,
+            remark: targetRowObj.remark
           }}
         >
         {({
@@ -250,6 +278,7 @@ function AddDocNoPattern() {
                 <Autocomplete
                 id="Pos_1st"
                 size="small"
+                disabled={!(targetRowObj=="N/A")}
                 freeSolo
                 onChange={(event, newValue) => {
                   setUniquePatternCheck(false)
@@ -261,7 +290,8 @@ function AddDocNoPattern() {
                 />
                 <Autocomplete
                   id="Pos_2nd"
-                size="small"
+                  size="small"
+                  disabled={!(targetRowObj=="N/A")}
                   freeSolo
                   onChange={(event, newValue) => {
                     setUniquePatternCheck(false)
@@ -273,7 +303,8 @@ function AddDocNoPattern() {
                 />
                 <Autocomplete
                   id="Pos_3rd"
-                size="small"
+                  size="small"
+                  disabled={!(targetRowObj=="N/A")}
                   freeSolo
                   onChange={(event, newValue) => {
                     setUniquePatternCheck(false)
@@ -285,7 +316,8 @@ function AddDocNoPattern() {
                 />
                 <Autocomplete
                   id="Pos_4th"
-                size="small"
+                  size="small"
+                  disabled={!(targetRowObj=="N/A")}
                   freeSolo
                   onChange={(event, newValue) => {
                     setUniquePatternCheck(false)
@@ -297,7 +329,8 @@ function AddDocNoPattern() {
                 />
                 <Autocomplete
                   id="Pos_5th"
-                size="small"
+                  size="small"
+                  disabled={!(targetRowObj=="N/A")}
                   freeSolo
                   onChange={(event, newValue) => {
                     setUniquePatternCheck(false)
@@ -318,7 +351,8 @@ function AddDocNoPattern() {
                 id="doc_no_pattern"
                 name="doc_no_pattern"
                 label="문서번호 패턴 미리보기"
-                value={values.doc_no_pattern=pos1st+pos2nd+pos3rd+pos4th+pos5th}
+                disabled={!(targetRowObj=="N/A")}
+                value={(targetRowObj=="N/A")?values.doc_no_pattern=pos1st+pos2nd+pos3rd+pos4th+pos5th:values.doc_no_pattern}
                 onChange={(e)=>{
                   handleChange(e)
                   setUniquePatternCheck(false)
@@ -329,7 +363,7 @@ function AddDocNoPattern() {
                 margin="dense"
                 fullWidth
                 />
-                <Button variant="outlined" size="small" disabled={isPatternConfirming} onClick={async ()=>{
+                <Button variant="outlined" size="small" disabled={isPatternConfirming||!(targetRowObj=="N/A")} onClick={async ()=>{
                   setUniquePatternCheck(true)
                   setIsPatternConfirming(isPatternConfirming=>true)
 
@@ -358,7 +392,7 @@ function AddDocNoPattern() {
                 id="pattern_name"
                 name="pattern_name"
                 label="문서번호 규칙 명칭"
-                // type="text"
+                disabled={!(targetRowObj=="N/A")}
                 value={values.pattern_name}
                 onChange={(e)=>{
                   handleChange(e)
@@ -370,7 +404,7 @@ function AddDocNoPattern() {
                 margin="dense"
                 fullWidth
                 />
-                <Button variant="outlined" size="small" disabled={isPatternNameConfirming} onClick={async ()=>{
+                <Button variant="outlined" size="small" disabled={isPatternNameConfirming||!(targetRowObj=="N/A")} onClick={async ()=>{
                   setUniquePatternNameCheck(true)
                   setIsPatternNameConfirming(isPatternNameConfirming=>true)
 
@@ -419,7 +453,7 @@ function AddDocNoPattern() {
                 id="pattern_pair_code"
                 name="pattern_pair_code"
                 label="Pair Code"
-                // type="text"
+                disabled={!(targetRowObj=="N/A")}
                 value={values.pattern_pair_code}
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -434,7 +468,7 @@ function AddDocNoPattern() {
                 id="serial_pool"
                 name="serial_pool"
                 label="Serial Pool"
-                // type="text"
+                disabled={!(targetRowObj=="N/A")}
                 value={values.serial_pool}
                 onChange={handleChange}
                 onBlur={handleBlur}

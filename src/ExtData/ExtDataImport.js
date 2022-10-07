@@ -1,5 +1,5 @@
-import { read, utils, writeFile } from 'xlsx';
-import {AppBar, Divider, Input, Backdrop, CircularProgress, Stack, TextField, Paper, Box, Toolbar, Typography, Button, IconButton, Drawer, ListItemButton, ListItemIcon, ListItemText, ListItem, List} from '@mui/material/';
+import { read, utils } from 'xlsx';
+import { Stack, TextField, Paper, Typography, Button } from '@mui/material/';
 import BackupIcon from '@mui/icons-material/Backup';
 //========================================================== Slide Popup 컴포넌트 & Redux import
 import { useDispatch, useSelector } from "react-redux"
@@ -8,7 +8,6 @@ import { useState } from 'react';
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
 import LoginSessionCheck from './../Account/LoginSessionCheck.js';
 import { useNavigate } from 'react-router-dom';
-import { object } from 'yup';
 //========================================================== axios 라이브러리 import
 import axios from 'axios';
 //========================================================== cookie 라이브러리 import
@@ -25,6 +24,7 @@ function ExtDataImport(){
     let [isEqms,setIsEqms] = useState(true);
     let [isSap,setIsSap] = useState(true);
     let [isTmms,setIsTmms] = useState(true);
+    let [isTmmsLoc,setIsTmmsLoc] = useState(true);
 
     async function LoginCheck(){
         let checkResult = await LoginSessionCheck("check",{})
@@ -143,10 +143,22 @@ function ExtDataImport(){
         else alert(ajaxData)
         
     }
-    
+
+    async function postExtDataTmmsLocation(qryBody){
+      let ajaxData = await axios.post("/postextdatatmmslocation",{extdatas:qryBody,handle_by:cookies.load('userInfo').user_account})
+      .then((res)=>res.data)
+      .catch((err)=>{
+        console.log(err)
+      })
+  
+      if(ajaxData.success) return ajaxData.result
+      else alert(ajaxData)
+      
+  }
+
     return(
         <div style={{width:'100vw', display:'flex', flexWrap:'wrap' ,justifyContent:'center', alignItems:'center'}}>
-            <Paper style={{width:'48vw', minWidth : '300px', height:'360px', padding:'10px', margin:'0.5vw', overflowY:'auto', boxSizing:'border-box'}} elevation={3}>
+            <Paper className="seperate-paper" elevation={3}>
                 <Stack spacing={2}>
                     <div style={{width:'100%', display:'flex', alignItems:'center'}}>
                         <BackupIcon color="primary"/>
@@ -159,27 +171,38 @@ function ExtDataImport(){
                                 setIsEqms(true);
                                 setIsSap(true);
                                 setIsTmms(true);
+                                setIsTmmsLoc(true)
                                 handleImport(e)
                                 setFileReading(false)
                             }} accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"/>
                         </div>
                         <Button disabled={fileReading} variant="contained" size="small" color="primary" onClick={()=>{
                             LoginCheck()
+                            console.log(Object.keys(extDataArray[0]).length)
                             if(Object.keys(extDataArray[0]).length==83){
                                 setIsEqms(true);
                                 setIsSap(false);
                                 setIsTmms(true);
+                                setIsTmmsLoc(true)
                             }
                             else if(Object.keys(extDataArray[0]).length==24){
                                 setIsEqms(true);
                                 setIsSap(true);
                                 setIsTmms(false);
+                                setIsTmmsLoc(true)
                             }
                             else if(Object.keys(extDataArray[0]).length==8){
                                 setIsEqms(false);
                                 setIsSap(true);
                                 setIsTmms(true);
+                                setIsTmmsLoc(true)
                             }
+                            else if(Object.keys(extDataArray[0]).length==7){
+                              setIsEqms(true);
+                              setIsSap(true);
+                              setIsTmms(true);
+                              setIsTmmsLoc(false)
+                          }
                             setFileReading(true)
                             }}>식별</Button>
                     </div>
@@ -201,8 +224,15 @@ function ExtDataImport(){
                         LoginCheck()
                         console.log (await postExtDataTmms(extDataArray))
                         }}>
-                        <Typography variant="button">TMMS Data</Typography>
+                        <Typography variant="button">{"TMMS Data (설비)"}</Typography>
                         <Typography variant="body2">{"(from : 설비자산>전체마스터)"}</Typography>
+                    </Button>
+                    <Button style={{ display: "block", textAlign: "center" }} disabled={isTmmsLoc} variant="contained" size="small" color="primary" onClick={async ()=>{
+                        LoginCheck()
+                        console.log (await postExtDataTmmsLocation(extDataArray))
+                        }}>
+                        <Typography variant="button">{"TMMS Data (설비위치)"}</Typography>
+                        <Typography variant="body2">{"(from : 설비자산>설비위치)"}</Typography>
                     </Button>
                 </Stack>
             </Paper>

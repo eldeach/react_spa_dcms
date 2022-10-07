@@ -1,10 +1,10 @@
 import './App.css';
 //========================================================== React 라이브러리 import
 import { useState } from 'react';
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, useNavigate  } from 'react-router-dom';
 
 //========================================================== Material UI 라이브러리 import
-import {AppBar, Divider, Box, Toolbar, Typography, Button, IconButton, Drawer, ListItemButton, ListItemIcon, ListItemText, ListItem, List} from '@mui/material/';
+import { AppBar, Divider, Box, Toolbar, Typography, Button, IconButton, Drawer, ListItemButton, ListItemIcon, ListItemText, ListItem, List} from '@mui/material/';
 //----------------------------------------------------------- Material UI 라이브러리 (Icon) import
 import MenuIcon from '@mui/icons-material/Menu';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
@@ -18,6 +18,18 @@ import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import AddIcon from '@mui/icons-material/Add';
 import FolderIcon from '@mui/icons-material/Folder';
+import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
+import PageviewIcon from '@mui/icons-material/Pageview';
+import ImportExportIcon from '@mui/icons-material/ImportExport';
+import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import BackupIcon from '@mui/icons-material/Backup';
+
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+
 //========================================================== axios 라이브러리 import
 import axios from 'axios';
 //========================================================== cookie 라이브러리 import
@@ -40,6 +52,14 @@ import AddDocNo_clone from './MngDoc/AddDocNo_clone'
 import AddDoc from './MngDoc/AddDoc'
 import MngDoc from './MngDoc/MngDoc'
 import AddDoc_clone from './MngDoc/AddDoc_clone'
+
+import AddBinder from './MngBinder/AddBinder'
+import MngBinder from './MngBinder/MngBinder'
+import PrintBinder from './MngBinder/PrintBinder'
+
+import ImportBinder from './MngBinder/ImportBinder'
+import ExportBinder from './MngBinder/ExportBinder'
+import Detectbinder from './MngBinder/Detectbinder'
 
 import AddDocNoPattern from './MngDoc/AddDocNoPattern'
 import MngDocNoPattern from './MngDoc/MngDocNoPattern'
@@ -84,6 +104,12 @@ const theme = createTheme({
       light: '#ff5c8d',
       main: '#d81b60',
       dark: '#a00037',
+      contrastText: '#ffffff',
+    },
+    confirm:{
+      light: '#9cff57',
+      main: '#64dd17',
+      dark: '#1faa00',
       contrastText: '#ffffff',
     }
   },
@@ -237,15 +263,87 @@ function App() {
         <ListItem disablePadding>
           <ListItemButton onClick={()=>{
             LoginCheck()
-            navigate("/mngdocno")
+            navigate("/mngbiner")
             }}>
             <ListItemIcon>
               <FolderIcon color="primary"/> 
             </ListItemIcon>
-            <ListItemText primary={"바인더 인벤토리"} />
+            <ListItemText primary={"바인더 정보 관리"} />
           </ListItemButton>
         </ListItem>
-      </List>   
+        <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/addbinder")
+            }}>
+            <ListItemIcon>
+              <CreateNewFolderIcon color="primary"/> 
+            </ListItemIcon>
+            <ListItemText primary={"바인더 정보 추가"} />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/audittrail")
+            }}>
+            <ListItemIcon>
+              <PageviewIcon color="primary"/> 
+            </ListItemIcon>
+            <ListItemText primary={"바인더 들여다보기"} />
+          </ListItemButton>
+        </ListItem>
+      </List>
+      <Divider />
+      <List>
+        <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/audittrail")
+            }}>
+            <ListItemIcon>
+              <ImportExportIcon color="primary"/> 
+            </ListItemIcon>
+            <ListItemText primary={"바인더 입출고 관리"} />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/importbinder")
+            }}>
+            <ListItemIcon>
+              <SystemUpdateAltIcon color="primary"/> 
+            </ListItemIcon>
+            <ListItemText primary={"바인더 입고"} />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/exportbinder")
+            }}>
+            <ListItemIcon>
+              <OpenInNewIcon color="primary"/> 
+            </ListItemIcon>
+            <ListItemText primary={"바인더 출고"} />
+          </ListItemButton>
+        </ListItem>
+      </List>
+      <Divider />
+      <List>
+        <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/audittrail")
+            }}>
+            <ListItemIcon>
+              <ManageSearchIcon color="primary"/> 
+            </ListItemIcon>
+            <ListItemText primary={"Audit Trail"} />
+          </ListItemButton>
+        </ListItem>
+      </List>
       <Divider />
       <List>
         <ListItem disablePadding>
@@ -287,35 +385,10 @@ function App() {
         <ListItem disablePadding>
           <ListItemButton onClick={()=>{
             LoginCheck()
-            navigate("/audittrail")
-            }}>
-            <ListItemIcon>
-              <ManageSearchIcon color="primary"/> 
-            </ListItemIcon>
-            <ListItemText primary={"Audit Trail"} />
-          </ListItemButton>
-        </ListItem>
-      </List>
-      <Divider />
-      <List>
-        <ListItem disablePadding>
-          <ListItemButton onClick={()=>{
-            LoginCheck()
-            navigate("/importtmmswholeasset")
-            }}>
-            <ListItemIcon>
-              <ManageSearchIcon /> 
-            </ListItemIcon>
-            <ListItemText primary={"Ext. TMMS DATA"} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton onClick={()=>{
-            LoginCheck()
             navigate("/extdataimport")
             }}>
             <ListItemIcon>
-              <ManageSearchIcon /> 
+              <BackupIcon /> 
             </ListItemIcon>
             <ListItemText primary={"Ext. Data Import"} />
           </ListItemButton>
@@ -391,7 +464,7 @@ function App() {
 
             <Route path='/adddocnopattern' element={ <AddDocNoPattern/>  }/>
             <Route path='/mngdocnopattern' element={ <MngDocNoPattern/> }/>
-            <Route path='/editdocnopattern' element={ <div>editdocnopattern</div> }/>
+            <Route path='/editdocnopattern' element={ <AddDocNoPattern/> }/>
 
             <Route path='/adddocno' element={ <AddDocNo/> }/>
             <Route path='/mngdocno' element={ <MngDocNo/> }/>
@@ -400,7 +473,16 @@ function App() {
             <Route path='/adddoc' element={<AddDoc/>}/>
             <Route path='/mngdoc' element={ <MngDoc/> }/>
             <Route path='/editdoc' element={<AddDoc_clone/>}/>
-            
+
+            <Route path='/addbinder' element={<AddBinder/>}/>
+            <Route path='/mngbiner' element={ <MngBinder/> }/>
+            <Route path='/editbinder' element={<AddBinder/>}/>
+            <Route path='/printbinder' element={<PrintBinder/>}/>
+
+            <Route path='/importbinder' element={<ImportBinder/>}/>
+            <Route path='/exportbinder' element={<ExportBinder/>}/>
+            <Route path='/Detectbinder' element={<Detectbinder/>}/>
+
             <Route path='/audittrail' element={ <AuditTrail/> }/>
             
             <Route path='/importtmmswholeasset' element={ <ImportTmmsWholeAsset/> }/>

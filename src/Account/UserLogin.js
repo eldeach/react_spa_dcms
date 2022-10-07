@@ -6,6 +6,8 @@ import {  useNavigate } from 'react-router-dom';
 
 import LockIcon from '@mui/icons-material/Lock';
 import {Box,TextField,Button,Paper, Stack, Backdrop, CircularProgress, Typography, Chip} from '@mui/material/';
+
+import LockPersonIcon from '@mui/icons-material/LockPerson';
 //========================================================== Formik & Yup 라이브러리 import
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -114,7 +116,7 @@ function UserLogin() {
           <div style={{width:'100%', height:'70vh', display:'flex', flexWrap:'wrap', justifyContent:'center', alignItems:'center'}}>
             <Paper className="seperate-paper" elevation={3}>
               <Stack spacing={2}>
-                <Chip label="로그인 계정 입력" color="primary"/>
+                <Chip icon={<LockPersonIcon/>} label="로그인 계정 입력" color="primary"/>
                 <div style={{height:'42px'}}></div>
                 <TextField
                 required
@@ -149,7 +151,7 @@ function UserLogin() {
             </Paper>
             <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding:'10px' }} elevation={6}>
                 <div style={{width:'100%', display:'flex', alignItems:'center', backdropFilter:'blur(10px)'}}>
-                    <LockIcon color="primary"/>
+                    <LockPersonIcon color="primary"/>
                     <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>사용자 로그인</Typography>
                     <Button size="small" variant="contained" type="submit" form="UserLogin" disabled={isSubmitting}>Submit</Button>
                     <Button style={{marginLeft:'1vw'}} size="small" variant="contained" onClick={async ()=>{
