@@ -201,6 +201,16 @@ h1{
     box-sizing:border-box
   }
 
+  .seperate-paper-fullheight{
+    width:30vw;
+    min-width : 300px;
+    height:82vh;
+    padding:20px;
+    margin:0.5vw;
+    overflow-y:auto;
+    box-sizing:border-box
+  }
+
   .incell-div-value{
     color:white;
     background-color: darkcyan;
@@ -210,4 +220,8 @@ h1{
     padding-top: 4px;
     padding-bottom: 4px;
     word-break:break-all
+  }
+
+  *{
+    font-family: 'Noto Sans KR', sans-serif;
   }

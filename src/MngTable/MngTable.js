@@ -245,6 +245,13 @@ function MngTable(props) {
       }
     }
 
+    else if(props.getUrlStr=="/getbindermovehistory")
+    {
+      allParams={
+        searchKeyWord : para.searchKeyWord,
+      }
+    }
+    
     let ajaxData = await axios({
       method:"get",
       url:props.getUrlStr,
@@ -511,9 +518,19 @@ function MngTable(props) {
             tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
               params.value?
               ((params.value.indexOf("user_account")==-1)?
-                <Chip icon={<GpsFixedIcon />} size="small" color="primary" label={params.value}/>
-                :<Tooltip title={"계정 : " + JSON.parse(params.value).user_account+" ("+JSON.parse(params.value).user_team+")"} placement="top" arrow><Chip icon={<GpsFixedIcon />} size="small" color="primary" label={JSON.parse(params.value).user_name+"님"}/></Tooltip>)
+                <Chip icon={<GpsFixedIcon />} size="small" color="confirm" label={params.value}/>
+                :<Tooltip title={"계정 : " + JSON.parse(params.value).user_account+" ("+JSON.parse(params.value).user_team+")"} placement="top" arrow><Chip icon={<GpsFixedIcon />} size="small" color="expired" label={JSON.parse(params.value).user_name+"님"}/></Tooltip>)
                 :<div/>
+            )})
+          }
+          else if (props.getUrlStr=="/getbindermovehistory"&&columName=="move_type"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              params.value=="Import"?
+              <Chip icon={<GpsFixedIcon />} size="small" color="confirm" label={params.value}/>
+              :(
+                params.value=="Export"?
+                <Chip icon={<GpsFixedIcon />} size="small" color="expired" label={params.value}/>
+                :<div/>)
             )})
           }
           else{

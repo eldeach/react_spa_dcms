@@ -6,28 +6,21 @@ import cookies from 'react-cookies'
 //========================================================== QRCode 라이브러리 import
 import { QRCode } from 'react-qrcode-logo';
 
-import {PropTypes, Box,Autocomplete, TextField,Button,Paper, Modal, Divider, Typography, Stack, Chip, Tooltip , CircularProgress, Backdrop} from '@mui/material/';
+import {PropTypes, Box,Autocomplete, TextField,Button,Paper, Typography, Stack, Chip } from '@mui/material/';
 import PrintIcon from '@mui/icons-material/Print';
-import MngTable from './../MngTable/MngTable'
 import ReactToPrint from 'react-to-print';
-import { GridToolbarDensitySelector } from '@mui/x-data-grid';
+
 import DescriptionIcon from '@mui/icons-material/Description';
-
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
-
 //========================================================== Slide Popup 컴포넌트 & Redux import
 import { useDispatch, useSelector } from "react-redux"
-import { setSel_tb_user,setLoginExpireTime, setSel_doc_no, setSel_doc, setSelTmmsWholeAsset, setSelSapZmmr1010, setSelEqmsAtemplate, setSelTmmsLocation } from "./../store.js"
+import { setLoginExpireTime } from "./../store.js"
 
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
 import LoginSessionCheck from './../Account/LoginSessionCheck.js';
 //========================================================== Formik & Yup 라이브러리 import
 import { Formik } from 'formik';
 import * as yup from 'yup';
-import { fontWeight, textAlign } from '@mui/system';
+
 
 
 function PrintBinder(){
@@ -115,17 +108,17 @@ function BinderCover(props){
                         </div>
                     </div>
                 </div>
-                <div style={{height: (props.binderSide=="Front"?'11cm':'23.4cm')}}>
+                <div style={{height: (props.binderSide=="Front"?'11cm':'22.4cm')}}>
                     {
                         props.binderSide=="Front"?<div style={{height:'100px'}}/>:<div></div>
                     }
-                    <div style={{writingMode:(writingModeStr), margin:'auto'}}>
+                    <div style={{writingMode:(writingModeStr), marginLeft:'auto', marginRight:'auto'}}>
                         <Typography variant='h5'>{targetRowObj.binder_title}</Typography>
                     </div>
                 </div>
                 {
                     props.binderSide=="Front"?
-                    <div style={{ height:'2.9cm', marginBottom:'3cm', display:'flex', flexWrap:'wrap', justifyContent:'center', overflow:'hidden',boxSizing:'border-box'}}>
+                    <div style={{ height:'3cm', display:'flex', flexWrap:'wrap', justifyContent:'center', overflow:'hidden',boxSizing:'border-box'}}>
                         {
                             JSON.parse(targetRowObj.relateddoc).map((oneDoc,i)=>{
                                 return <Chip icon={<DescriptionIcon />} size="small" color="primary" label={oneDoc.doc_no+"("+oneDoc.rev_no+")"}/>
@@ -136,13 +129,13 @@ function BinderCover(props){
                 }
                 <div style={{fontSize:'3px'}}>
                     <Stack spacing={0}>
-                        <Typography variant='inherit'>{targetRowObj.binder_year}</Typography>
-                        <Typography variant='inherit'>{"CONFIDENTIAL"}</Typography>
-                        <Typography variant='inherit'>{"OSONG PLANT"}</Typography>
+                        <Typography variant='caption'>{targetRowObj.binder_year}</Typography>
+                        <Typography variant='caption'>{"CONFIDENTIAL"}</Typography>
+                        <Typography variant='caption'>{"OSONG PLANT"}</Typography>
                         {
-                            props.binderSide=="Front"?<Typography style={{marginBottom:'6cm'}} variant='inherit'>{"Daewoong Pharmaceutical Co., Ltd"}</Typography>:<div></div>
+                            props.binderSide=="Front"?<Typography variant='caption'>{"Daewoong Pharmaceutical Co., Ltd"}</Typography>:<div></div>
                         }
-                        <div style={{fontWeight:'bold'}}><Typography color="primary" variant='inherit'>{"DCMS"}</Typography></div>
+                        <div style={{fontWeight:'bold'}}><Typography color="primary" variant='caption'>{"DCMS"}</Typography></div>
                     </Stack>
                 </div>
             </Stack>

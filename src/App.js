@@ -25,11 +25,6 @@ import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import BackupIcon from '@mui/icons-material/Backup';
 
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
-
 //========================================================== axios 라이브러리 import
 import axios from 'axios';
 //========================================================== cookie 라이브러리 import
@@ -57,6 +52,7 @@ import AddBinder from './MngBinder/AddBinder'
 import MngBinder from './MngBinder/MngBinder'
 import PrintBinder from './MngBinder/PrintBinder'
 
+import BinderMoveHistory from './MngBinder/BinderMoveHistory'
 import ImportBinder from './MngBinder/ImportBinder'
 import ExportBinder from './MngBinder/ExportBinder'
 import Detectbinder from './MngBinder/Detectbinder'
@@ -71,16 +67,16 @@ import MyPage from './Account/MyPage';
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
 import LoginSessionCheck from './Account/LoginSessionCheck.js';
 import LoginTimer from './Account/LoginTimer';
-//========================================================== 반응형 웹
-import { BrowserView, MobileView } from 'react-device-detect';
-
 import { createTheme , ThemeProvider} from '@mui/material/styles';
-import { RedoSharp } from '@mui/icons-material';
+
 
 
 
 
 const theme = createTheme({
+  typography:{
+    fontFamily:['sans-serif']
+  },
   palette: {
     primary: {
       light: '#6ec6ff',
@@ -299,12 +295,12 @@ function App() {
         <ListItem disablePadding>
           <ListItemButton onClick={()=>{
             LoginCheck()
-            navigate("/audittrail")
+            navigate("/getbindermovehistory")
             }}>
             <ListItemIcon>
               <ImportExportIcon color="primary"/> 
             </ListItemIcon>
-            <ListItemText primary={"바인더 입출고 관리"} />
+            <ListItemText primary={"바인더 입출고 이력"} />
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
@@ -478,7 +474,8 @@ function App() {
             <Route path='/mngbiner' element={ <MngBinder/> }/>
             <Route path='/editbinder' element={<AddBinder/>}/>
             <Route path='/printbinder' element={<PrintBinder/>}/>
-
+            
+            <Route path='/getbindermovehistory' element={<BinderMoveHistory/>}/>
             <Route path='/importbinder' element={<ImportBinder/>}/>
             <Route path='/exportbinder' element={<ExportBinder/>}/>
             <Route path='/Detectbinder' element={<Detectbinder/>}/>
