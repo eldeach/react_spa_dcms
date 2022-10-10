@@ -74,7 +74,10 @@ function DetectBinder(){
     //========================================================== [함수][권한] 권한 점검
     function authCheck(){
         if(cookies.load('loginStat')){
-            if(cookies.load('userInfo').user_auth.indexOf("MNG_USER_AUTH",0)!=-1){
+            if(cookies.load('userInfo').user_auth.indexOf("MNG_BINDER_INFO",0)!=-1){
+
+            }
+            if(cookies.load('userInfo').user_auth.indexOf("VIEW_BINDER_INFO",0)!=-1){
 
             }
             else{
@@ -154,7 +157,7 @@ function DetectBinder(){
             autoComplete="off"
             >
                 <div style={{width:'100%', display:'flex', flexWrap:'wrap', justifyContent:'center'}}>
-                    <Paper className="seperate-paper-long" elevation={3}>
+                    <Paper className="seperate-paper-fullheight" elevation={3}>
                         <Stack spacing={2}>
                             <Chip label="바인더 찾기" color="primary"/>
                             

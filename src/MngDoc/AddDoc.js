@@ -38,7 +38,7 @@ function AddDoc() {
     let [isProtocol,setIsProtocol] = useState(false);
     let isProtocolHandleChange = (event) => {setIsProtocol(event.target.checked)}
 
-    let [qualAttList,setQualAttList] = useState([
+    const qualAttList=[
         {abb:"URS", att_name: "User Requirement Specification"},
         {abb:"RA", att_name: "Risk Analysis"},
         {abb:"IA", att_name: "Impact Assessment"},
@@ -65,11 +65,11 @@ function AddDoc() {
         {abb:"RTM", att_name: "Requirment Trace Matrix"},
         {abb:"MT", att_name: "Mapping Test"},
         {abb:"ETC", att_name: "Etcetera"},
-    ])
+    ]
     let [qualAttFiled,setQualAttFiled]=useState();
     let [qualAtt,setQualAtt] = useState([])
 
-    const val_att = [
+    const valAttList = [
         {abb:"VMP",att_name:"Validation Master Plan"},
         {abb:"VMR",att_name:"Validation Master Report"},
         {abb:"VP",att_name:"Validation Plan"},
@@ -148,7 +148,8 @@ function AddDoc() {
     }
     else{
         setAppDate(targetRowObj.approval_date);
-        setInvDate(targetRowObj.invalid_date);
+        if(targetRowObj.invalid_date==0) setInvDate(null)
+        else setInvDate(targetRowObj.invalid_date);
         if(targetRowObj.isprotocol=='1'){
             setIsProtocol(isProtocol=>true)
         }
@@ -185,11 +186,11 @@ function AddDoc() {
   //========================================================== [함수][권한] 권한 점검
   function authCheck(){
     if(cookies.load('loginStat')){
-      if(cookies.load('userInfo').user_auth.indexOf("MNG_USER_AUTH",0)!=-1){
+      if(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_INFO",0)!=-1){
 
       }
       else{
-          alert("MNG_USER_AUTH 권한이 없습니다.")
+          alert("MNG_DOC_INFO 권한이 없습니다.")
           navigate('/')
       }
 
@@ -472,8 +473,8 @@ function AddDoc() {
                                 }}
                                 disablePortal
                                 size="small"
-                                id="val_att"
-                                options={val_att.map((option) => option.abb + " : " + option.att_name)}
+                                id="valAttList"
+                                options={valAttList.map((option) => option.abb + " : " + option.att_name)}
                                 sx={{ flexGrow:1, marginRight:'10px'}}
                                 renderInput={(params) => <TextField {...params} color="primary" label="밸리데이션 평가 성격 추가" />}
                                 />
@@ -481,7 +482,13 @@ function AddDoc() {
                                     <Button size="small" variant="contained" onClick={()=>{
                                         if(valAttFiled){
                                             let tempArr = [...valAtt]
-                                            if(tempArr.indexOf(valAttFiled)==(-1)) tempArr.push(valAttFiled)
+
+                                            let dupAbbCheck=false
+                                            tempArr.map((oneItem,i)=>{
+                                                if(oneItem.abb==valAttFiled.abb) dupAbbCheck=true
+                                            })
+                                            if(!dupAbbCheck) tempArr.push(valAttFiled)
+
                                             setValAtt(tempArr)
                                             LoginCheck()
                                         }
@@ -518,6 +525,9 @@ function AddDoc() {
                                     }
                                 </List>
                             </div>
+                            <Button size="small" variant="contained" onClick={()=>{
+                                setValAtt([])
+                            }}>비우기{" ("+valAtt.length+")"}</Button>
                         </Stack>
                     </Paper>
                     <Paper className="seperate-paper" elevation={3}>
@@ -539,7 +549,13 @@ function AddDoc() {
                                     <Button size="small" variant="contained" onClick={()=>{
                                         if(qualAttFiled){
                                             let tempArr = [...qualAtt]
-                                            if(tempArr.indexOf(qualAttFiled)==(-1)) tempArr.push(qualAttFiled)
+
+                                            let dupAbbCheck=false
+                                            tempArr.map((oneItem,i)=>{
+                                                if(oneItem.abb==qualAttFiled.abb) dupAbbCheck=true
+                                            })
+                                            if(!dupAbbCheck) tempArr.push(qualAttFiled)
+
                                             setQualAtt(tempArr)
                                             LoginCheck()
                                         }
@@ -576,6 +592,9 @@ function AddDoc() {
                                     }
                                 </List>
                             </div>
+                            <Button size="small" variant="contained" onClick={()=>{
+                                setQualAtt([])
+                            }}>비우기{" ("+qualAtt.length+")"}</Button>
                         </Stack>
                     </Paper>
                     <Paper className="seperate-paper" elevation={3}>
@@ -829,7 +848,7 @@ function AddDoc() {
                     popUpPage==1?<MngTable getUrlStr={'/adddoc_getextdatatmmswholeasset'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={true} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
                     popUpPage==2?<MngTable getUrlStr={'/adddoc_getextdatasapzmmr1010'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={true} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
                     popUpPage==3?<MngTable getUrlStr={'/adddoc_getextdataeqmsatemplate'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={true} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
-                    popUpPage==4?<MngTable getUrlStr={'/edituserauth_getuser'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={false} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
+                    popUpPage==4?<MngTable getUrlStr={'/getgroupwareuser'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={false} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
                     popUpPage==5?<MngTable getUrlStr={'/adddoc_getmngdoc'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={true} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
                     popUpPage==6?<MngTable getUrlStr={'/adddoc_getextdatatmmslocation'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={true} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
                     <div></div>

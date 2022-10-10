@@ -191,6 +191,16 @@ h1{
     box-sizing:border-box
   }
 
+  .seperate-paper-login{
+    width:30vw;
+    min-width : 300px;
+    height:340px;
+    padding:20px;
+    margin:0.5vw;
+    overflow-y:auto;
+    box-sizing:border-box
+  }
+
   .seperate-paper-long{
     width:30vw;
     min-width : 300px;

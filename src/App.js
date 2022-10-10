@@ -11,7 +11,6 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import RuleIcon from '@mui/icons-material/Rule';
 import RuleFolderIcon from '@mui/icons-material/RuleFolder';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
@@ -19,7 +18,6 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import AddIcon from '@mui/icons-material/Add';
 import FolderIcon from '@mui/icons-material/Folder';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
-import PageviewIcon from '@mui/icons-material/Pageview';
 import ImportExportIcon from '@mui/icons-material/ImportExport';
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -35,12 +33,11 @@ import { setLoginExpireTime } from "./store.js"
 //========================================================== 라우트할 import
 import UserLogin from './Account/UserLogin';
 
-import MngAccount from './Account/MngAccount';
-import AddAccount from './Account/AddAccount';
-import EditAccount from './Account/EditAccount';
-import MngUserAuth from './Auth/MngUserAuth';
+import MngUser from './Account/MngUser';
+import ModifyUser from './Account/ModifyUser';
 
 import AddDocNo from './MngDoc/AddDocNo'
+import AddDocNoManual from './MngDoc/AddDocNoManual'
 import MngDocNo from './MngDoc/MngDocNo'
 import AddDocNo_clone from './MngDoc/AddDocNo_clone'
 
@@ -49,6 +46,7 @@ import MngDoc from './MngDoc/MngDoc'
 import AddDoc_clone from './MngDoc/AddDoc_clone'
 
 import AddBinder from './MngBinder/AddBinder'
+import AddBinder_clone from './MngBinder/AddBinder_clone'
 import MngBinder from './MngBinder/MngBinder'
 import PrintBinder from './MngBinder/PrintBinder'
 
@@ -59,6 +57,7 @@ import Detectbinder from './MngBinder/Detectbinder'
 
 import AddDocNoPattern from './MngDoc/AddDocNoPattern'
 import MngDocNoPattern from './MngDoc/MngDocNoPattern'
+import AddDocNoPattern_clone from './MngDoc/AddDocNoPattern_clone'
 
 import AuditTrail from './SystemPage/AuditTrail'
 import ImportTmmsWholeAsset from './ExtData/ImportTmmsWholeAsset'
@@ -225,7 +224,18 @@ function App() {
             <ListItemIcon>
               <AddIcon color="primary"/> 
             </ListItemIcon>
-            <ListItemText primary={"문서 번호 추가"} />
+            <ListItemText primary={"문서 번호 추가 (자동)"} />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/adddocnomanual")
+            }}>
+            <ListItemIcon>
+              <AddIcon color="primary"/> 
+            </ListItemIcon>
+            <ListItemText primary={"문서 번호 추가 (수동)"} />
           </ListItemButton>
         </ListItem>
       </List>
@@ -276,17 +286,6 @@ function App() {
               <CreateNewFolderIcon color="primary"/> 
             </ListItemIcon>
             <ListItemText primary={"바인더 정보 추가"} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton onClick={()=>{
-            LoginCheck()
-            navigate("/audittrail")
-            }}>
-            <ListItemIcon>
-              <PageviewIcon color="primary"/> 
-            </ListItemIcon>
-            <ListItemText primary={"바인더 들여다보기"} />
           </ListItemButton>
         </ListItem>
       </List>
@@ -345,34 +344,12 @@ function App() {
         <ListItem disablePadding>
           <ListItemButton onClick={()=>{
             LoginCheck()
-            navigate("/addaccount")
+            navigate("/mnguser")
             }}>
             <ListItemIcon>
-              <PersonAddIcon /> 
-            </ListItemIcon>
-            <ListItemText primary={"계정추가"} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton onClick={()=>{
-            LoginCheck()
-            navigate("/mngaccount")
-            }}>
-            <ListItemIcon>
-              <SupervisorAccountIcon /> 
+              <SupervisorAccountIcon color="primary"/> 
             </ListItemIcon>
             <ListItemText primary={"계정관리"} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton onClick={()=>{
-            LoginCheck()
-            navigate("/mnguserauth")
-            }}>
-            <ListItemIcon>
-              <PostAddIcon /> 
-            </ListItemIcon>
-            <ListItemText primary={"유저권한관리"} />
           </ListItemButton>
         </ListItem>
       </List> 
@@ -384,7 +361,7 @@ function App() {
             navigate("/extdataimport")
             }}>
             <ListItemIcon>
-              <BackupIcon /> 
+              <BackupIcon color="primary"/> 
             </ListItemIcon>
             <ListItemText primary={"Ext. Data Import"} />
           </ListItemButton>
@@ -453,26 +430,25 @@ function App() {
 
           <Routes>
             <Route path='/' element={<div>home</div>}/>
-            <Route path='/addaccount' element={<AddAccount/>}/>
-            <Route path='/mngaccount' element={<MngAccount/>}/>
-            <Route path='/editaccount' element={<EditAccount/>}/>
-            <Route path='/mnguserauth' element={<MngUserAuth/>}/>
+            <Route path='/mnguser' element={<MngUser/>}/>
+            <Route path='/modifyuser' element={<ModifyUser/>}/>
 
             <Route path='/adddocnopattern' element={ <AddDocNoPattern/>  }/>
             <Route path='/mngdocnopattern' element={ <MngDocNoPattern/> }/>
-            <Route path='/editdocnopattern' element={ <AddDocNoPattern/> }/>
+            <Route path='/editdocnopattern' element={ <AddDocNoPattern_clone/> }/>
 
             <Route path='/adddocno' element={ <AddDocNo/> }/>
+            <Route path='/adddocnomanual' element={ <AddDocNoManual/> }/>
             <Route path='/mngdocno' element={ <MngDocNo/> }/>
             <Route path='/editdocno' element={ <AddDocNo_clone/> }/>
 
-            <Route path='/adddoc' element={<AddDoc/>}/>
+            <Route path='/adddoc' element={ <AddDoc /> }/>
             <Route path='/mngdoc' element={ <MngDoc/> }/>
-            <Route path='/editdoc' element={<AddDoc_clone/>}/>
+            <Route path='/editdoc' element={ <AddDoc_clone /> }/>
 
             <Route path='/addbinder' element={<AddBinder/>}/>
             <Route path='/mngbiner' element={ <MngBinder/> }/>
-            <Route path='/editbinder' element={<AddBinder/>}/>
+            <Route path='/editbinder' element={<AddBinder_clone/>}/>
             <Route path='/printbinder' element={<PrintBinder/>}/>
             
             <Route path='/getbindermovehistory' element={<BinderMoveHistory/>}/>

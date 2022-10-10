@@ -4,9 +4,8 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import {  useNavigate } from 'react-router-dom';
 //========================================================== Material UI 라이브러리 import
-import {PropTypes, Tabs, Tab, Typography, Box, Chip, Button, Stack, Paper,Divider, TextField, Modal, Checkbox, ListItemIcon, ListItemText, ListItem, CardHeader, Card, List, Grid} from '@mui/material/';
+import {PropTypes, Typography, Box, Chip, Button, Stack, Paper,Divider, TextField } from '@mui/material/';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import LockResetIcon from '@mui/icons-material/LockReset';
 //========================================================== Formik & Yup 라이브러리 import
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -340,6 +339,12 @@ function MyPage() {
         </Box>
       )}
       </Formik>
+      <div style={{width:'90vw'}}>
+        <MngTable getUrlStr={'/getmyimexbinderhistory'} targetPk={{}} heightValue={'60vh'} tblCtrl={false} chkSel={false} deleteButton={false} addToListButton={false} editable={false} selectButton={false}/>
+      </div>
+      <div style={{width:'90vw', marginBottom:'48px'}}>
+        <MngTable getUrlStr={'/getmydocno'} targetPk={{}} heightValue={'60vh'} tblCtrl={false} chkSel={false} deleteButton={false} addToListButton={false} editable={false} selectButton={false}/>
+      </div>
       <div style={{height:'48px'}}/>
           <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding:'10px' }} elevation={6}>
               <div style={{width:'100%', display:'flex', alignItems:'center', backdropFilter:'blur(10px)'}}>

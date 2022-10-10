@@ -48,7 +48,9 @@ function UserLogin() {
 
   async function LoginCheck(qryBody){
     let checkResult = await LoginSessionCheck("init",qryBody)
+    // console.log(checkResult)
     if(checkResult.expireTime==0){
+      // console.log(checkResult.flashMsg)
       if(checkResult.flashMsg=="wrong PW"){
         dispatch(setLoginExpireTime(0))
         alert("비밀번호가 틀렸습니다.")
@@ -58,6 +60,12 @@ function UserLogin() {
       {
         dispatch(setLoginExpireTime(0))
         alert("존재하지 않는 계정입니다.")
+        navigate("/login")
+      }
+      else if(checkResult.flashMsg=="locked")
+      {
+        dispatch(setLoginExpireTime(0))
+        alert("이 계정은 잠겨있습니다.")
         navigate("/login")
       }
       else if(checkResult.flashMsg=="no auth")
@@ -114,10 +122,10 @@ function UserLogin() {
         autoComplete="off"
         >
           <div style={{width:'100%', height:'70vh', display:'flex', flexWrap:'wrap', justifyContent:'center', alignItems:'center'}}>
-            <Paper className="seperate-paper" elevation={3}>
+            <Paper className="seperate-paper-login" elevation={3}>
               <Stack spacing={2}>
                 <Chip icon={<LockPersonIcon/>} label="로그인 계정 입력" color="primary"/>
-                <div style={{height:'42px'}}></div>
+                <div style={{height:'30px'}}></div>
                 <TextField
                 required
                 variant="standard"

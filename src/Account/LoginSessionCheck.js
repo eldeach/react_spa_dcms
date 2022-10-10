@@ -32,6 +32,9 @@ async function LoginSessionCheck(typeStr,qryBody){
         else if(res.data.flashMsg=="no user_account"){
           return {type:'init', expireTime: 0, flashMsg:res.data.flashMsg}
         }
+        else if(res.data.flashMsg=="locked"){
+          return {type:'init', expireTime: 0, flashMsg:res.data.flashMsg}
+        }
         else if(res.data.flashMsg=="no auth"){
           return {type:'init', expireTime: 0, flashMsg:res.data.flashMsg}
         }

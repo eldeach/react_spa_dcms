@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import {  useNavigate, useLocation } from 'react-router-dom';
 //========================================================== Material UI 라이브러리 import
 import { Box, Typography, Chip, Button, Stack, Paper,Divider,Modal,  } from '@mui/material/';
-import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -13,6 +12,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Diversity3OutlinedIcon from '@mui/icons-material/Diversity3Outlined';
 import BadgeIcon from '@mui/icons-material/Badge';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 //========================================================== QR Reader 라이브러리 import
 import { QrReader } from 'react-qr-reader';
 //========================================================== cookie 라이브러리 import
@@ -84,11 +84,11 @@ function ExportBinder(){
     //========================================================== [함수][권한] 권한 점검
     function authCheck(){
         if(cookies.load('loginStat')){
-            if(cookies.load('userInfo').user_auth.indexOf("MNG_USER_AUTH",0)!=-1){
+            if(cookies.load('userInfo').user_auth.indexOf("MNG_BINDER_MOVE_HISTORY",0)!=-1){
     
             }
             else{
-                alert("MNG_USER_AUTH 권한이 없습니다.")
+                alert("MNG_BINDER_MOVE_HISTORY 권한이 없습니다.")
                 navigate('/')
             }
     
@@ -241,7 +241,7 @@ function ExportBinder(){
                 <div style={{height:'48px'}}/>
                 <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding:'10px' }} elevation={6}>
                     <div style={{width:'100%', display:'flex', alignItems:'center', backdropFilter:'blur(10px)'}}>
-                        <SystemUpdateAltIcon color="primary"/>
+                        <OpenInNewIcon color="primary"/>
                         <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>{"바인더 출고 처리"}</Typography>
                         <Button size="small" disabled={!qrData||!rdx.sel_tb_user.user_account||exportDone} variant="contained" type="submit" form="putBinderCurrentLoc" >출고</Button>
                         <Button style={{marginLeft:'1vw'}} size="small" variant="contained" onClick={async ()=>{
@@ -269,7 +269,7 @@ function ExportBinder(){
                 </div>
                 <Divider style={{marginTop:'5px',marginBottom:'10px'}}/>
                 {
-                    popUpPage==0?<MngTable getUrlStr={'/edituserauth_getuser'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={false} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
+                    popUpPage==0?<MngTable getUrlStr={'/getgroupwareuser'} targetPk={{}} heightValue={'72vh'} tblCtrl={true} chkSel={false} deleteButton={false} addToListButton={false} editable={false} selectButton={true}/>:
                     <div></div>
                 }                    
                 </div>

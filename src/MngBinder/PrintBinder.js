@@ -75,90 +75,17 @@ async function LoginCheck(){
     }
   }
 
-const componentRef = useRef(null);
-function BinderCover(props){
-
-    let binderCoverWidth
-    let writingModeStr
-    let qrCodeMarginStr
-    if (props.binderSide=="Front") {
-        qrCodeMarginStr='auto'
-        binderCoverWidth='20.3cm'
-        writingModeStr = 'horizontal-tb'
-    }
-    else {
-        qrCodeMarginStr='auto'
-        binderCoverWidth = props.sideWidth+'cm'
-        writingModeStr = 'vertical-rl'
-    }
-  
-    return (
-    <div ref={props.printRef}>
-        <div style={{margin:'0.3cm', padding:'0.1cm', width:(binderCoverWidth), height:'29cm', textAlign:'center', border:'4px solid', borderColor:'#2196f3',boxSizing:'border-box'}}>
-            <Stack spacing={1}>
-                <div style={{width:'99%', justifyItems:(props.binderSide=="Front"?'right':'center')}}>
-                    <div style={{display:'flex', justifyContent: (props.binderSide=="Front"?'flex-end':'center')}}>
-                        <div style={{width:'2.4cm', hieght:'2.8cm', textAlign:'center', marginTop:(props.binderSide=="Front"?'6px':'0px')}} >
-                            <Stack spacing={0}>
-                                <div><QRCode value={targetRowObj.binder_no} quietZone='1' logoImage="public/logo192.png" size='80'  fgColor="#2196f3"/></div>
-                                <div style={{fontSize:'3px'}}><Typography variant='inherit'>{targetRowObj.binder_no}</Typography></div>
-                                <div style={{fontSize:'3px', fontWeight:'bold'}}><Typography variant='inherit'>{targetRowObj.mng_team+" / "+targetRowObj.binder_loc}</Typography></div>
-                                <div style={{fontSize:'3px', fontWeight:'bold'}}><Typography variant='inherit'>{"문서 "+JSON.parse(targetRowObj.relateddoc).length+"건"}</Typography></div>
-                            </Stack>
-                        </div>
-                    </div>
-                </div>
-                <div style={{height: (props.binderSide=="Front"?'11cm':'22.4cm')}}>
-                    {
-                        props.binderSide=="Front"?<div style={{height:'100px'}}/>:<div></div>
-                    }
-                    <div style={{writingMode:(writingModeStr), marginLeft:'auto', marginRight:'auto'}}>
-                        <Typography variant='h5'>{targetRowObj.binder_title}</Typography>
-                    </div>
-                </div>
-                {
-                    props.binderSide=="Front"?
-                    <div style={{ height:'3cm', display:'flex', flexWrap:'wrap', justifyContent:'center', overflow:'hidden',boxSizing:'border-box'}}>
-                        {
-                            JSON.parse(targetRowObj.relateddoc).map((oneDoc,i)=>{
-                                return <Chip icon={<DescriptionIcon />} size="small" color="primary" label={oneDoc.doc_no+"("+oneDoc.rev_no+")"}/>
-                            })
-                        }
-                    </div>
-                    :<div></div>
-                }
-                <div style={{fontSize:'3px'}}>
-                    <Stack spacing={0}>
-                        <Typography variant='caption'>{targetRowObj.binder_year}</Typography>
-                        <Typography variant='caption'>{"CONFIDENTIAL"}</Typography>
-                        <Typography variant='caption'>{"OSONG PLANT"}</Typography>
-                        {
-                            props.binderSide=="Front"?<Typography variant='caption'>{"Daewoong Pharmaceutical Co., Ltd"}</Typography>:<div></div>
-                        }
-                        <div style={{fontWeight:'bold'}}><Typography color="primary" variant='caption'>{"DCMS"}</Typography></div>
-                    </Stack>
-                </div>
-            </Stack>
-        </div>
-    </div>
-    )
-}
-
-
   //========================================================== [ADD form에서 추가] 수정할 row Oject state 넘겨받기 위한 코드
   const location = useLocation();
   const targetRowObj= (!location.state ? "N/A" : location.state.rowObj)
   
     function authCheck(){
         if(cookies.load('loginStat')){
-            if(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_NO_PATTERN",0)!=-1){
+            if(cookies.load('userInfo').user_auth.indexOf("MNG_BINDER_INFO",0)!=-1){
                 setTblCtrl(true)
             }
-            else if(cookies.load('userInfo').user_auth.indexOf("VIEW_MNG_DOC_NO_PATTERN",0)!=-1){
-                setTblCtrl(false)
-            }
             else{
-                alert("MNG_DOC_NO_PATTERN 또는 VIEW_MNG_DOC_NO_PATTERN 권한이 없습니다.")
+                alert("MNG_BINDER_INFO 권한이 없습니다.")
                 navigate('/')
             }
 
@@ -169,6 +96,75 @@ function BinderCover(props){
         }
     }
 
+
+    const componentRef = useRef(null);
+    function BinderCover(props){
+
+        let binderCoverWidth
+        let writingModeStr
+        let qrCodeMarginStr
+        if (props.binderSide=="Front") {
+            qrCodeMarginStr='auto'
+            binderCoverWidth='20.3cm'
+            writingModeStr = 'horizontal-tb'
+        }
+        else {
+            qrCodeMarginStr='auto'
+            binderCoverWidth = props.sideWidth+'cm'
+            writingModeStr = 'vertical-rl'
+        }
+    
+        return (
+        <div ref={props.printRef}>
+            <div style={{margin:'0.3cm', padding:'0.1cm', width:(binderCoverWidth), height:'29cm', textAlign:'center', border:'4px solid', borderColor:'#2196f3',boxSizing:'border-box'}}>
+                <Stack spacing={1}>
+                    <div style={{width:'99%', justifyItems:(props.binderSide=="Front"?'right':'center')}}>
+                        <div style={{display:'flex', justifyContent: (props.binderSide=="Front"?'flex-end':'center')}}>
+                            <div style={{width:'2.4cm', hieght:'2.8cm', textAlign:'center', marginTop:(props.binderSide=="Front"?'6px':'0px')}} >
+                                <Stack spacing={0}>
+                                    <div><QRCode value={targetRowObj.binder_no} quietZone='1' logoImage="public/logo192.png" size='80'  fgColor="#2196f3"/></div>
+                                    <div style={{fontSize:'3px'}}><Typography variant='inherit'>{targetRowObj.binder_no}</Typography></div>
+                                    <div style={{fontSize:'3px', fontWeight:'bold'}}><Typography variant='inherit'>{targetRowObj.mng_team+" / "+targetRowObj.binder_loc}</Typography></div>
+                                    <div style={{fontSize:'3px', fontWeight:'bold'}}><Typography variant='inherit'>{"문서 "+JSON.parse(targetRowObj.relateddoc).length+"건"}</Typography></div>
+                                </Stack>
+                            </div>
+                        </div>
+                    </div>
+                    <div style={{height: (props.binderSide=="Front"?'11cm':'22.4cm')}}>
+                        {
+                            props.binderSide=="Front"?<div style={{height:'100px'}}/>:<div></div>
+                        }
+                        <div style={{writingMode:(writingModeStr), marginLeft:'auto', marginRight:'auto'}}>
+                            <Typography variant='h5'>{targetRowObj.binder_title}</Typography>
+                        </div>
+                    </div>
+                    {
+                        props.binderSide=="Front"?
+                        <div style={{ height:'3cm', display:'flex', flexWrap:'wrap', justifyContent:'center', overflow:'hidden',boxSizing:'border-box'}}>
+                            {
+                                JSON.parse(targetRowObj.relateddoc).map((oneDoc,i)=>{
+                                    return <Chip icon={<DescriptionIcon />} size="small" color="primary" label={oneDoc.doc_no+"("+oneDoc.rev_no+")"}/>
+                                })
+                            }
+                        </div>
+                        :<div></div>
+                    }
+                    <div style={{fontSize:'3px'}}>
+                        <Stack spacing={0}>
+                            <Typography variant='caption'>{targetRowObj.binder_year}</Typography>
+                            <Typography variant='caption'>{"CONFIDENTIAL"}</Typography>
+                            <Typography variant='caption'>{"OSONG PLANT"}</Typography>
+                            {
+                                props.binderSide=="Front"?<Typography variant='caption'>{"Daewoong Pharmaceutical Co., Ltd"}</Typography>:<div></div>
+                            }
+                            <div style={{fontWeight:'bold'}}><Typography color="primary" variant='caption'>{"DCMS"}</Typography></div>
+                        </Stack>
+                    </div>
+                </Stack>
+            </div>
+        </div>
+        )
+    }
     return(
         <div style={{display:'block', padding:'0.5vw'}}>
             <Formik

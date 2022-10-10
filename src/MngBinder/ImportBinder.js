@@ -68,11 +68,11 @@ function ImportBinder(){
     //========================================================== [함수][권한] 권한 점검
     function authCheck(){
         if(cookies.load('loginStat')){
-            if(cookies.load('userInfo').user_auth.indexOf("MNG_USER_AUTH",0)!=-1){
+            if(cookies.load('userInfo').user_auth.indexOf("MNG_BINDER_MOVE_HISTORY",0)!=-1){
 
             }
             else{
-                alert("MNG_USER_AUTH 권한이 없습니다.")
+                alert("MNG_BINDER_MOVE_HISTORY 권한이 없습니다.")
                 navigate('/')
             }
 
@@ -148,7 +148,7 @@ function ImportBinder(){
             autoComplete="off"
             >
                 <div style={{width:'100%', display:'flex', flexWrap:'wrap', justifyContent:'center'}}>
-                    <Paper className="seperate-paper" elevation={3}>
+                    <Paper className="seperate-paper-long" elevation={3}>
                         <Stack spacing={2}>
                             <Chip label="바인더 정의" color="primary"/>
                             <Button size="small" variant="contained" onClick={()=>{

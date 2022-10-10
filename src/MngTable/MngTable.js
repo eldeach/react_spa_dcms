@@ -22,7 +22,11 @@ import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutli
 import UnpublishedOutlinedIcon from '@mui/icons-material/UnpublishedOutlined';
 import PrintIcon from '@mui/icons-material/Print';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import EmojiTransportationIcon from '@mui/icons-material/EmojiTransportation';
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
+import WifiFindIcon from '@mui/icons-material/WifiFind';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import AddIcon from '@mui/icons-material/Add';
 //========================================================== Formik & Yup 라이브러리 import
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -143,7 +147,7 @@ function MngTable(props) {
           targetPk : props.targetPk   
       }
     }
-    else if(props.getUrlStr=="/edituserauth_getuser")
+    else if(props.getUrlStr=="/getgroupwareuser")
     {
       allParams={
         searchKeyWord : para.searchKeyWord,
@@ -248,6 +252,29 @@ function MngTable(props) {
     else if(props.getUrlStr=="/getbindermovehistory")
     {
       allParams={
+        searchKeyWord : para.searchKeyWord,
+      }
+    }
+
+    else if(props.getUrlStr=="/getmnguser")
+    {
+      allParams={
+        searchKeyWord : para.searchKeyWord,
+      }
+    }
+
+    else if(props.getUrlStr=="/getmyimexbinderhistory")
+    {
+      allParams={
+        user_account: cookies.load('userInfo').user_account,
+        searchKeyWord : para.searchKeyWord,
+      }
+    }
+
+    else if(props.getUrlStr=="/getmydocno")
+    {
+      allParams={
+        user_account: cookies.load('userInfo').user_account,
         searchKeyWord : para.searchKeyWord,
       }
     }
@@ -373,17 +400,35 @@ function MngTable(props) {
                         },})
                       }}
                     >
-                      <SearchIcon fontSize="small"/>
+                      <WifiFindIcon fontSize="small"/>
                     </Button>
                   </Stack>
                 )
               }
+              else if(props.getUrlStr=="/getmnguser"){
+                return (
+                  <Button
+                    variant="contained"
+                    onClick={(event) => {
+                      navigate('/modifyuser',{state: {
+                        rowObj: cellValues.row,
+                      },})
+                    }}
+                  >
+                    <EditIcon fontSize="small"/>
+                  </Button>
+                )
+              }
+              //
             }
           })
         }
         
         Object.keys(ajaxData.result[0]).map((columName,i)=>{
           let tempMinWidth = columName.length*14
+
+          if(columName=="doc_no_pattern") tempMinWidth= 300
+
           if(columName=="remark") tempMinWidth= 300
           if(columName=="uuid_binary") tempMinWidth= 200
           if(columName=="doc_no") tempMinWidth= 200
@@ -416,6 +461,12 @@ function MngTable(props) {
 
           if(columName=="binder_title") tempMinWidth= 400
           if(columName=="binder_year") tempMinWidth= 100
+
+          if(columName=="user_team") tempMinWidth= 200
+          if(columName=="req_team") tempMinWidth= 200
+          if(columName=="user_email") tempMinWidth= 300
+          if(columName=="user_auth") tempMinWidth= 300
+          if(columName=="account_status") tempMinWidth= 300
 
           if (columName=="user_name"){
             tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
@@ -533,6 +584,34 @@ function MngTable(props) {
                 :<div/>)
             )})
           }
+          else if (columName=="user_company"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <Chip icon={<EmojiTransportationIcon />} size="small" color="primary" variant="outlined" label={params.value}/>
+            )})
+          }
+          else if (columName=="user_email"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <Chip icon={<AlternateEmailIcon />} size="small" color="primary" variant="outlined" label={params.value}/>
+            )})
+          }
+          else if (columName=="account_status"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <div style={{display:'flex', flexWrap:'wrap'}}>{
+                JSON.parse(params.value).map((oneItem,i)=>{
+                  return <Tooltip title={oneItem.att_name} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.abb}/></Tooltip>
+                })
+              }</div>
+            )})
+          }
+          else if (columName=="user_auth"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <div style={{display:'flex', flexWrap:'wrap'}}>{
+                JSON.parse(params.value).map((oneItem,i)=>{
+                  return <Tooltip title={oneItem.att_name} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.abb}/></Tooltip>
+                })
+              }</div>
+            )})
+          }
           else{
             tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1})
           }
@@ -623,6 +702,17 @@ function MngTable(props) {
           onSubmit={handleSubmit}
           autoComplete="off"
           >
+            {
+            props.getUrlStr=="/getmydocno"?
+            <div style={{display:'flex', marginTop:'20px', marginBottom:'4px', alignItems:'flex-start', justifyContent:'flex-start', flexGrow:1 }}>
+              <Chip icon={<AddIcon/>} label="내가 받은 문서번호" color="primary"/>
+            </div>
+            :(props.getUrlStr=="/getmyimexbinderhistory"?
+            <div style={{display:'flex', marginTop:'20px', marginBottom:'4px', alignItems:'flex-start', justifyContent:'flex-start', flexGrow:1}}>
+              <Chip icon={<OpenInNewIcon/>} label="내가 반출한 바인더" color="primary"/>
+            </div>
+            :<div/>)
+            }
             <TextField
               style={{width:'300px'}}
               required
@@ -638,7 +728,7 @@ function MngTable(props) {
               margin="dense"
               fullWidth
             />
-            <div style={{display:'flex', marginTop:'4px',marginBottom:'4px',alignItems:'center'}}>
+            <div style={{display:'flex', marginTop:'20px', marginBottom:'4px',  alignItems:'flex-start'}}>
               <Button style={{marginLeft:'5px'}} size="small" variant="contained" type="submit" form={props.getUrlStr} disabled={isSubmitting}><SearchIcon/></Button>
               <Button style={{marginLeft:'5px'}} size="small" variant="outlined" type="reset" disabled={isResetting} onClick={async ()=>{
                 setIsResetting(true)
@@ -698,7 +788,7 @@ function MngTable(props) {
               {
                 props.selectButton?
                 <Button style={{marginLeft:'5px'}} disabled={!props.tblCtrl} size="small" variant="outlined" onClick={async ()=>{
-                  if(props.getUrlStr=="/edituserauth_getuser"){
+                  if(props.getUrlStr=="/getgroupwareuser"){
                     if(pickRows.length==1){
                       dispatch(setSel_tb_user(pickRows[0]))
                     }
@@ -888,28 +978,7 @@ function MngTable(props) {
 
               if(user_sign.signStat){
                 alert(user_sign.msg)
-                if (props.getUrlStr=="/edituserauth_getuserauth"&&delRowBt)
-                {
-                  let reqResult = await DeleteUserAuth(pickRows, props.targetPk.user_account)
-                  if(!reqResult.success) alert(reqResult.result)
-                  InitializeTbl ()
-                  setDelRowBt(delRowBt=>false)
-                }
-                else if (props.getUrlStr=="/edituserauth_getusernoauth"&&addRowBt)
-                {
-                  let reqResult =  await AddUserAuth(pickRows, props.targetPk.user_account)
-                  if(!reqResult.success) alert(reqResult.result)
-                  InitializeTbl ()
-                  setAddRowBt(addRowBt=>false)
-                }
-                else if (props.getUrlStr=="/getmngaccount"&&delRowBt)
-                {
-                  let reqResult = await DeleteOneUser(pickRows[0])
-                  if(!reqResult.success) alert(reqResult.result)
-                  InitializeTbl ()
-                  setDelRowBt(addRowBt=>false)
-                }
-                else if (props.getUrlStr=="/getmngdocnopattern"&&delRowBt)
+                if (props.getUrlStr=="/getmngdocnopattern"&&delRowBt)
                 {
                   let reqResult = await DeleteDocNoPattern(pickRows)
                   if(!reqResult.success) alert(reqResult.result)
@@ -919,14 +988,23 @@ function MngTable(props) {
                 else if (props.getUrlStr=="/getmngdocno"&&delRowBt)
                 {
                   let reqResult = await DeleteDocNo(pickRows)
-                  if(!reqResult.success) alert(reqResult.result)
+                  if(reqResult.success) console.log(reqResult.result)
+                  else if (reqResult.result.code.indexOf("ROW_IS_REFERENCED")!=(-1)){
+                    console.log("Err No.:"+reqResult.result.errno+"\nErr Code : "+reqResult.result.code)
+                    alert("선택한 데이터 중 일부가 다른 정보에서 사용하고 있어서 삭제할 수 없습니다.\n미사용 중인 데이터만 삭제 가능합니다.")
+                  }
+                  else alert(reqResult.result)
                   InitializeTbl ()
                   setDelRowBt(delRowBt=>false)
                 }
                 else if (props.getUrlStr=="/getmngdoc"&&delRowBt)
                 {
                   let reqResult = await DeleteDoc(pickRows)
-                  if(!reqResult.success) alert(reqResult.result)
+                  let rejectStr =""
+                  if(reqResult.rejected.length>0) rejectStr="\n\n삭제 거부된 문서 : \n" +reqResult.rejected.join("\n")
+                  if(reqResult.success) alert(reqResult.result.affectedRows+"개 삭제 성공" + rejectStr)
+                  else alert(reqResult.result + rejectStr)
+                  
                   InitializeTbl ()
                   setDelRowBt(delRowBt=>false)
                 }
@@ -942,6 +1020,27 @@ function MngTable(props) {
                 setIsModalSubmitting(false)
                 handleModalClose()
               }
+              // else if (props.getUrlStr=="/edituserauth_getuserauth"&&delRowBt)
+              // {
+              //   let reqResult = await DeleteUserAuth(pickRows, props.targetPk.user_account)
+              //   if(!reqResult.success) alert(reqResult.result)
+              //   InitializeTbl ()
+              //   setDelRowBt(delRowBt=>false)
+              // }
+              // else if (props.getUrlStr=="/edituserauth_getusernoauth"&&addRowBt)
+              // {
+              //   let reqResult =  await AddUserAuth(pickRows, props.targetPk.user_account)
+              //   if(!reqResult.success) alert(reqResult.result)
+              //   InitializeTbl ()
+              //   setAddRowBt(addRowBt=>false)
+              // }
+              // else if (props.getUrlStr=="/getmngaccount"&&delRowBt)
+              // {
+              //   let reqResult = await DeleteOneUser(pickRows[0])
+              //   if(!reqResult.success) alert(reqResult.result)
+              //   InitializeTbl ()
+              //   setDelRowBt(addRowBt=>false)
+              // }
               else{
                 alert(user_sign.msg)
                 setOpenModalBackDrop(false)
@@ -1047,61 +1146,61 @@ function CustomToolbar() {
   return <GridToolbarExport csvOptions={{ utf8WithBom: true }} />;
 }
 
-async function DeleteUserAuth(pickRows, targetUser){
-  let targetRows=[]
-  pickRows.map((oneRow,i)=>{
-    targetRows.push({user_account:targetUser, user_auth:oneRow.user_auth, uuid_binary:oneRow.uuid_binary, delete_by:cookies.load('userInfo').user_account})
-  })
+// async function DeleteUserAuth(pickRows, targetUser){
+//   let targetRows=[]
+//   pickRows.map((oneRow,i)=>{
+//     targetRows.push({user_account:targetUser, user_auth:oneRow.user_auth, uuid_binary:oneRow.uuid_binary, delete_by:cookies.load('userInfo').user_account})
+//   })
 
-  let para={
-    targetRows:targetRows
-  }
+//   let para={
+//     targetRows:targetRows
+//   }
   
-  let ajaxData =  await axios({
-    method:"delete",
-    url:"/edituserauth_deleteuserauth",
-    params:para,
-    headers:{
-      'Content-Type':'application/json'
-    }})
-    .then((res)=>res.data)
-    .catch((err)=>console.log(err))
-    return ajaxData
-}
+//   let ajaxData =  await axios({
+//     method:"delete",
+//     url:"/edituserauth_deleteuserauth",
+//     params:para,
+//     headers:{
+//       'Content-Type':'application/json'
+//     }})
+//     .then((res)=>res.data)
+//     .catch((err)=>console.log(err))
+//     return ajaxData
+// }
 
 
-async function AddUserAuth(pickRows, targetUser){
-  let targetRows=[]
-  pickRows.map((oneRow,i)=>{
-    targetRows.push({user_account:targetUser, user_auth:oneRow.user_auth, insert_by:cookies.load('userInfo').user_account})
-  })
-  let body={
-    targetRows:targetRows
-  }
-  let ajaxData = await axios.post("/edituserauth_adduserauth",body)
-  .then((res)=>res.data)
-  .catch((err)=>console.log(err))
-  return ajaxData 
-}
+// async function AddUserAuth(pickRows, targetUser){
+//   let targetRows=[]
+//   pickRows.map((oneRow,i)=>{
+//     targetRows.push({user_account:targetUser, user_auth:oneRow.user_auth, insert_by:cookies.load('userInfo').user_account})
+//   })
+//   let body={
+//     targetRows:targetRows
+//   }
+//   let ajaxData = await axios.post("/edituserauth_adduserauth",body)
+//   .then((res)=>res.data)
+//   .catch((err)=>console.log(err))
+//   return ajaxData 
+// }
 
-async function DeleteOneUser(pickRows){
-  let para={
-    user_account:pickRows.user_account,
-    uuid_binary: pickRows.uuid_binary ,
-    delete_by:cookies.load('userInfo').user_account
-  }
+// async function DeleteOneUser(pickRows){
+//   let para={
+//     user_account:pickRows.user_account,
+//     uuid_binary: pickRows.uuid_binary ,
+//     delete_by:cookies.load('userInfo').user_account
+//   }
   
-  let ajaxData =  await axios({
-    method:"delete",
-    url:"/deleteaccount",
-    params:para,
-    headers:{
-      'Content-Type':'application/json'
-    }})
-    .then((res)=>res.data)
-    .catch((err)=>console.log(err))
-    return ajaxData
-}
+//   let ajaxData =  await axios({
+//     method:"delete",
+//     url:"/deleteaccount",
+//     params:para,
+//     headers:{
+//       'Content-Type':'application/json'
+//     }})
+//     .then((res)=>res.data)
+//     .catch((err)=>console.log(err))
+//     return ajaxData
+// }
 
 
 async function DeleteDocNoPattern(pickRows){
@@ -1173,7 +1272,7 @@ async function DeleteDoc(pickRows){
 async function DeleteBinder(pickRows){
   let targetRows=[]
   pickRows.map((oneRow,i)=>{
-    targetRows.push({binder_no:oneRow.binder_no, binder_title:oneRow.binder_title, uuid_binary:oneRow.uuid_binary, delete_by:cookies.load('userInfo').user_account})
+    targetRows.push({binder_no:oneRow.binder_no, binder_title:oneRow.binder_title, relateddoc:JSON.stringify(JSON.parse(oneRow.relateddoc)), uuid_binary:oneRow.uuid_binary, delete_by:cookies.load('userInfo').user_account})
   })
 
   let para={

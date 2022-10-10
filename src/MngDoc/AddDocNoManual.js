@@ -6,9 +6,8 @@ import {  useLocation, useNavigate } from 'react-router-dom';
 import {PropTypes, TextField, Box, Typography,IconButton, Chip, Button, Stack, Paper,Divider,Modal, ListItemIcon, ListItemText, ListItem, List } from '@mui/material/';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import AddIcon from '@mui/icons-material/Add';
-import RuleIcon from '@mui/icons-material/Rule';
-import DeleteIcon from '@mui/icons-material/Delete';
 import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
+import DeleteIcon from '@mui/icons-material/Delete';
 //========================================================== Formik & Yup 라이브러리 import
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -18,13 +17,13 @@ import axios from 'axios';
 import cookies from 'react-cookies'
 //========================================================== Slide Popup 컴포넌트 & Redux import
 import { useDispatch, useSelector } from "react-redux"
-import { setSel_tb_user, setSel_doc_pattern, setLoginExpireTime } from "../store.js"
+import { setSel_tb_user, setLoginExpireTime } from "../store.js"
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
 import LoginSessionCheck from './../Account/LoginSessionCheck.js';
 //========================================================== MngTable 컴포넌트 import
 import MngTable from './../MngTable/MngTable'
 
-function AddDocNo() {
+function AddDocNoManual() {
 
   //========================================================== [변수, 객체 선언] 선택된 정보 redux 저장용
   let rdx = useSelector((state) => { return state } )
@@ -35,6 +34,9 @@ function AddDocNo() {
   //========================================================== Form 작동 Satae 정의 정의
   let [isSubmitting, setIsSubmitting] = useState(false); // Submit 중복 클릭 방지
   let [popUpPage,setPopUpPage] = useState(0);
+  let [manDocNo,setManDocNo]=useState('');
+  let manDocNohandleChange = (event) => {setManDocNo(event.target.value.replace(" ",""))}
+  let [manDocNoList,setManDocNoList] = useState([])
 
   //========================================================== Formik & yup Validation schema
   const schema = yup.object().shape({
@@ -52,11 +54,9 @@ function AddDocNo() {
     //값 초기화
     if(targetRowObj=="N/A"){
       dispatch(setSel_tb_user({}))
-      dispatch(setSel_doc_pattern([]))
     }
     else{
       dispatch(setSel_tb_user({user_account:targetRowObj.req_user, user_name:targetRowObj.user_name, user_team:targetRowObj.req_team }))
-      dispatch(setSel_doc_pattern([{pattern_name: targetRowObj.used_pattern_name, doc_no_pattern:targetRowObj.used_pattern}]))
     }
   },[]);
    //========================================================== [ADD form에서 추가] 수정할 row Oject state 넘겨받기 위한 코드
@@ -91,8 +91,8 @@ function AddDocNo() {
     }
   }
 
-  async function postAddDocNo(qryBody){
-    let ajaxData = await axios.post("/postAddDocNo",qryBody)
+  async function postAddDocNoManual(qryBody){
+    let ajaxData = await axios.post("/postadddocnomanual",qryBody)
     .then((res)=>res.data)
     .catch((err)=>{
       console.log(err)
@@ -101,17 +101,6 @@ function AddDocNo() {
     if(ajaxData.success) return ajaxData.result
     else alert(ajaxData)
     
-  }
-
-  async function putEditDocNo(qryBody){
-    let ajaxData = await axios.put("/puteditdocno",qryBody)
-    .then((res)=>res.data)
-    .catch((err)=>{
-      console.log(err)
-    })
-
-    if(ajaxData.success) return ajaxData.result
-    else alert(ajaxData)
   }
 
     //========================================================== [Modal] 모달 열기/닫기 및 스타일 정의
@@ -138,42 +127,25 @@ function AddDocNo() {
         validationSchema={schema}
         onSubmit={async (values, {resetForm})=>{
           setIsSubmitting(true);           
-          if(rdx.sel_doc_pattern.length>0 && rdx.sel_tb_user.user_account.length>0 ){
-            if(targetRowObj=="N/A"){
-              let qryBody = {
-                pattenrs:rdx.sel_doc_pattern,
-                req_purpose:values.req_purpose,
-                req_user:rdx.sel_tb_user.user_account,
-                req_team:rdx.sel_tb_user.user_team,
-                remark:values.remark,                
-                insert_by:cookies.load('userInfo').user_account
-              }
-              let ajaxData = await postAddDocNo(qryBody)
-              console.log(ajaxData)
+          if(manDocNoList.length>0 && !(!rdx.sel_tb_user.user_account) ){
+            let qryBody = {
+              docNos:manDocNoList,
+              req_purpose:values.req_purpose,
+              req_user:rdx.sel_tb_user.user_account,
+              req_team:rdx.sel_tb_user.user_team,
+              remark:values.remark,                
+              insert_by:cookies.load('userInfo').user_account
             }
-            else{
-              let qryBody = {
-                doc_no:targetRowObj.doc_no,
-                pattenrs:rdx.sel_doc_pattern,
-                req_purpose:values.req_purpose,
-                req_user:rdx.sel_tb_user.user_account,
-                req_team:rdx.sel_tb_user.user_team,
-                remark:values.remark,                
-                update_by:cookies.load('userInfo').user_account,
-                uuid_binary:targetRowObj.uuid_binary
-              }
-              let ajaxData = await putEditDocNo(qryBody)
-              console.log(ajaxData)
-            }
-
+            let ajaxData = await postAddDocNoManual(qryBody)
+            console.log(ajaxData)
           }
           else{
-            alert("요청자와 문서번호 패턴이 선택되어야 합니다.")
+            alert("요청자 선택과 문서번호(수동)가 추가되어야 합니다.")
           }
 
           resetForm()
           dispatch(setSel_tb_user({}))
-          dispatch(setSel_doc_pattern([]))
+          setManDocNoList([])
           
           setIsSubmitting(false);
           LoginCheck()
@@ -224,16 +196,16 @@ function AddDocNo() {
                 LoginCheck()
                 }}>요청자 선택</Button>
                 <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
-                  <Chip label="요청자" color="primary"/>
-                  <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{rdx.sel_tb_user.user_account}</div></div>
+                  <div style={{wdith:'80px', minWidth:'80px', display:'flex', justifyContent:'center', alignItems:'center'}}><Chip style={{width:'80px', minWidth:'80px'}} size="small" label="요청자" color="primary"/></div>
+                  <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center', overflowY:"auto"}}><Typography>{rdx.sel_tb_user.user_account}</Typography></div>
                 </Stack>
                 <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
-                  <Chip label="요청자명" color="primary"/>
-                  <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{rdx.sel_tb_user.user_name}</div></div>
+                  <div style={{wdith:'80px', minWidth:'80px', display:'flex', justifyContent:'center', alignItems:'center'}}><Chip style={{width:'80px', minWidth:'80px'}} size="small" label="요청자명" color="primary"/></div>
+                  <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center', overflowY:"auto"}}><Typography>{rdx.sel_tb_user.user_name}</Typography></div>
                 </Stack>
                 <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
-                  <Chip label="요청팀" color="primary"/>
-                  <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{rdx.sel_tb_user.user_team}</div></div>
+                  <div style={{wdith:'80px', minWidth:'80px', display:'flex', justifyContent:'center', alignItems:'center'}}><Chip style={{width:'80px', minWidth:'80px'}} size="small" label="요청팀" color="primary"/></div>
+                  <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center', overflowY:"auto"}}><Typography>{rdx.sel_tb_user.user_team}</Typography></div>
                 </Stack>
                 <TextField
                   required
@@ -270,61 +242,84 @@ function AddDocNo() {
             </Paper>
             <Paper className="seperate-paper" elevation={3}>
               <Stack spacing={2}>
-                  <Button disabled={!(targetRowObj=="N/A")} size="small" variant="contained" onClick={()=>{
-                  setPopUpPage(1)
-                  setModalTitle("문서번호 패턴 선택")
-                  handleModalOpen()
-                  LoginCheck()
-                  }}>문서번호 패턴 선택</Button>
-                  <div style={{width:'100%', height:'300px', overflowY:'auto', boxSizing:'border-box'}}>
+                  <div style={{width:'100%',display:'flex'}}>
+                    <TextField
+                    size="small"
+                    variant="outlined"
+                    id="manualDocNo"
+                    name="manualDocNo"
+                    label="수동 문서번호 입력"
+                    value={manDocNo}
+                    sx={{ flexGrow:1, marginRight:'10px'}}
+                    onChange={manDocNohandleChange}
+                    margin="dense"
+                    fullWidth
+                    />
+                      <div style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
+                          <Button size="small" variant="contained" onClick={async ()=>{
+                            let dupCheckResult = await axios.post('/dupcheckdocnomanual',{doc_no:manDocNo})
+                            console.log(dupCheckResult)
+                            if(dupCheckResult.data.result.length<1){
+                              if(manDocNo){
+                                let tempArr = [...manDocNoList]
+
+                                let dupAbbCheck=false
+                                tempArr.map((oneItem,i)=>{
+                                    if(oneItem==manDocNo) dupAbbCheck=true
+                                })
+                                if(!dupAbbCheck) tempArr.push(manDocNo)
+
+                                setManDocNoList(tempArr)
+                                LoginCheck()
+                              }
+                            }
+                            else{
+                              alert("해당 번호는 이미 발번된 번호입니다.")
+                            }
+
+                          }}>추가</Button>
+                      </div>
+                  </div>
+                  <div style={{width:'100%', height:'290px', overflowY:'auto', boxSizing:'border-box'}}>
                       <List>
                           {
-                            rdx.sel_doc_pattern.map((oneAtt,i)=>{
-                              console.log(oneAtt)
-                              let secondaryStr
-                              if(targetRowObj=="N/A"){
-                                secondaryStr="패턴: "+oneAtt.doc_no_pattern
-                              }
-                              else{
-                                secondaryStr = "문서번호 : " + targetRowObj.doc_no
-                              }
-                              
-                                return(
-                                    <ListItem
-                                    secondaryAction={
-                                        <IconButton disabled={!(targetRowObj=="N/A")} edge="end" aria-label="delete" onClick={()=>{
-                                        let temp = [...rdx.sel_doc_pattern]
-                                        temp.splice(i,1)
-                                        dispatch(setSel_doc_pattern(temp))
-                                        }}>
-                                        <DeleteIcon />
-                                        </IconButton>
-                                    }
-                                    >
-                                    <ListItemIcon>
-                                      <RuleIcon color='primary'/>
-                                    </ListItemIcon>
-                                    <ListItemText
-                                        primary={oneAtt.pattern_name}
-                                        secondary={secondaryStr}
-                                    />
-                                    </ListItem>
+                              manDocNoList.map((oneDocNo,i)=>{
+                                  return(
+                                      <ListItem
+                                      style={{ width: "100%" }}
+                                      secondaryAction={
+                                          <IconButton edge="end" aria-label="delete" onClick={()=>{
+                                              let temp = [...manDocNoList]
+                                              temp.splice(i,1)
+                                              setManDocNoList(temp)
+                                          }}>
+                                          <DeleteIcon />
+                                          </IconButton>
+                                      }
+                                      >
+                                      <ListItemIcon>
+                                          <SettingsApplicationsIcon color='primary'/>
+                                      </ListItemIcon>
+                                      <ListItemText
+                                          primary={oneDocNo}
+                                      />
+                                      </ListItem>
                                   )
                               })
                           }
                       </List>
                   </div>
-                  <Button disabled={!(targetRowObj=="N/A")} size="small" variant="contained" onClick={()=>{
-                      dispatch(setSel_doc_pattern([]))
-                  }}>비우기{" ("+rdx.sel_doc_pattern.length+")"}</Button>
+                  <Button size="small" variant="contained" onClick={()=>{
+                      setManDocNoList([])
+                  }}>비우기{" ("+manDocNoList.length+")"}</Button>
               </Stack>
-            </Paper>
+          </Paper>
           </div>
         <div style={{height:'48px'}}/>
           <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding:'10px' }} elevation={6}>
               <div style={{width:'100%', display:'flex', alignItems:'center', backdropFilter:'blur(10px)'}}>
                   <AddIcon color="primary"/>
-                  <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>{(targetRowObj=="N/A")?"문서번호 추가":"발번정보 수정"}</Typography>
+                  <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>{"수동으로 문서번호 추가"}</Typography>
                   <Button size="small" variant="contained" type="submit" form="addDocPatternPostForm" disabled={isSubmitting}>Submit</Button>
                   <Button style={{marginLeft:'1vw'}} size="small" variant="contained" onClick={async ()=>{
                   LoginCheck()
@@ -365,4 +360,4 @@ function AddDocNo() {
   );
 }
 
-export default AddDocNo
+export default AddDocNoManual

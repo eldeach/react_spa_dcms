@@ -158,7 +158,6 @@ function AddBinder() {
                     binder_year:values.binder_year,
                     mng_team:values.mng_team,
                     binder_loc:values.binder_loc,
-                    current_loc:values.binder_loc,
                     relateddoc: JSON.stringify(rdx.sel_doc),
                     binder_keyword:values.binder_keyword,
                     remark:values.remark,

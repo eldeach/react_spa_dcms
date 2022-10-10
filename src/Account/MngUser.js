@@ -4,7 +4,7 @@ import {  useNavigate } from 'react-router-dom';
 //========================================================== Material UI 라이브러리 import
 import { Typography, Button, Paper } from '@mui/material/';
 //---------------------------------------------------------- Material Icons
-import FolderIcon from '@mui/icons-material/Folder';
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 //========================================================== cookie 라이브러리 import
 import cookies from 'react-cookies'
 //========================================================== Slide Popup 컴포넌트 & Redux import
@@ -16,7 +16,7 @@ import LoginSessionCheck from './../Account/LoginSessionCheck.js';
 import MngTable from './../MngTable/MngTable'
 
 
-function MngBinder(){
+function MngUser(){
     let [tblCtrl,setTblCtrl]=useState(true)
     //========================================================== [변수, 객체 선언] 선택된 정보 redux 저장용
     let rdx = useSelector((state) => { return state } )
@@ -28,17 +28,17 @@ function MngBinder(){
         // 이 페이지의 권한 유무 확인
         authCheck()
     },[]);
-    
+  
     function authCheck(){
         if(cookies.load('loginStat')){
-            if(cookies.load('userInfo').user_auth.indexOf("MNG_BINDER_INFO",0)!=-1){
+            if(cookies.load('userInfo').user_auth.indexOf("MNG_USER_INFO",0)!=-1){
                 setTblCtrl(true)
             }
-            else if(cookies.load('userInfo').user_auth.indexOf("VIEW_BINDER_INFO",0)!=-1){
+            else if(cookies.load('userInfo').user_auth.indexOf("VIEW_USER_INFO",0)!=-1){
                 setTblCtrl(false)
             }
             else{
-                alert("MNG_BINDER_INFO 또는 VIEW_BINDER_INFO 권한이 없습니다.")
+                alert("MNG_USER_INFO 또는 VIEW_USER_INFO 권한이 없습니다.")
                 navigate('/')
             }
 
@@ -48,7 +48,7 @@ function MngBinder(){
             navigate('/')
         }
     }
-
+    
     async function LoginCheck(){
         let checkResult = await LoginSessionCheck("check",{})
         if(checkResult.expireTime==0){
@@ -63,13 +63,13 @@ function MngBinder(){
     return(
         <div style={{padding:'0.5vw'}}>
             <div>
-                <MngTable getUrlStr={'/getmngbinder'} targetPk={{}} heightValue={'75vh'} tblCtrl={tblCtrl} chkSel={true} deleteButton={true} addToListButton={false} editable={true} selectButton={false}/>
+                <MngTable getUrlStr={'/getmnguser'} targetPk={{}} heightValue={'75vh'} tblCtrl={tblCtrl} chkSel={false} deleteButton={false} addToListButton={false} editable={true} selectButton={false}/>
             </div>
             <div style={{height:'48px'}}/>
             <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding:'10px' }} elevation={6}>
                 <div style={{width:'100%', display:'flex', alignItems:'center', backdropFilter:'blur(10px)'}}>
-                    <FolderIcon color="primary"/>
-                    <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>{"바인더 정보 관리"}</Typography>
+                    <SupervisorAccountIcon color="primary"/>
+                    <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>{"계정관리"}</Typography>
                     {/* <Button size="small" disabled={!qrData||importDone} variant="contained" type="submit" form="putBinderCurrentLoc" >입고</Button> */}
                     <Button style={{marginLeft:'1vw'}} size="small" variant="contained" onClick={async ()=>{
                     LoginCheck()
@@ -81,4 +81,5 @@ function MngBinder(){
 
     )
 }
-export default MngBinder
+
+export default MngUser
