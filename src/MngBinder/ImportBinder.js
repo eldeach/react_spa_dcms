@@ -4,11 +4,13 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import {  useNavigate } from 'react-router-dom';
 //========================================================== Material UI 라이브러리 import
-import { Box, Typography, Chip, Button, Stack, Paper } from '@mui/material/';
+import { Box, Typography, Chip, Button, Stack, Paper, TextField } from '@mui/material/';
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import FolderIcon from '@mui/icons-material/Folder';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import LockIcon from '@mui/icons-material/Lock';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 //========================================================== QR Reader 라이브러리 import
 import { QrReader } from 'react-qr-reader';
 //========================================================== cookie 라이브러리 import
@@ -58,7 +60,8 @@ function ImportBinder(){
     let dispatch = useDispatch();
     //========================================================== Formik & yup Validation schema
     const schema = yup.object().shape({
-
+        user_pw: yup.string()
+        .required('비밀번호를 입력해주세요.')
     });
     //========================================================== [변수, 객체 선언][useEffect]
     useEffect(() => {
@@ -68,11 +71,11 @@ function ImportBinder(){
     //========================================================== [함수][권한] 권한 점검
     function authCheck(){
         if(cookies.load('loginStat')){
-            if(cookies.load('userInfo').user_auth.indexOf("MNG_BINDER_MOVE_HISTORY",0)!=-1){
+            if(cookies.load('userInfo').user_auth.indexOf("IMPORT_BINDER",0)!=-1){
 
             }
             else{
-                alert("MNG_BINDER_MOVE_HISTORY 권한이 없습니다.")
+                alert("IMPORT_BINDER 권한이 없습니다.")
                 navigate('/')
             }
 
@@ -114,18 +117,36 @@ function ImportBinder(){
         <Formik
         validationSchema={schema}
         onSubmit={async (values, {resetForm})=>{
-            let qryBody = {
-                binder_no:qrData,    
-                update_by:cookies.load('userInfo').user_account
-            }
-            let ajaxData = await putBinderImportLoc(qryBody)
-            console.log(ajaxData)
+            let user_sign =  await axios({
+                method:"get",
+                url:"/signpw",
+                params:{
+                    user_account : cookies.load('userInfo').user_account,
+                    user_pw : values.user_pw
+                },
+                headers:{
+                    'Content-Type':'application/json'
+            }})
+            .then((res)=>res.data)
+            .catch((err)=>console.log(err))
+            if(user_sign.signStat){
+                let qryBody = {
+                    binder_no:qrData,    
+                    update_by:cookies.load('userInfo').user_account
+                }
+                let ajaxData = await putBinderImportLoc(qryBody)
+                console.log(ajaxData)
 
-            resetForm()
+                resetForm()
+            }
+            else{
+                alert(user_sign.msg)
+            }
             LoginCheck()
 
         }}
         initialValues={{
+            user_pw:''
 
         }}
         >
@@ -175,6 +196,31 @@ function ImportBinder(){
                             }
                             {
                                 scanTimeStamp?<Chip icon={<QrCodeScannerIcon/>} label={"스캔시각 : "+moment(new Date(scanTimeStamp)).format('YYYY-MM-DD HH:mm:ss')} color="primary"/>:<div></div>
+                            }
+                            {
+                                qrData&&scanTimeStamp&&!importDone?<Chip icon={<AdminPanelSettingsIcon/>} label={"입고 담당자 : " + cookies.load('userInfo').user_name+" 님"} color="primary"/>:<div/>
+                            }
+                            {
+                                qrData&&scanTimeStamp&&!importDone?
+                                <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                                    <LockIcon  sx={{ color: 'action.active', mt:3.5, mr: 1}} />
+                                    <TextField
+                                    required
+                                    variant="standard"
+                                    id="user_pw"
+                                    name="user_pw"
+                                    label="입고 담당자 전자서명"
+                                    type="password"
+                                    value={values.user_pw}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    helperText={touched.user_pw ? errors.user_pw : ""}
+                                    error={touched.user_pw && Boolean(errors.user_pw)}
+                                    margin="dense"
+                                    fullWidth
+                                    />
+                                </Box>
+                                :<div/>
                             }
                             {
                                 importDone?<Chip icon={<CheckCircleOutlineIcon/>} label={"입고처리 완료"} color="confirm"/>:<div></div>

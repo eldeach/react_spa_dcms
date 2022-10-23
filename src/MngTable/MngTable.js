@@ -278,6 +278,13 @@ function MngTable(props) {
         searchKeyWord : para.searchKeyWord,
       }
     }
+
+    else if(props.getUrlStr=="/getcfgbinderloc")
+    {
+      allParams={
+        searchKeyWord : para.searchKeyWord,
+      }
+    }
     
     let ajaxData = await axios({
       method:"get",
@@ -419,6 +426,20 @@ function MngTable(props) {
                   </Button>
                 )
               }
+              else if(props.getUrlStr=="/getcfgbinderloc"){
+                return (
+                  <Button
+                    variant="contained"
+                    onClick={(event) => {
+                      navigate('/editbinderloc',{state: {
+                        rowObj: cellValues.row,
+                      },})
+                    }}
+                  >
+                    <EditIcon fontSize="small"/>
+                  </Button>
+                )
+              }
               //
             }
           })
@@ -450,6 +471,7 @@ function MngTable(props) {
 
           if(columName=="mat_name") tempMinWidth= 300
 
+          if(columName=="docAtt") tempMinWidth= 300
           if(columName=="qualAtt") tempMinWidth= 300
           if(columName=="valAtt") tempMinWidth= 300
           if(columName=="eqAtt") tempMinWidth= 300
@@ -464,6 +486,7 @@ function MngTable(props) {
 
           if(columName=="user_team") tempMinWidth= 200
           if(columName=="req_team") tempMinWidth= 200
+          if(columName=="mng_team") tempMinWidth= 200
           if(columName=="user_email") tempMinWidth= 300
           if(columName=="user_auth") tempMinWidth= 300
           if(columName=="account_status") tempMinWidth= 300
@@ -486,6 +509,15 @@ function MngTable(props) {
           else if (columName=="invalid_date"){
             tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
               params.value?<Chip icon={<UnpublishedOutlinedIcon />} size="small" color="expired" label={params.value}/>:<div></div>
+            )})
+          }
+          else if (columName=="docAtt"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <div style={{display:'flex', flexWrap:'wrap'}}>{
+                JSON.parse(params.value).map((oneItem,i)=>{
+                  return <Tooltip title={oneItem.att_name} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.abb}/></Tooltip>
+                })
+              }</div>
             )})
           }
           else if (columName=="qualAtt"){
@@ -554,7 +586,7 @@ function MngTable(props) {
           else if (columName=="isprotocol"){
             tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
               params.value?
-              (params.value==0?
+              (params.value=='0'?
                 <Tooltip title={"값 : " + params.value} placement="top" arrow><Chip icon={<DescriptionOutlinedIcon />} size="small" color="primary" label={"보고서"}/></Tooltip>
               :<Tooltip title={"값 : " + params.value} placement="top" arrow><Chip icon={<DescriptionOutlinedIcon />} size="small" color="primary" label={"계획서"}/></Tooltip>)
               :<div></div>
@@ -610,6 +642,23 @@ function MngTable(props) {
                   return <Tooltip title={oneItem.att_name} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.abb}/></Tooltip>
                 })
               }</div>
+            )})
+          }
+          else if (columName=="loc_status"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              params.value=="IMPORTED"?
+              <Chip icon={<GpsFixedIcon />} size="small" color="confirm" label={params.value}/>
+              :(
+                params.value=="EXPORTED"?
+                <Chip icon={<GpsFixedIcon />} size="small" color="expired" label={params.value}/>
+                :<div/>)
+            )})
+          }
+          else if (columName=="confirmed_by"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              params.value?
+              <Tooltip title={"계정 : " + JSON.parse(params.value).user_account+" ("+JSON.parse(params.value).user_team+")"} placement="top" arrow><Chip icon={<GpsFixedIcon />} size="small" color="primary" label={JSON.parse(params.value).user_name+"님"}/></Tooltip>
+              :<div/>
             )})
           }
           else{
@@ -807,7 +856,6 @@ function MngTable(props) {
                       let newRevNo
                       if(!tempRow.last_rev_no&&tempRow.last_rev_no!=0) newRevNo=parseInt(pickRows[0].start_rev_no)
                       else newRevNo=(parseInt(tempRow.last_rev_no)+1)
-                      console.log(newRevNo)
                       dispatch(setSel_doc_no({doc_no:tempRow.doc_no, newRevNo:newRevNo}))
                       
                     }
@@ -1015,32 +1063,18 @@ function MngTable(props) {
                   InitializeTbl ()
                   setDelRowBt(delRowBt=>false)
                 }
+                else if (props.getUrlStr=="/getcfgbinderloc"&&delRowBt)
+                {
+                  let reqResult = await DeleteBinderLoc(pickRows)
+                  if(!reqResult.success) alert(reqResult.result)
+                  InitializeTbl ()
+                  setDelRowBt(delRowBt=>false)
+                }
 
                 setOpenModalBackDrop(false)
                 setIsModalSubmitting(false)
                 handleModalClose()
               }
-              // else if (props.getUrlStr=="/edituserauth_getuserauth"&&delRowBt)
-              // {
-              //   let reqResult = await DeleteUserAuth(pickRows, props.targetPk.user_account)
-              //   if(!reqResult.success) alert(reqResult.result)
-              //   InitializeTbl ()
-              //   setDelRowBt(delRowBt=>false)
-              // }
-              // else if (props.getUrlStr=="/edituserauth_getusernoauth"&&addRowBt)
-              // {
-              //   let reqResult =  await AddUserAuth(pickRows, props.targetPk.user_account)
-              //   if(!reqResult.success) alert(reqResult.result)
-              //   InitializeTbl ()
-              //   setAddRowBt(addRowBt=>false)
-              // }
-              // else if (props.getUrlStr=="/getmngaccount"&&delRowBt)
-              // {
-              //   let reqResult = await DeleteOneUser(pickRows[0])
-              //   if(!reqResult.success) alert(reqResult.result)
-              //   InitializeTbl ()
-              //   setDelRowBt(addRowBt=>false)
-              // }
               else{
                 alert(user_sign.msg)
                 setOpenModalBackDrop(false)
@@ -1143,65 +1177,8 @@ function MngTable(props) {
 export default MngTable
 
 function CustomToolbar() {
-  return <GridToolbarExport csvOptions={{ utf8WithBom: true }} />;
+  return <GridToolbarExport csvOptions={{ utf8WithBom: true }} printOptions={{ disableToolbarButton: true }} />;
 }
-
-// async function DeleteUserAuth(pickRows, targetUser){
-//   let targetRows=[]
-//   pickRows.map((oneRow,i)=>{
-//     targetRows.push({user_account:targetUser, user_auth:oneRow.user_auth, uuid_binary:oneRow.uuid_binary, delete_by:cookies.load('userInfo').user_account})
-//   })
-
-//   let para={
-//     targetRows:targetRows
-//   }
-  
-//   let ajaxData =  await axios({
-//     method:"delete",
-//     url:"/edituserauth_deleteuserauth",
-//     params:para,
-//     headers:{
-//       'Content-Type':'application/json'
-//     }})
-//     .then((res)=>res.data)
-//     .catch((err)=>console.log(err))
-//     return ajaxData
-// }
-
-
-// async function AddUserAuth(pickRows, targetUser){
-//   let targetRows=[]
-//   pickRows.map((oneRow,i)=>{
-//     targetRows.push({user_account:targetUser, user_auth:oneRow.user_auth, insert_by:cookies.load('userInfo').user_account})
-//   })
-//   let body={
-//     targetRows:targetRows
-//   }
-//   let ajaxData = await axios.post("/edituserauth_adduserauth",body)
-//   .then((res)=>res.data)
-//   .catch((err)=>console.log(err))
-//   return ajaxData 
-// }
-
-// async function DeleteOneUser(pickRows){
-//   let para={
-//     user_account:pickRows.user_account,
-//     uuid_binary: pickRows.uuid_binary ,
-//     delete_by:cookies.load('userInfo').user_account
-//   }
-  
-//   let ajaxData =  await axios({
-//     method:"delete",
-//     url:"/deleteaccount",
-//     params:para,
-//     headers:{
-//       'Content-Type':'application/json'
-//     }})
-//     .then((res)=>res.data)
-//     .catch((err)=>console.log(err))
-//     return ajaxData
-// }
-
 
 async function DeleteDocNoPattern(pickRows){
   let targetRows=[]
@@ -1250,7 +1227,10 @@ async function DeleteDocNo(pickRows){
 async function DeleteDoc(pickRows){
   let targetRows=[]
   pickRows.map((oneRow,i)=>{
-    targetRows.push({doc_no:oneRow.doc_no, rev_no:oneRow.rev_no, doc_title:oneRow.doc_title, uuid_binary:oneRow.uuid_binary, delete_by:cookies.load('userInfo').user_account})
+    targetRows.push({doc_no:oneRow.doc_no, rev_no:oneRow.rev_no, doc_title:oneRow.doc_title, written_by:oneRow.written_by, written_by_team:oneRow.written_by_team,
+      approval_date:oneRow.approval_date, invalid_date:oneRow.invalid_date, remark:oneRow.remark,
+      qualAtt:oneRow.qualAtt, valAtt:oneRow.valAtt, eqAtt:oneRow.eqAtt, prodAtt:oneRow.prodAtt, eqmsAtt:oneRow.eqmsAtt, isprotocol:oneRow.isprotocol,
+      relateddoc:oneRow.relateddoc, uuid_binary:oneRow.uuid_binary, delete_by:cookies.load('userInfo').user_account})
   })
 
   let para={
@@ -1282,6 +1262,29 @@ async function DeleteBinder(pickRows){
   let ajaxData =  await axios({
     method:"delete",
     url:"/deletebinder",
+    params:para,
+    headers:{
+      'Content-Type':'application/json'
+    }})
+    .then((res)=>res.data)
+    .catch((err)=>console.log(err))
+    return ajaxData
+}
+
+
+async function DeleteBinderLoc(pickRows){
+  let targetRows=[]
+  pickRows.map((oneRow,i)=>{
+    targetRows.push({binder_loc:oneRow.binder_loc, binder_loc_description:oneRow.binder_loc_description, uuid_binary:oneRow.uuid_binary, delete_by:cookies.load('userInfo').user_account})
+  })
+
+  let para={
+    targetRows:targetRows
+  }
+  
+  let ajaxData =  await axios({
+    method:"delete",
+    url:"/deletebinderloc",
     params:para,
     headers:{
       'Content-Type':'application/json'

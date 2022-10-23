@@ -12,6 +12,12 @@ import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+//---------------------------------------------------------- Material Icons
+import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
+import WhereToVoteIcon from '@mui/icons-material/WhereToVote';
+import VaccinesIcon from '@mui/icons-material/Vaccines';
+import ViewModuleIcon from '@mui/icons-material/ViewModule';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 //========================================================== Moment 라이브러리 import
 import moment from 'moment';
 import 'moment/locale/ko';	//대한민국
@@ -85,10 +91,33 @@ function AddDoc() {
         {abb:"SV",att_name:"Shipping Validation"},
         {abb:"HTS",att_name:"Holding Time Study"},
         {abb:"CHT",att_name:"Cleaning Holding Time"},
+        {abb:"CSV",att_name:"Computerized System Validation"},
         {abb:"ESV",att_name:"Excel Sheet Validation"},
+        {abb:"ET",att_name:"Etcetera"},
+        {abb:"TT",att_name:"Technical Transfer"},
+        {abb:"FT",att_name:"Feasibility Test"},
     ]
     let [valAttFiled,setValAttFiled]=useState();
     let [valAtt, setValAtt] = useState([])
+
+
+    const docAttList = [
+        {abb:"DWG",att_name:"Drawing"},
+        {abb:"PAR",att_name:"Production A Report"},
+        {abb:"PCR",att_name:"Production C Report"},
+        {abb:"QCAR",att_name:"Quality Control A Report"},
+        {abb:"QCCR",att_name:"Quality Control C Report"},
+        {abb:"P2R",att_name:"Packaging 2 Report"},
+        {abb:"QAR",att_name:"Quality Assurance Report"},
+        {abb:"LOR",att_name:"Logistics Report"},
+        {abb:"ENR",att_name:"Engineering Report"},
+        {abb:"PMR",att_name:"Production Management Report"},
+        {abb:"TOR",att_name:"Technical Operations Report"},
+        {abb:"QAOD",att_name:"Official Document"},
+
+    ]
+    let [docAttFiled,setDocAttFiled]=useState();
+    let [docAtt, setDocAtt] = useState([])
 
       //========================================================== Formik & yup Validation schema
   const schema = yup.object().shape({
@@ -147,15 +176,19 @@ function AddDoc() {
         dispatch(setSel_doc([]))
     }
     else{
-        setAppDate(targetRowObj.approval_date);
+        if(targetRowObj.approval_date==0) setAppDate(null)
+        else setAppDate(targetRowObj.approval_date);
+
         if(targetRowObj.invalid_date==0) setInvDate(null)
         else setInvDate(targetRowObj.invalid_date);
+
         if(targetRowObj.isprotocol=='1'){
             setIsProtocol(isProtocol=>true)
         }
         else{
             setIsProtocol(isProtocol=>false)
         }
+        setDocAtt(JSON.parse(targetRowObj.docAtt))
         setValAtt(JSON.parse(targetRowObj.valAtt))
         setQualAtt(JSON.parse(targetRowObj.qualAtt))
         dispatch(setSel_doc_no({doc_no:targetRowObj.doc_no, newRevNo:targetRowObj.rev_no}))
@@ -223,88 +256,95 @@ function AddDoc() {
     else console.log(ajaxData)
   }
 
+  function onKeyDown(keyEvent) {
+    if ((keyEvent.charCode || keyEvent.keyCode) === 13) {
+      keyEvent.preventDefault();
+    }
+  }
+
+
   return (
     <div style={{padding:'0.5vw'}}>
         <Formik
         validationSchema={schema}
         onSubmit={async (values, {resetForm})=>{
             setIsSubmitting(true);
-            if(targetRowObj=="N/A"){
-                let qryBody = {
-                    doc_no:rdx.sel_doc_no.doc_no,
-                    rev_no:rdx.sel_doc_no.newRevNo,
-                    doc_title:values.doc_title,
-                    written_by:rdx.sel_tb_user.user_account,
-                    written_by_team:rdx.sel_tb_user.user_team,
-                    approval_date:moment(new Date(appDate)).format('YYYY-MM-DD'),
-                    invalid_date:moment(new Date(invDate)).format('YYYY-MM-DD'),
-                    qualAtt: JSON.stringify(qualAtt),
-                    valAtt: JSON.stringify(valAtt),
-                    eqAtt: JSON.stringify(rdx.selTmmsWholeAsset),
-                    locAtt: JSON.stringify(rdx.selTmmsLocation),
-                    prodAtt: JSON.stringify(rdx.selSapZmmr1010),
-                    eqmsAtt: JSON.stringify(rdx.selEqmsAtemplate),
-                    isprotocol: isProtocol,
-                    relateddoc: JSON.stringify(rdx.sel_doc),
-                    remark:values.remark,
-                    insert_by:cookies.load('userInfo').user_account
-                }
-                
-                let ajaxData = await postAddDoc(qryBody)
-                console.log(ajaxData)
+            if(!rdx.sel_doc_no.doc_no||!rdx.sel_tb_user.user_account||!appDate){
+                alert("문서번호 선택 또는 사용자 선택, 승인일이 입력되지 않았습니다.")
             }
             else{
-                let qryBody = {
-                    doc_no:rdx.sel_doc_no.doc_no,
-                    rev_no:rdx.sel_doc_no.newRevNo,
-                    doc_title:values.doc_title,
-                    written_by:rdx.sel_tb_user.user_account,
-                    written_by_team:rdx.sel_tb_user.user_team,
-                    approval_date:moment(new Date(appDate)).format('YYYY-MM-DD'),
-                    invalid_date:moment(new Date(invDate)).format('YYYY-MM-DD'),
-                    qualAtt: JSON.stringify(qualAtt),
-                    valAtt: JSON.stringify(valAtt),
-                    eqAtt: JSON.stringify(rdx.selTmmsWholeAsset),
-                    locAtt: JSON.stringify(rdx.selTmmsLocation),
-                    prodAtt: JSON.stringify(rdx.selSapZmmr1010),
-                    eqmsAtt: JSON.stringify(rdx.selEqmsAtemplate),
-                    isprotocol: isProtocol,
-                    relateddoc: JSON.stringify(rdx.sel_doc),
-                    remark:values.remark,
-                    update_by:cookies.load('userInfo').user_account,
-                    uuid_binary:targetRowObj.uuid_binary
+                if(targetRowObj=="N/A"){
+                    let qryBody = {
+                        doc_no:rdx.sel_doc_no.doc_no,
+                        rev_no:rdx.sel_doc_no.newRevNo,
+                        doc_title:values.doc_title,
+                        written_by:rdx.sel_tb_user.user_account,
+                        written_by_team:rdx.sel_tb_user.user_team,
+                        approval_date:moment(new Date(appDate)).format('YYYY-MM-DD'),
+                        invalid_date:moment(new Date(invDate)).format('YYYY-MM-DD'),
+                        docAtt: JSON.stringify(docAtt),
+                        qualAtt: JSON.stringify(qualAtt),
+                        valAtt: JSON.stringify(valAtt),
+                        eqAtt: JSON.stringify(rdx.selTmmsWholeAsset),
+                        locAtt: JSON.stringify(rdx.selTmmsLocation),
+                        prodAtt: JSON.stringify(rdx.selSapZmmr1010),
+                        eqmsAtt: JSON.stringify(rdx.selEqmsAtemplate),
+                        isprotocol: isProtocol,
+                        relateddoc: JSON.stringify(rdx.sel_doc),
+                        remark:values.remark,
+                        insert_by:cookies.load('userInfo').user_account
+                    }
+                    
+                    let ajaxData = await postAddDoc(qryBody)
+                    console.log(ajaxData)
                 }
-                let ajaxData = await putEditDoc(qryBody)
-                console.log(ajaxData)
+                else{
+                    let qryBody = {
+                        doc_no:rdx.sel_doc_no.doc_no,
+                        rev_no:rdx.sel_doc_no.newRevNo,
+                        doc_title:values.doc_title,
+                        written_by:rdx.sel_tb_user.user_account,
+                        written_by_team:rdx.sel_tb_user.user_team,
+                        approval_date:moment(new Date(appDate)).format('YYYY-MM-DD'),
+                        invalid_date:moment(new Date(invDate)).format('YYYY-MM-DD'),
+                        docAtt: JSON.stringify(docAtt),
+                        qualAtt: JSON.stringify(qualAtt),
+                        valAtt: JSON.stringify(valAtt),
+                        eqAtt: JSON.stringify(rdx.selTmmsWholeAsset),
+                        locAtt: JSON.stringify(rdx.selTmmsLocation),
+                        prodAtt: JSON.stringify(rdx.selSapZmmr1010),
+                        eqmsAtt: JSON.stringify(rdx.selEqmsAtemplate),
+                        isprotocol: isProtocol,
+                        relateddoc: JSON.stringify(rdx.sel_doc),
+                        remark:values.remark,
+                        update_by:cookies.load('userInfo').user_account,
+                        uuid_binary:targetRowObj.uuid_binary
+                    }
+                    let ajaxData = await putEditDoc(qryBody)
+                    console.log(ajaxData)
+                    navigate(-1)
+                }
+                resetForm()
+                setDocAtt([])
+                //setValAttFiled(null)
+                setValAtt([])
+                //setQualAttFiled(null)
+                setQualAtt([])
+                setIsProtocol(false)
+                setAppDate(null)
+                setInvDate(null)
+                dispatch(setSel_doc_no({}))
+                dispatch(setSel_tb_user({}))
+                dispatch(setSelTmmsWholeAsset([]))
+                dispatch(setSelTmmsLocation([]))
+                dispatch(setSelSapZmmr1010([]))
+                dispatch(setSelEqmsAtemplate([]))
+                dispatch(setSel_doc([]))
             }
-
-
-            resetForm()
-            setValAttFiled(null)
-            setValAtt([])
-            setQualAttFiled(null)
-            setQualAtt([])
-            setIsProtocol(false)
-            setAppDate(null)
-            setInvDate(null)
-            dispatch(setSel_doc_no({}))
-            dispatch(setSel_tb_user({}))
-            dispatch(setSelTmmsWholeAsset([]))
-            dispatch(setSelTmmsLocation([]))
-            dispatch(setSelSapZmmr1010([]))
-            dispatch(setSelEqmsAtemplate([]))
-            dispatch(setSel_doc([]))
 
             setIsSubmitting(false);
             LoginCheck()
 
-            if(targetRowObj=="N/A"){
-
-            }
-            else
-            {
-                navigate(-1)
-            }
         }}
         initialValues={!location.state ?{
             doc_title:'',
@@ -328,6 +368,7 @@ function AddDoc() {
             <Box
             id="postAddDoc"
             component="form"
+            onKeyDown={onKeyDown}
             noValidate
             onSubmit={handleSubmit}
             autoComplete="off"
@@ -340,7 +381,7 @@ function AddDoc() {
                             setModalTitle("문서번호 선택")
                             handleModalOpen()
                             LoginCheck()
-                            }}>문서선택</Button>
+                            }}>문서번호 선택</Button>
                             <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
                                 <Chip label="문서번호" color="primary"/>
                                 <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{rdx.sel_doc_no.doc_no}</div></div>
@@ -467,6 +508,73 @@ function AddDoc() {
                         <Stack spacing={2}>
                             <div style={{width:'100%',display:'flex'}}>
                                 <Autocomplete
+                                value={docAttFiled}
+                                onChange={(event, newValue) => {
+                                setDocAttFiled({abb:newValue.split(" : ")[0], att_name : newValue.split(" : ")[1]});
+                                }}
+                                disablePortal
+                                size="small"
+                                id="docAttList"
+                                options={docAttList.map((option) => option.abb + " : " + option.att_name)}
+                                sx={{ flexGrow:1, marginRight:'10px'}}
+                                renderInput={(params) => <TextField {...params} color="primary" label="문서 성격 추가" />}
+                                />
+                                <div style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
+                                    <Button size="small" variant="contained" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_DOCATT",0)==-1)} onClick={()=>{
+                                        if(docAttFiled){
+                                            let tempArr = [...docAtt]
+
+                                            let dupAbbCheck=false
+                                            tempArr.map((oneItem,i)=>{
+                                                if(oneItem.abb==docAttFiled.abb) dupAbbCheck=true
+                                            })
+                                            if(!dupAbbCheck) tempArr.push(docAttFiled)
+
+                                            setDocAtt(tempArr)
+                                            LoginCheck()
+                                        }
+                                    }}>추가</Button>
+                                </div>
+                            </div>
+                            <div style={{width:'100%', height:'294px', overflowY:'auto', boxSizing:'border-box'}}>
+                                <List>
+                                    {
+                                        docAtt.map((oneAtt,i)=>{
+                                            return(
+                                                <ListItem
+                                                style={{ width: "100%" }}
+                                                secondaryAction={
+                                                    <IconButton edge="end" aria-label="delete" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_DOCATT",0)==-1)} onClick={()=>{
+                                                        let temp = [...docAtt]
+                                                        temp.splice(i,1)
+                                                        setDocAtt(temp)
+                                                    }}>
+                                                    <DeleteIcon />
+                                                    </IconButton>
+                                                }
+                                                >
+                                                <ListItemIcon>
+                                                    <SettingsApplicationsIcon color='primary'/>
+                                                </ListItemIcon>
+                                                <ListItemText
+                                                    primary={oneAtt.abb}
+                                                    secondary={oneAtt.att_name}
+                                                />
+                                                </ListItem>
+                                            )
+                                        })
+                                    }
+                                </List>
+                            </div>
+                            <Button size="small" variant="contained" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_DOCATT",0)==-1)} onClick={()=>{
+                                setDocAtt([])
+                            }}>비우기{" ("+docAtt.length+")"}</Button>
+                        </Stack>
+                    </Paper>
+                    <Paper className="seperate-paper" elevation={3}>
+                        <Stack spacing={2}>
+                            <div style={{width:'100%',display:'flex'}}>
+                                <Autocomplete
                                 value={valAttFiled}
                                 onChange={(event, newValue) => {
                                 setValAttFiled({abb:newValue.split(" : ")[0], att_name : newValue.split(" : ")[1]});
@@ -479,7 +587,7 @@ function AddDoc() {
                                 renderInput={(params) => <TextField {...params} color="primary" label="밸리데이션 평가 성격 추가" />}
                                 />
                                 <div style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
-                                    <Button size="small" variant="contained" onClick={()=>{
+                                    <Button size="small" variant="contained" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_VALATT",0)==-1)} onClick={()=>{
                                         if(valAttFiled){
                                             let tempArr = [...valAtt]
 
@@ -495,7 +603,7 @@ function AddDoc() {
                                     }}>추가</Button>
                                 </div>
                             </div>
-                            <div style={{width:'100%', height:'300px', overflowY:'auto', boxSizing:'border-box'}}>
+                            <div style={{width:'100%', height:'294px', overflowY:'auto', boxSizing:'border-box'}}>
                                 <List>
                                     {
                                         valAtt.map((oneAtt,i)=>{
@@ -503,7 +611,7 @@ function AddDoc() {
                                                 <ListItem
                                                 style={{ width: "100%" }}
                                                 secondaryAction={
-                                                    <IconButton edge="end" aria-label="delete" onClick={()=>{
+                                                    <IconButton edge="end" aria-label="delete" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_VALATT",0)==-1)} onClick={()=>{
                                                         let temp = [...valAtt]
                                                         temp.splice(i,1)
                                                         setValAtt(temp)
@@ -525,7 +633,7 @@ function AddDoc() {
                                     }
                                 </List>
                             </div>
-                            <Button size="small" variant="contained" onClick={()=>{
+                            <Button size="small" variant="contained" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_VALATT",0)==-1)} onClick={()=>{
                                 setValAtt([])
                             }}>비우기{" ("+valAtt.length+")"}</Button>
                         </Stack>
@@ -546,7 +654,7 @@ function AddDoc() {
                                 renderInput={(params) => <TextField {...params} color="primary" label="적격성 평가 성격 추가" />}
                                 />
                                 <div style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
-                                    <Button size="small" variant="contained" onClick={()=>{
+                                    <Button size="small" variant="contained" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_QUALATT",0)==-1)} onClick={()=>{
                                         if(qualAttFiled){
                                             let tempArr = [...qualAtt]
 
@@ -562,7 +670,7 @@ function AddDoc() {
                                     }}>추가</Button>
                                 </div>
                             </div>
-                            <div style={{width:'100%', height:'300px', overflowY:'auto', boxSizing:'border-box'}}>
+                            <div style={{width:'100%', height:'294px', overflowY:'auto', boxSizing:'border-box'}}>
                                 <List>
                                     {
                                         qualAtt.map((oneAtt,i)=>{
@@ -570,7 +678,7 @@ function AddDoc() {
                                                 <ListItem
                                                 style={{ width: "100%" }}
                                                 secondaryAction={
-                                                    <IconButton edge="end" aria-label="delete" onClick={()=>{
+                                                    <IconButton edge="end" aria-label="delete" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_QUALATT",0)==-1)} onClick={()=>{
                                                         let temp = [...qualAtt]
                                                         temp.splice(i,1)
                                                         setQualAtt(temp)
@@ -592,14 +700,14 @@ function AddDoc() {
                                     }
                                 </List>
                             </div>
-                            <Button size="small" variant="contained" onClick={()=>{
+                            <Button size="small" variant="contained" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_QUALATT",0)==-1)} onClick={()=>{
                                 setQualAtt([])
                             }}>비우기{" ("+qualAtt.length+")"}</Button>
                         </Stack>
                     </Paper>
                     <Paper className="seperate-paper" elevation={3}>
                         <Stack spacing={2}>
-                            <Button size="small" variant="contained" onClick={()=>{
+                            <Button size="small" variant="contained" startIcon={<PrecisionManufacturingIcon/>} disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_EQATT",0)==-1)} onClick={()=>{
                             setPopUpPage(1)
                             setModalTitle("설비선택")
                             handleModalOpen()
@@ -612,7 +720,7 @@ function AddDoc() {
                                             return(
                                                 <ListItem
                                                 secondaryAction={
-                                                    <IconButton edge="end" aria-label="delete" onClick={()=>{
+                                                    <IconButton edge="end" aria-label="delete" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_EQATT",0)==-1)} onClick={()=>{
                                                     let temp = [...rdx.selTmmsWholeAsset]
                                                     temp.splice(i,1)
                                                     dispatch(setSelTmmsWholeAsset(temp))
@@ -634,14 +742,14 @@ function AddDoc() {
                                     }
                                 </List>
                             </div>
-                            <Button size="small" variant="contained" onClick={()=>{
+                            <Button size="small" variant="contained" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_EQATT",0)==-1)} onClick={()=>{
                                 dispatch(setSelTmmsWholeAsset([]))
                             }}>비우기{" ("+rdx.selTmmsWholeAsset.length+")"}</Button>
                         </Stack>
                     </Paper>
                     <Paper className="seperate-paper" elevation={3}>
                         <Stack spacing={2}>
-                            <Button size="small" variant="contained" onClick={()=>{
+                            <Button size="small" variant="contained" startIcon={<WhereToVoteIcon/>} disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_LOCATT",0)==-1)} onClick={()=>{
                                 setPopUpPage(6)
                                 setModalTitle("관련 위치 선택")
                                 handleModalOpen()
@@ -654,7 +762,7 @@ function AddDoc() {
                                             return(
                                                 <ListItem
                                                 secondaryAction={
-                                                    <IconButton edge="end" aria-label="delete" onClick={()=>{
+                                                    <IconButton edge="end" aria-label="delete" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_LOCATT",0)==-1)} onClick={()=>{
                                                         console.log(rdx.selTmmsLocation[i])
                                                         let temp = [...rdx.selTmmsLocation]
                                                         temp.splice(i,1)
@@ -677,14 +785,14 @@ function AddDoc() {
                                     }
                                 </List>
                             </div>
-                            <Button size="small" variant="contained" onClick={()=>{
+                            <Button size="small" variant="contained" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_LOCATT",0)==-1)} onClick={()=>{
                                 dispatch(setSelTmmsLocation([]))
                             }}>비우기{" ("+rdx.selTmmsLocation.length+")"}</Button>
                         </Stack>
                     </Paper>
                     <Paper className="seperate-paper" elevation={3}>
                         <Stack spacing={2}>
-                            <Button size="small" variant="contained" onClick={()=>{
+                            <Button size="small" variant="contained" startIcon={<VaccinesIcon/>} disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_PRODATT",0)==-1)} onClick={()=>{
                                 setPopUpPage(2)
                                 setModalTitle("제품선택")
                                 handleModalOpen()
@@ -697,7 +805,7 @@ function AddDoc() {
                                             return(
                                                 <ListItem
                                                 secondaryAction={
-                                                    <IconButton edge="end" aria-label="delete" onClick={()=>{
+                                                    <IconButton edge="end" aria-label="delete" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_PRODATT",0)==-1)} onClick={()=>{
                                                         console.log(rdx.selSapZmmr1010[i])
                                                         let temp = [...rdx.selSapZmmr1010]
                                                         temp.splice(i,1)
@@ -720,14 +828,14 @@ function AddDoc() {
                                     }
                                 </List>
                             </div>
-                            <Button size="small" variant="contained" onClick={()=>{
+                            <Button size="small" variant="contained" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_PRODATT",0)==-1)} onClick={()=>{
                                 dispatch(setSelSapZmmr1010([]))
                             }}>비우기{" ("+rdx.selSapZmmr1010.length+")"}</Button>
                         </Stack>
                     </Paper>
                     <Paper className="seperate-paper" elevation={3}>
                         <Stack spacing={2}>
-                            <Button size="small" variant="contained" onClick={()=>{
+                            <Button size="small" variant="contained" startIcon={<ViewModuleIcon/>} disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_EQMSATT",0)==-1)} onClick={()=>{
                                 setPopUpPage(3)
                                 setModalTitle("eQMS 모듈 선택")
                                 handleModalOpen()
@@ -740,7 +848,7 @@ function AddDoc() {
                                             return(
                                                 <ListItem
                                                 secondaryAction={
-                                                    <IconButton edge="end" aria-label="delete" onClick={()=>{
+                                                    <IconButton edge="end" aria-label="delete" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_EQMSATT",0)==-1)} onClick={()=>{
                                                         console.log(rdx.selEqmsAtemplate[i])
                                                         let temp = [...rdx.selEqmsAtemplate]
                                                         temp.splice(i,1)
@@ -763,14 +871,14 @@ function AddDoc() {
                                     }
                                 </List>
                             </div>
-                            <Button size="small" variant="contained" onClick={()=>{
+                            <Button size="small" variant="contained" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_EQMSATT",0)==-1)} onClick={()=>{
                                 dispatch(setSelEqmsAtemplate([]))
                             }}>비우기{" ("+rdx.selEqmsAtemplate.length+")"}</Button>
                         </Stack>
                     </Paper>
                     <Paper className="seperate-paper" elevation={3}>
                         <Stack spacing={2}>
-                            <Button size="small" variant="contained" onClick={()=>{
+                            <Button size="small" variant="contained" startIcon={<InsertDriveFileIcon/>} disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_RELATEDDOC",0)==-1)} onClick={()=>{
                                 setPopUpPage(5)
                                 setModalTitle("관련문서 선택")
                                 handleModalOpen()
@@ -783,7 +891,7 @@ function AddDoc() {
                                             return(
                                                 <ListItem
                                                 secondaryAction={
-                                                    <IconButton edge="end" aria-label="delete" onClick={()=>{
+                                                    <IconButton edge="end" aria-label="delete" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_RELATEDDOC",0)==-1)} onClick={()=>{
                                                         console.log(rdx.sel_doc[i])
                                                         let temp = [...rdx.sel_doc]
                                                         temp.splice(i,1)
@@ -806,7 +914,7 @@ function AddDoc() {
                                     }
                                 </List>
                             </div>
-                            <Button size="small" variant="contained" onClick={()=>{
+                            <Button size="small" variant="contained" disabled={(cookies.load('userInfo').user_auth.indexOf("MNG_DOC_BT_RELATEDDOC",0)==-1)} onClick={()=>{
                                 dispatch(setSel_doc([]))
                             }}>비우기{" ("+rdx.sel_doc.length+")"}</Button>
                         </Stack>

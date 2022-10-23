@@ -4,15 +4,17 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import {  useNavigate, useLocation } from 'react-router-dom';
 //========================================================== Material UI 라이브러리 import
-import { Box, Typography, Chip, Button, Stack, Paper,Divider,Modal,  } from '@mui/material/';
+import { Box, Typography, Chip, Button, Stack, Paper,Divider,Modal, TextField  } from '@mui/material/';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import FolderIcon from '@mui/icons-material/Folder';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Diversity3OutlinedIcon from '@mui/icons-material/Diversity3Outlined';
-import BadgeIcon from '@mui/icons-material/Badge';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import LockIcon from '@mui/icons-material/Lock';
+import BadgeIcon from '@mui/icons-material/Badge';
 //========================================================== QR Reader 라이브러리 import
 import { QrReader } from 'react-qr-reader';
 //========================================================== cookie 라이브러리 import
@@ -58,7 +60,8 @@ function ExportBinder(){
 
     //========================================================== Formik & yup Validation schema
     const schema = yup.object().shape({
-
+        user_pw: yup.string()
+        .required('비밀번호를 입력해주세요.')
     });
 
     //========================================================== [변수] popup 작동 제어 State
@@ -84,11 +87,11 @@ function ExportBinder(){
     //========================================================== [함수][권한] 권한 점검
     function authCheck(){
         if(cookies.load('loginStat')){
-            if(cookies.load('userInfo').user_auth.indexOf("MNG_BINDER_MOVE_HISTORY",0)!=-1){
+            if(cookies.load('userInfo').user_auth.indexOf("EXPORT_BINDER",0)!=-1){
     
             }
             else{
-                alert("MNG_BINDER_MOVE_HISTORY 권한이 없습니다.")
+                alert("EXPORT_BINDER 권한이 없습니다.")
                 navigate('/')
             }
     
@@ -145,20 +148,37 @@ function ExportBinder(){
         <Formik
         validationSchema={schema}
         onSubmit={async (values, {resetForm})=>{
-            let user_info={
-                user_account:rdx.sel_tb_user.user_account,
-                user_name:rdx.sel_tb_user.user_name,
-                user_team:rdx.sel_tb_user.user_team
-            }
-            let qryBody = {
-                binder_no:qrData,
-                current_loc:user_info,    
-                update_by:cookies.load('userInfo').user_account
-              }
-              let ajaxData = await putBinderExportLoc(qryBody)
-              console.log(ajaxData)
+            let user_sign =  await axios({
+                method:"get",
+                url:"/signpw",
+                params:{
+                    user_account : cookies.load('userInfo').user_account,
+                    user_pw : values.user_pw
+                },
+                headers:{
+                    'Content-Type':'application/json'
+            }})
+            .then((res)=>res.data)
+            .catch((err)=>console.log(err))
+            if(user_sign.signStat){
+                let user_info={
+                    user_account:rdx.sel_tb_user.user_account,
+                    user_name:rdx.sel_tb_user.user_name,
+                    user_team:rdx.sel_tb_user.user_team
+                }
+                let qryBody = {
+                    binder_no:qrData,
+                    current_loc:user_info,    
+                    update_by:cookies.load('userInfo').user_account
+                }
+                let ajaxData = await putBinderExportLoc(qryBody)
+                console.log(ajaxData)
 
-            resetForm()
+                resetForm()
+            }
+            else{
+                alert(user_sign.msg)
+            }
             LoginCheck()
 
         }}
@@ -232,6 +252,33 @@ function ExportBinder(){
                                 </Stack>
                                 :<div></div>
                             }
+                            {
+                                qrData&&scanTimeStamp&&rdx.sel_tb_user.user_account&&!exportDone?<Chip icon={<AdminPanelSettingsIcon/>} label={"출고 담당자 : " + cookies.load('userInfo').user_name+" 님"} color="primary"/>:<div/>
+                            }
+                            {
+                                qrData&&scanTimeStamp&&rdx.sel_tb_user.user_account&&!exportDone?
+                                <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                                    <LockIcon  sx={{ color: 'action.active', mt:3.5, mr: 1}} />
+                                    <TextField
+                                    required
+                                    size="small"
+                                    variant="standard"
+                                    id="user_pw"
+                                    name="user_pw"
+                                    label="출고 담당자 전자서명"
+                                    type="password"
+                                    value={values.user_pw}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    helperText={touched.user_pw ? errors.user_pw : ""}
+                                    error={touched.user_pw && Boolean(errors.user_pw)}
+                                    margin="dense"
+                                    fullWidth
+                                    />
+                                </Box>
+                                :<div/>
+                            }
+
                             {
                                 exportDone?<Chip icon={<CheckCircleOutlineIcon/>} label={"출고처리 완료"} color="confirm"/>:<div></div>
                             }

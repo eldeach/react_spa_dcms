@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 //========================================================== Material UI 라이브러리 import
-import { Stack, TextField, Paper, Typography, Button } from '@mui/material/';
+import { Stack, Chip, TextField, Paper, Typography, Button } from '@mui/material/';
 //---------------------------------------------------------- Material Icons
 import BackupIcon from '@mui/icons-material/Backup';
 //========================================================== Slide Popup 컴포넌트 & Redux import
@@ -201,10 +201,7 @@ function ExtDataImport(){
         <div style={{width:'100vw', display:'flex', flexWrap:'wrap' ,justifyContent:'center', alignItems:'center'}}>
             <Paper className="seperate-paper" elevation={2}>
                 <Stack spacing={2}>
-                    <div style={{width:'100%', display:'flex', alignItems:'center'}}>
-                        <BackupIcon color="primary"/>
-                        <div style={{flexGrow:1, fontWeight:'bold', marginLeft:'4px'}}>외부 시스템 데이터 업로드</div>
-                    </div>
+                  <Chip label="외부 시스템 데이터 업로드" color="primary"/>
                     <div style={{width:'100%', display:'flex'}}>
                         <div style={{flexGrow:1, marginRight:'4px'}}>
                             <TextField type="file" name="file" id="inputGroupFile" size="small" color="primary" fullWidth onChange={async (e)=>{
@@ -265,7 +262,7 @@ function ExtDataImport(){
                         console.log (await postExtDataEqmsAtemplate(extDataArray))
                         }}>
                         <Typography variant="button">eQMS Data</Typography>
-                        <Typography variant="body2">{"(Teamplate : A:공통)"}</Typography>
+                        <Typography variant="body2">{"(Template : A:공통)"}</Typography>
                     </Button>
                     <Button style={{ display: "block", textAlign: "center" }} disabled={isSap} variant="contained" size="small" color="primary" onClick={async ()=>{
                         LoginCheck()
@@ -292,11 +289,22 @@ function ExtDataImport(){
                         LoginCheck()
                         console.log (await postExtDataGroupWareAccount(extDataArray))
                         }}>
-                        <Typography variant="button">{"베어월드 계정입력"}</Typography>
+                        <Typography variant="button">{"베어월드 계정"}</Typography>
                     </Button>
                 </Stack>
             </Paper>
         </div>
+        <div style={{height:'48px'}}/>
+        <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding:'10px' }} elevation={6}>
+            <div style={{width:'100%', display:'flex', alignItems:'center', backdropFilter:'blur(10px)'}}>
+                <BackupIcon color="primary"/>
+                <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>{"외부 시스템 데이터 업로드"}</Typography>
+                <Button style={{marginLeft:'1vw'}} size="small" variant="contained" onClick={async ()=>{
+                LoginCheck()
+                navigate(-1)
+                }}>Cancel</Button>
+            </div>
+        </Paper>
       </div>
     )
 }

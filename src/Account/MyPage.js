@@ -4,8 +4,9 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import {  useNavigate } from 'react-router-dom';
 //========================================================== Material UI 라이브러리 import
-import {PropTypes, Typography, Box, Chip, Button, Stack, Paper,Divider, TextField } from '@mui/material/';
+import {PropTypes, Typography, Box, Chip, Button, Stack, Paper,Divider, Tooltip, TextField } from '@mui/material/';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
 //========================================================== Formik & Yup 라이브러리 import
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -20,10 +21,24 @@ import axios from 'axios';
 import MngTable from './../MngTable/MngTable'
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
 import LoginSessionCheck from './LoginSessionCheck.js';
-//========================================================== 반응형 웹
-import { BrowserView, MobileView } from 'react-device-detect';
 
 function MyPage() {
+
+  const userAuthList = [
+    {abb:"MNG_USER_INFO",att_name:"Manage User Information"},
+    {abb:"VIEW_USER_INFO",att_name:"View User Information"},
+    {abb:"MODIFY_USER_INFO",att_name:"Modify User Information"},
+    {abb:"EXT_DATA",att_name:"Upload Exteranl Data"},
+    {abb:"ADD_EDIT_BINDER",att_name:"Add or Edit Binder Information"},
+    {abb:"MNG_BINDER_MOVE_HISTORY",att_name:"Manage Binder History of Moving"},
+    {abb:"VIEW_BINDER_MOVE_HISTORY",att_name:"View Binder History of Moving"},
+    {abb:"MNG_BINDER_INFO",att_name:"Manage Binder Information"},
+    {abb:"VIEW_BINDER_INFO",att_name:"View Binder Information"},
+    {abb:"MNG_DOC_INFO",att_name:"Manage Documents Information"},
+    {abb:"VIEW_DOC_INFO",att_name:"View Documents Information"},
+    {abb:"VIEW_AUDIT_TRAIL",att_name:"View Audit Trail"},
+    {abb:"CFG_BINDER_LOC",att_name:"Configure Binder Location"},
+  ]
     //========================================================== Form 작동 Satae 정의 정의
     let [isSubmitting, setIsSubmitting] = useState(false); // Submit 중복 클릭 방지
     let [isResetting, setIsResetting] = useState(false); // Reset 중복 클릭 방지
@@ -149,7 +164,7 @@ function MyPage() {
     let checkResult = await LoginSessionCheck("check",{})
     if(checkResult.expireTime==0){
       dispatch(setLoginExpireTime(0))
-      navigate('/login')
+      navigate('/')
     }
     else{
       dispatch(setLoginExpireTime(checkResult.expireTime))
@@ -183,7 +198,7 @@ function MyPage() {
       <div style={{width:'100%', display:'flex', flexWrap:'wrap', justifyContent:'center'}}>
         <Paper className="seperate-paper" elevation={3}>   
           <Stack spacing={2}>
-            <Chip label="계정 및 소속" color="primary"/>
+            <Chip label="그릅웨어 정보" color="primary"/>
               <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
                 <div style={{width:'80px'}}><Chip label="사용자명" color="primary"/></div>
                 <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{initMyInfo.user_name}</div></div>
@@ -208,11 +223,7 @@ function MyPage() {
                 <div style={{width:'80px'}}><Chip label="회사" color="primary"/></div>
                 <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{initMyInfo.user_company}</div></div>
               </Stack>
-          </Stack>
-        </Paper>
-        <Paper className="seperate-paper" elevation={3}>   
-          <Stack spacing={2}>
-            <Chip label="연락처 및 기타 정보" color="primary"/>
+
               <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
                 <div style={{width:'80px'}}><Chip label="이메일" color="primary"/></div>
                 <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{initMyInfo.user_email}</div></div>
@@ -222,7 +233,26 @@ function MyPage() {
                 <div style={{width:'80px'}}><Chip label="전화번호" color="primary"/></div>
                 <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{initMyInfo.user_phone}</div></div>
               </Stack>
+          </Stack>
+        </Paper>
+        <Paper className="seperate-paper" elevation={3}>   
+          <Stack spacing={2}>
+              <Chip label="사용자 권한" color="primary"/>
+              <div style={{minWidth:'100%', height:'208px', flexGrow:1, padding:'10px', display:'flex', flexWrap:'wrap', justifyContent:'center', alignItems:'center', overflowY:'auto', borderStyle:'solid', borderColor:'#2196f3',boxSizing:'border-box'}}>
+                {
+                  rdx.loginExpireTime!=0?
+                  cookies.load('userInfo').user_auth.map((oneAuth,i)=>{
+                    let authName
+                    
+                      for (let i=0;i<userAuthList.length;i++){
+                        if(oneAuth==userAuthList[i].abb) authName= userAuthList[i].att_name
+                      }
 
+                    return(<Tooltip style={{margin:'4px'}} title={authName} placement="top" arrow><Chip icon={<SettingsApplicationsIcon/>} size="small" label={oneAuth} color="primary"/></Tooltip>)                      
+                  })
+                  :<div/>
+                }
+              </div>
               <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
                 <div style={{width:'80px'}}><Chip label="비고" color="primary"/></div>
                 <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{initMyInfo.remark}</div></div>

@@ -105,7 +105,7 @@ async function LoginCheck(){
         let qrCodeMarginStr
         if (props.binderSide=="Front") {
             qrCodeMarginStr='auto'
-            binderCoverWidth='20.3cm'
+            binderCoverWidth='20cm'
             writingModeStr = 'horizontal-tb'
         }
         else {
@@ -116,7 +116,7 @@ async function LoginCheck(){
     
         return (
         <div ref={props.printRef}>
-            <div style={{margin:'0.3cm', padding:'0.1cm', width:(binderCoverWidth), height:'29cm', textAlign:'center', border:'4px solid', borderColor:'#2196f3',boxSizing:'border-box'}}>
+            <div style={{marginLeft:'auto', marginRight:'auto', marginTop:'0.5cm', padding:'0.1cm', width:(binderCoverWidth), height:'28.6cm', textAlign:'center', border:'3px solid', borderColor:'#2196f3',boxSizing:'border-box'}}>
                 <Stack spacing={1}>
                     <div style={{width:'99%', justifyItems:(props.binderSide=="Front"?'right':'center')}}>
                         <div style={{display:'flex', justifyContent: (props.binderSide=="Front"?'flex-end':'center')}}>
@@ -130,7 +130,7 @@ async function LoginCheck(){
                             </div>
                         </div>
                     </div>
-                    <div style={{height: (props.binderSide=="Front"?'11cm':'22.4cm')}}>
+                    <div style={{height: (props.binderSide=="Front"?'10.5cm':'22cm')}}>
                         {
                             props.binderSide=="Front"?<div style={{height:'100px'}}/>:<div></div>
                         }
@@ -157,7 +157,7 @@ async function LoginCheck(){
                             {
                                 props.binderSide=="Front"?<Typography variant='caption'>{"Daewoong Pharmaceutical Co., Ltd"}</Typography>:<div></div>
                             }
-                            <div style={{fontWeight:'bold'}}><Typography color="primary" variant='caption'>{"DCMS"}</Typography></div>
+                            <div style={{fontWeight:'bold'}}><Typography color="primary" variant='caption'>{"CDMS"}</Typography></div>
                         </Stack>
                     </div>
                 </Stack>
@@ -197,7 +197,7 @@ async function LoginCheck(){
                 onSubmit={handleSubmit}
                 autoComplete="off"
                 >
-                    <div style={{width:'100vw', display:'flex', flexWrap:'wrap', justifyContent:'center'}}>
+                    <div style={{width:'100vw', marginBottom:'6px', display:'flex', flexWrap:'wrap', justifyContent:'center'}}>
                         <Autocomplete
                         id="coverSide"
                         size="small"

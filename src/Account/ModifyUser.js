@@ -8,6 +8,7 @@ import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
+import LockResetIcon from '@mui/icons-material/LockReset';
 //========================================================== Formik & Yup 라이브러리 import
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -17,13 +18,21 @@ import axios from 'axios';
 import cookies from 'react-cookies'
 //========================================================== Slide Popup 컴포넌트 & Redux import
 import { useDispatch, useSelector } from "react-redux"
-import { setSel_tb_user, setSel_doc_pattern, setLoginExpireTime } from "../store.js"
+import { setLoginExpireTime } from "../store.js"
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
 import LoginSessionCheck from './../Account/LoginSessionCheck.js';
 //========================================================== MngTable 컴포넌트 import
 import MngTable from './../MngTable/MngTable'
 
 function ModifyUser() {
+  async function handleCopyClipBoard (text){
+    try {
+      await navigator.clipboard.writeText(text);
+      alert('클립보드에 재발행된 비밀번호가 복사되었습니다.');
+    } catch (e) {
+      alert('복사에 실패하였습니다');
+    }
+};
 
   //========================================================== [변수, 객체 선언] 선택된 정보 redux 저장용
   let rdx = useSelector((state) => { return state } )
@@ -43,11 +52,23 @@ function ModifyUser() {
     {abb:"ADD_EDIT_BINDER",att_name:"Add or Edit Binder Information"},
     {abb:"MNG_BINDER_MOVE_HISTORY",att_name:"Manage Binder History of Moving"},
     {abb:"VIEW_BINDER_MOVE_HISTORY",att_name:"View Binder History of Moving"},
+    {abb:"IMPORT_BINDER",att_name:"Import Binder"},
+    {abb:"EXPORT_BINDER",att_name:"Export Binder"},
     {abb:"MNG_BINDER_INFO",att_name:"Manage Binder Information"},
     {abb:"VIEW_BINDER_INFO",att_name:"View Binder Information"},
     {abb:"MNG_DOC_INFO",att_name:"Manage Documents Information"},
+    {abb:"MNG_DOC_BT_DOCATT",att_name:"Manage Attribute of Document"},
+    {abb:"MNG_DOC_BT_VALATT",att_name:"Manage Attribute of Validation in Document"},
+    {abb:"MNG_DOC_BT_QUALATT",att_name:"Manage Attribute of Qualification in Document"},
+    {abb:"MNG_DOC_BT_EQATT",att_name:"Manage Attribute of Equipment in Document"},
+    {abb:"MNG_DOC_BT_LOCATT",att_name:"Manage Attribute of Location in Document"},
+    {abb:"MNG_DOC_BT_PRODATT",att_name:"Manage Attribute of Product or Material in Document"},
+    {abb:"MNG_DOC_BT_EQMSATT",att_name:"Manage Attribute of eQMS in Document"},
+    {abb:"MNG_DOC_BT_RELATEDDOC",att_name:"Manage Releated Documents in Document"},
     {abb:"VIEW_DOC_INFO",att_name:"View Documents Information"},
     {abb:"VIEW_AUDIT_TRAIL",att_name:"View Audit Trail"},
+    {abb:"CFG_BINDER_LOC",att_name:"Configure Binder Location"},
+    
   ]
   let [userAuthField,setUserAuthField]=useState();
   let [userAuth, setUserAuth] = useState([])
@@ -59,8 +80,7 @@ function ModifyUser() {
   let [userStatField,setUserStatField]=useState();
   let [userStat, setUserStat] = useState([])
 
-    
-    
+  let [rndPw,setRndPw]=useState('');
 
   //========================================================== Formik & yup Validation schema
   const schema = yup.object().shape({
@@ -112,6 +132,17 @@ function ModifyUser() {
 
   async function putEditUserInfo(qryBody){
     let ajaxData = await axios.put("/putedituserinfo",qryBody)
+    .then((res)=>res.data)
+    .catch((err)=>{
+      console.log(err)
+    })
+
+    if(ajaxData.success) return ajaxData.result
+    else alert(ajaxData)
+  }
+
+  async function putResetPw(qryBody){
+    let ajaxData = await axios.put("resetaccountpw",qryBody)
     .then((res)=>res.data)
     .catch((err)=>{
       console.log(err)
@@ -241,6 +272,40 @@ function ModifyUser() {
                   margin="dense"
                   fullWidth
                 />
+                <Button size="small" variant="contained" onClick={()=>{
+                  let chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                  let passwordLength = 8;
+                  let password=""
+                  for (var i = 0; i <= passwordLength; i++) {
+                    var randomNumber = Math.floor(Math.random() * chars.length);
+                    password += chars.substring(randomNumber, randomNumber +1);
+                   }
+                   setRndPw(password)
+                  let qryBody={
+                    user_account : targetRowObj.user_account,
+                    user_pw : password,
+                    uuid_binary : targetRowObj.uuid_binary,
+                    reset_by:cookies.load('userInfo').user_account
+                  }
+                  putResetPw(qryBody)
+                }}>비밀번호 초기화</Button>
+                {
+                  rndPw!=''?
+                  <div style={{width:'100%',display:'flex',alignItems:'center'}}>
+                    <Chip sx={{ flexGrow:1, marginRight:'10px'}} size="small" label={rndPw} icon={<LockResetIcon/>} color="confirm"/>
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
+                        <Button size="small" variant="contained" onClick={()=>{
+                            handleCopyClipBoard(rndPw)
+                        }}>복사</Button>
+                    </div>
+                  </div>
+                  :<div></div>
+                }
+                {
+                  rndPw!=''?
+                  <Typography variant='caption'>위 초기화된 비밀번호를 사용자에게 알려주세요.</Typography>
+                  :<div></div>
+                }
               </Stack>
             </Paper>
             <Paper className="seperate-paper" elevation={3}>

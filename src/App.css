@@ -192,7 +192,7 @@ h1{
   }
 
   .seperate-paper-login{
-    width:30vw;
+    width:400px;
     min-width : 300px;
     height:340px;
     padding:20px;
@@ -221,6 +221,15 @@ h1{
     box-sizing:border-box
   }
 
+  .seperate-paper-cfg{
+    width:30vw;
+    min-width : 300px;
+    padding:20px;
+    margin:0.5vw;
+    overflow-y:auto;
+    box-sizing:border-box
+  }
+
   .incell-div-value{
     color:white;
     background-color: darkcyan;
@@ -234,4 +243,52 @@ h1{
 
   *{
     font-family: 'Noto Sans KR', sans-serif;
+  }
+
+
+  .page-print-header {
+    height: 40px;
+    background-color: white;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    align-items: center;
+    z-index: 0;
+  }
+  .page-print-header-content{
+    width:98vw;
+    padding-top: 14px;
+    padding-bottom: 3px;
+    margin-left: auto;
+    margin-right: auto;
+    border-bottom: solid, black, 0.5px;
+    display: flex;
+    box-sizing: border-box;
+  }
+
+  .page-print-footer {
+    height: 40px;
+    background-color: white;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    align-items: center;
+    z-index: 0;
+  }
+
+  .page-print-footer-content{
+    width:98vw;
+    padding-top: 3px;
+    margin-left: auto;
+    margin-right: auto;
+    border-top: solid, black, 0.5px;
+    display: flex;
+    box-sizing: border-box;
+  }
+
+  
+  @media print {
+    .page-print-footer .page-print-header {
+      page-break-after: always;
+    }
   }

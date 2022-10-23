@@ -22,7 +22,7 @@ import ImportExportIcon from '@mui/icons-material/ImportExport';
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import BackupIcon from '@mui/icons-material/Backup';
-
+import PermDataSettingIcon from '@mui/icons-material/PermDataSetting';
 //========================================================== axios 라이브러리 import
 import axios from 'axios';
 //========================================================== cookie 라이브러리 import
@@ -51,6 +51,7 @@ import MngBinder from './MngBinder/MngBinder'
 import PrintBinder from './MngBinder/PrintBinder'
 
 import BinderMoveHistory from './MngBinder/BinderMoveHistory'
+import PrintBinderMoveHistory from './MngBinder/PrintBinderMoveHistory'
 import ImportBinder from './MngBinder/ImportBinder'
 import ExportBinder from './MngBinder/ExportBinder'
 import Detectbinder from './MngBinder/Detectbinder'
@@ -59,10 +60,14 @@ import AddDocNoPattern from './MngDoc/AddDocNoPattern'
 import MngDocNoPattern from './MngDoc/MngDocNoPattern'
 import AddDocNoPattern_clone from './MngDoc/AddDocNoPattern_clone'
 
+import Home from './SystemPage/Home'
 import AuditTrail from './SystemPage/AuditTrail'
-import ImportTmmsWholeAsset from './ExtData/ImportTmmsWholeAsset'
 import ExtDataImport from './ExtData/ExtDataImport'
 import MyPage from './Account/MyPage';
+
+import CfgBinderLoc from './ConfigPage/CfgBinderLoc'
+import AddBinderLoc from './ConfigPage/AddBinderLoc'
+import AddBinderLoc_clone from './ConfigPage/AddBinderLoc_clone'
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
 import LoginSessionCheck from './Account/LoginSessionCheck.js';
 import LoginTimer from './Account/LoginTimer';
@@ -130,7 +135,7 @@ function App() {
     let checkResult = await LoginSessionCheck("check",{})
     if(checkResult.expireTime==0){
       dispatch(setLoginExpireTime(0))
-      navigate('/login')
+      navigate('/userlogin')
     }
     else{
       dispatch(setLoginExpireTime(checkResult.expireTime))
@@ -224,18 +229,7 @@ function App() {
             <ListItemIcon>
               <AddIcon color="primary"/> 
             </ListItemIcon>
-            <ListItemText primary={"문서 번호 추가 (자동)"} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton onClick={()=>{
-            LoginCheck()
-            navigate("/adddocnomanual")
-            }}>
-            <ListItemIcon>
-              <AddIcon color="primary"/> 
-            </ListItemIcon>
-            <ListItemText primary={"문서 번호 추가 (수동)"} />
+            <ListItemText primary={"문서 번호 추가"} />
           </ListItemButton>
         </ListItem>
       </List>
@@ -324,6 +318,17 @@ function App() {
             <ListItemText primary={"바인더 출고"} />
           </ListItemButton>
         </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton onClick={()=>{
+            LoginCheck()
+            navigate("/cfgbinderloc")
+            }}>
+            <ListItemIcon>
+              <PermDataSettingIcon color="primary"/> 
+            </ListItemIcon>
+            <ListItemText primary={"바인더 위치 구성"} />
+          </ListItemButton>
+        </ListItem>
       </List>
       <Divider />
       <List>
@@ -393,9 +398,8 @@ function App() {
                   >
                     {list(anchor)}
                   </Drawer>
-                  {/* <div style={{fontWeight:'bold', flexGrow: 1, overflow:'hidden'}}>DCMS</div> */}
                   <Typography variant="h6" component="div" sx={{ flexGrow: 1, overflow:'hidden' }}>
-                    DCMS
+                    CDMS
                   </Typography>
                 {
                   cookies.load('loginStat') ? 
@@ -429,7 +433,7 @@ function App() {
           <div style={{height:'70px'}}>Appbar is here</div>
 
           <Routes>
-            <Route path='/' element={<div>home</div>}/>
+            <Route path='/' element={<Home/>}/>
             <Route path='/mnguser' element={<MngUser/>}/>
             <Route path='/modifyuser' element={<ModifyUser/>}/>
 
@@ -452,18 +456,23 @@ function App() {
             <Route path='/printbinder' element={<PrintBinder/>}/>
             
             <Route path='/getbindermovehistory' element={<BinderMoveHistory/>}/>
+            <Route path='/printbindermovehistory' element={<PrintBinderMoveHistory/>}/>
             <Route path='/importbinder' element={<ImportBinder/>}/>
             <Route path='/exportbinder' element={<ExportBinder/>}/>
             <Route path='/Detectbinder' element={<Detectbinder/>}/>
 
             <Route path='/audittrail' element={ <AuditTrail/> }/>
             
-            <Route path='/importtmmswholeasset' element={ <ImportTmmsWholeAsset/> }/>
             <Route path='/extdataimport' element={ <ExtDataImport/> }/>
 
             <Route path='/mypage' element={ <MyPage />}/>
             <Route path='/userlogin' element={<UserLogin/>}/>
             <Route path='/login' element={<UserLogin/>}/>
+
+            <Route path='/cfgbinderloc' element={ <CfgBinderLoc />}/>
+            <Route path='/addbinderloc' element={ <AddBinderLoc />}/>
+            <Route path='/editbinderloc' element={ <AddBinderLoc_clone />}/>
+
           </Routes>
 
       </ThemeProvider>

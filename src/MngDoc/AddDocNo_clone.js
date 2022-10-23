@@ -8,7 +8,6 @@ import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import AddIcon from '@mui/icons-material/Add';
 import RuleIcon from '@mui/icons-material/Rule';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
 //========================================================== Formik & Yup 라이브러리 import
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -138,7 +137,7 @@ function AddDocNo() {
         validationSchema={schema}
         onSubmit={async (values, {resetForm})=>{
           setIsSubmitting(true);           
-          if(rdx.sel_doc_pattern.length>0 && rdx.sel_tb_user.user_account.length>0 ){
+          if(rdx.sel_doc_pattern.length>0 && !(!rdx.sel_tb_user.user_account)){
             if(targetRowObj=="N/A"){
               let qryBody = {
                 pattenrs:rdx.sel_doc_pattern,
@@ -224,16 +223,16 @@ function AddDocNo() {
                 LoginCheck()
                 }}>요청자 선택</Button>
                 <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
-                  <Chip label="요청자" color="primary"/>
-                  <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{rdx.sel_tb_user.user_account}</div></div>
+                  <div style={{wdith:'80px', minWidth:'80px', display:'flex', justifyContent:'center', alignItems:'center'}}><Chip style={{width:'80px', minWidth:'80px'}} size="small" label="요청자" color="primary"/></div>
+                  <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center', overflowY:"auto"}}><Typography>{rdx.sel_tb_user.user_account}</Typography></div>
                 </Stack>
                 <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
-                  <Chip label="요청자명" color="primary"/>
-                  <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{rdx.sel_tb_user.user_name}</div></div>
+                  <div style={{wdith:'80px', minWidth:'80px', display:'flex', justifyContent:'center', alignItems:'center'}}><Chip style={{width:'80px', minWidth:'80px'}} size="small" label="요청자명" color="primary"/></div>
+                  <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center', overflowY:"auto"}}><Typography>{rdx.sel_tb_user.user_name}</Typography></div>
                 </Stack>
                 <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
-                  <Chip label="요청팀" color="primary"/>
-                  <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{rdx.sel_tb_user.user_team}</div></div>
+                  <div style={{wdith:'80px', minWidth:'80px', display:'flex', justifyContent:'center', alignItems:'center'}}><Chip style={{width:'80px', minWidth:'80px'}} size="small" label="요청팀" color="primary"/></div>
+                  <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center', overflowY:"auto"}}><Typography>{rdx.sel_tb_user.user_team}</Typography></div>
                 </Stack>
                 <TextField
                   required
@@ -330,6 +329,13 @@ function AddDocNo() {
                   LoginCheck()
                   navigate(-1)
                   }}>Cancel</Button>
+                  {
+                    (targetRowObj=="N/A")?<Button style={{marginLeft:'1vw'}} size="small" variant="contained" onClick={async ()=>{
+                      LoginCheck()
+                      navigate('/adddocnomanual')
+                      }}>수동발번</Button>
+                      :<div/>
+                  }
               </div>
           </Paper>
         </Box>

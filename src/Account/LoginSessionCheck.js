@@ -26,7 +26,7 @@ async function LoginSessionCheck(typeStr,qryBody){
           return {type:'init', expireTime: expires}
       }
       else {
-        if(res.data.flashMsg=="wrong PW"){
+        if(res.data.flashMsg.indexOf("wrong PW")!=(-1)){
           return {type:'init', expireTime: 0, flashMsg:res.data.flashMsg}
         }
         else if(res.data.flashMsg=="no user_account"){

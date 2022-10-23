@@ -50,10 +50,16 @@ function UserLogin() {
     let checkResult = await LoginSessionCheck("init",qryBody)
     // console.log(checkResult)
     if(checkResult.expireTime==0){
-      // console.log(checkResult.flashMsg)
-      if(checkResult.flashMsg=="wrong PW"){
+      console.log(checkResult.flashMsg)
+      if(checkResult.flashMsg.indexOf("wrong PW")!=(-1)){
         dispatch(setLoginExpireTime(0))
-        alert("비밀번호가 틀렸습니다.")
+        let failCount = checkResult.flashMsg.split(" (")[1].replace(")","")
+        if(failCount=='max'){
+          alert("비밀번호가 틀렸습니다 (최대횟수).\n비밀번호 불일치 최대횟수에 도달하여 계정이 잠깁니다.")
+        }
+        else{
+          alert("비밀번호가 틀렸습니다. ("+failCount+" 회)")
+        }
         navigate("/login")
       }
       else if(checkResult.flashMsg=="no user_account")
@@ -159,14 +165,14 @@ function UserLogin() {
             </Paper>
             <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding:'10px' }} elevation={6}>
                 <div style={{width:'100%', display:'flex', alignItems:'center', backdropFilter:'blur(10px)'}}>
-                    <LockPersonIcon color="primary"/>
-                    <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>사용자 로그인</Typography>
-                    <Button size="small" variant="contained" type="submit" form="UserLogin" disabled={isSubmitting}>Submit</Button>
-                    <Button style={{marginLeft:'1vw'}} size="small" variant="contained" onClick={async ()=>{
-                    setIsResetting(true)
-                    resetForm()
-                    setIsResetting(false)
-                    }}>Reset</Button>
+                  <LockPersonIcon color="primary"/>
+                  <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>사용자 로그인</Typography>
+                  <Button size="small" variant="contained" type="submit" form="UserLogin" disabled={isSubmitting}>Submit</Button>
+                  <Button style={{marginLeft:'1vw'}} size="small" variant="contained" onClick={async ()=>{
+                  setIsResetting(true)
+                  resetForm()
+                  setIsResetting(false)
+                  }}>Reset</Button>
                 </div>
             </Paper>
           </div>

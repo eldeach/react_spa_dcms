@@ -4,14 +4,11 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import {  useNavigate, useLocation } from 'react-router-dom';
 //========================================================== Material UI 라이브러리 import
-import {PropTypes, Autocomplete, Switch, FormControlLabel, TextField, IconButton, Box, Typography, Chip, Button, Stack, Paper,Divider,Modal, ListItemIcon, ListItemText, ListItem, List } from '@mui/material/';
+import {PropTypes, Autocomplete, TextField, IconButton, Box, Typography, Chip, Button, Stack, Paper,Divider,Modal, ListItemIcon, ListItemText, ListItem, List } from '@mui/material/';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 //========================================================== Moment 라이브러리 import
 import moment from 'moment';
 import 'moment/locale/ko';	//대한민국
@@ -21,7 +18,7 @@ import { QRCode } from 'react-qrcode-logo';
 import cookies from 'react-cookies'
 //========================================================== Slide Popup 컴포넌트 & Redux import
 import { useDispatch, useSelector } from "react-redux"
-import { setSel_tb_user,setLoginExpireTime, setSel_doc_no, setSel_doc, setSelTmmsWholeAsset, setSelSapZmmr1010, setSelEqmsAtemplate, setSelTmmsLocation } from "./../store.js"
+import { setLoginExpireTime, setSel_doc } from "./../store.js"
 //========================================================== MngTable 컴포넌트 import
 import MngTable from './../MngTable/MngTable'
 //========================================================== 로그인 세션 확인 및 쿠키 save 컴포넌트 import
@@ -36,17 +33,7 @@ function AddBinder() {
       //========================================================== Formik & yup Validation schema
   const schema = yup.object().shape({
     binder_title: yup.string()
-    .required('바인더제목을 입력해주세요.')
-    // binder_year: yup.number()
-    // .test(
-    //     'length',
-    //     "연도는 4자리 숫자로 입력해야 합니다.",
-    //     function(value){
-    //         if(typeof(value)=="string"){
-    //             return !(value.length==4)
-    //         }
-    //     }
-    // ),
+    .required('바인더제목을 입력해주세요.'),
   });
 
   //========================================================== [Modal] 모달 열기/닫기 및 스타일 정의
@@ -54,6 +41,7 @@ function AddBinder() {
   let handleModalOpen = () => setOpenModal(true);
   let handleModalClose = () => setOpenModal(false);
   let [modalTitle,setModalTitle] = useState(false);
+  let [popUpPage,setPopUpPage] = useState(0);
   const modalStyle = {
     position: 'absolute',
     top: '50%',
@@ -64,9 +52,19 @@ function AddBinder() {
     overflow:'auto',
     padding:'20px'
   };
-
-  let [popUpPage,setPopUpPage] = useState(0);
   let [isSubmitting, setIsSubmitting] = useState(false); // Submit 중복 클릭 방지
+
+  let [yearList, setYearList] = useState([]);
+  let [binderYear,setBinderYear] = useState('');
+  
+  let [teamList, setTeamList]=useState([]);
+  let [mngTeam,setMngTeam]=useState('');
+
+  let [locList, setLocList]=useState([]);
+  let [bndLoc,setBndLoc]=useState('');
+
+  let [bndKeyWordList,setBndKeyWordList]=useState([]);
+  let [bndKeyWord,setBndKeyWord]=useState('');
 
   //========================================================== [변수, 객체 선언][useNaviagte]
   let navigate = useNavigate()
@@ -82,11 +80,31 @@ function AddBinder() {
 
     //값 초기화
     if(targetRowObj=="N/A"){
+        setBndKeyWord("OPBND")
         dispatch(setSel_doc([]))
     }
     else{
+        setBndKeyWord(targetRowObj.binder_keyword)
+        setBinderYear(targetRowObj.binder_year)
+        setMngTeam(targetRowObj.mng_team)
+        setBndLoc(targetRowObj.binder_loc)
         dispatch(setSel_doc(JSON.parse(targetRowObj.relateddoc)))
     }
+
+    getTeams()
+
+    getLocs()
+
+    let nowYear=moment(new Date()).format('YYYY')
+    let tempYearArry = []
+    for(let i=0;i<5;i++){
+        tempYearArry.push((parseInt(nowYear)-i))
+    }
+    setYearList(tempYearArry)
+    setBinderYear(nowYear)
+
+    setBndKeyWordList(['OPBND'])
+    
 
   },[]);
   //========================================================== [ADD form에서 추가] 수정할 row Oject state 넘겨받기 위한 코드
@@ -100,7 +118,7 @@ function AddBinder() {
       navigate('/login')
     }
     else{
-      dispatch(setLoginExpireTime(checkResult.expireTime))
+        dispatch(setLoginExpireTime(checkResult.expireTime))
     }
   }
 
@@ -120,6 +138,34 @@ function AddBinder() {
         alert("로그인 상태가 아닙니다.")
         navigate('/')
     }
+  }
+
+  async function getTeams(){
+    let getTeamsResult = await axios.get("/getteams")
+    let teamTempList=[]
+    getTeamsResult.data.result.map((oneTeam,i)=>{
+        if(!oneTeam.user_team){
+        }
+        else
+        {
+            teamTempList.push(oneTeam.user_team)
+        }
+    })
+    setTeamList(teamTempList)
+  }
+
+  async function getLocs(){
+    let getLocsResult = await axios.get("/getbndlocs")
+    let teamLocList=[]
+    getLocsResult.data.result.map((oneLoc,i)=>{
+        if(!oneLoc.binder_loc){
+        }
+        else
+        {
+            teamLocList.push({Location:oneLoc.binder_loc, Description : oneLoc.binder_loc_description})
+        }
+    })
+    setLocList(teamLocList)
   }
 
   async function postAddBinder(qryBody){
@@ -144,74 +190,74 @@ function AddBinder() {
     else console.log(ajaxData)
   }
 
+  function onKeyDown(keyEvent) {
+    if ((keyEvent.charCode || keyEvent.keyCode) === 13) {
+      keyEvent.preventDefault();
+    }
+  }
+
   return (
     <div style={{padding:'0.5vw'}}>
         <Formik
         validationSchema={schema}
         onSubmit={async (values, {resetForm})=>{
             setIsSubmitting(true);
-            console.log(values.binder_title)
-            if(targetRowObj=="N/A"){
-                let qryBody = {
-                    binder_title:values.binder_title,
-                    relateddoc: JSON.stringify(rdx.sel_doc),
-                    binder_year:values.binder_year,
-                    mng_team:values.mng_team,
-                    binder_loc:values.binder_loc,
-                    relateddoc: JSON.stringify(rdx.sel_doc),
-                    binder_keyword:values.binder_keyword,
-                    remark:values.remark,
-                    insert_by:cookies.load('userInfo').user_account
-                }
-                
-                let ajaxData = await postAddBinder(qryBody)
-                console.log(ajaxData)
+            if(!mngTeam||!bndKeyWord||!binderYear||!bndLoc||rdx.sel_doc.length<1){
+                alert("관리부서, 발행년도, 바인딩할 문서 선택이 되어야 합니다.")
             }
             else{
-                let qryBody = {
-                    binder_title:values.binder_title,
-                    relateddoc: JSON.stringify(rdx.sel_doc),
-                    binder_year:values.binder_year,
-                    mng_team:values.mng_team,
-                    binder_loc:values.binder_loc,
-                    relateddoc: JSON.stringify(rdx.sel_doc),
-                    binder_keyword:values.binder_keyword,
-                    remark:values.remark,
-                    update_by:cookies.load('userInfo').user_account,
-                    uuid_binary:targetRowObj.uuid_binary
+                if(targetRowObj=="N/A"){
+                    let qryBody = {
+                        binder_title:values.binder_title,
+                        relateddoc: JSON.stringify(rdx.sel_doc),
+                        binder_year:binderYear,
+                        mng_team:mngTeam,
+                        binder_loc:bndLoc,
+                        current_loc:values.binder_loc,
+                        relateddoc: JSON.stringify(rdx.sel_doc),
+                        binder_keyword:bndKeyWord,
+                        remark:values.remark,
+                        insert_by:cookies.load('userInfo').user_account
+                    }
+                    
+                    let ajaxData = await postAddBinder(qryBody)
+                    console.log(ajaxData)
                 }
-                let ajaxData = await putEditBinder(qryBody)
-                console.log(ajaxData)
+                else{
+                    let qryBody = {
+                        binder_no:targetRowObj.binder_no,
+                        binder_title:values.binder_title,
+                        relateddoc: JSON.stringify(rdx.sel_doc),
+                        binder_year:binderYear,
+                        mng_team:mngTeam,
+                        binder_loc:bndLoc,
+                        relateddoc: JSON.stringify(rdx.sel_doc),
+                        binder_keyword:bndKeyWord,
+                        remark:values.remark,
+                        update_by:cookies.load('userInfo').user_account,
+                        uuid_binary:targetRowObj.uuid_binary
+                    }
+                    let ajaxData = await putEditBinder(qryBody)
+                    console.log(ajaxData)
+                    navigate(-1)
+                }
+                
+                dispatch(setSel_doc([]))
+                setBinderYear('')
+                setMngTeam('')
+                setBndLoc('')
+                resetForm()
             }
-
-
-            resetForm()
-            dispatch(setSel_doc([]))
-
+            
             setIsSubmitting(false);
             LoginCheck()
 
-            if(targetRowObj=="N/A"){
-
-            }
-            else
-            {
-                navigate(-1)
-            }
         }}
         initialValues={!location.state ?{
-            binder_keyword:'OPBND',
             binder_title:'',
-            binder_year:'',
-            mng_team:'',
-            binder_loc:'',
             remark:''
         }:{
-            binder_keyword:targetRowObj.binder_keyword,
             binder_title:targetRowObj.binder_title,
-            binder_year:targetRowObj.binder_year,
-            mng_team:targetRowObj.mng_team,
-            binder_loc:targetRowObj.binder_loc,
             remark:targetRowObj.remark
         }}
         >
@@ -227,8 +273,9 @@ function AddBinder() {
         errors,
         })=>(
             <Box
-            id="postAddDoc"
+            id="postAddBinder"
             component="form"
+            onKeyDown={onKeyDown}
             noValidate
             onSubmit={handleSubmit}
             autoComplete="off"
@@ -250,20 +297,18 @@ function AddBinder() {
                     <Paper className="seperate-paper" elevation={3}>
                         <Stack spacing={2}>
                             <Chip label="바인더 정의" color="primary"/>
-                            <TextField
-                            required
-                            dislabled={true}
-                            variant="standard"
-                            id="binder_keyword"
-                            name="binder_keyword"
-                            label="바인더 키워드"
-                            value={values.binder_keyword}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            helperText={touched.binder_keyword ? errors.binder_keyword : ""}
-                            error={touched.binder_keyword && Boolean(errors.binder_keyword)}
-                            margin="dense"
-                            fullWidth
+                            <Autocomplete
+                            value={bndKeyWord}
+                            onChange={(event, newValue) => {
+                                setBndKeyWord(newValue);
+                            }}
+                            disablePortal
+                            size="small"
+                            id="bndKeyWord"
+                            disabled={bndKeyWordList.length==1}
+                            options={bndKeyWordList.map((option) => option)}
+                            sx={{ flexGrow:1, marginRight:'10px'}}
+                            renderInput={(params) => <TextField {...params} color="primary" label="바인더 키워드" />}
                             />
                             <TextField
                             required
@@ -299,7 +344,6 @@ function AddBinder() {
                                                 <ListItem
                                                 secondaryAction={
                                                     <IconButton edge="end" aria-label="delete" onClick={()=>{
-                                                        console.log(rdx.sel_doc[i])
                                                         let temp = [...rdx.sel_doc]
                                                         temp.splice(i,1)
                                                         dispatch(setSel_doc(temp))
@@ -329,50 +373,43 @@ function AddBinder() {
                     <Paper className="seperate-paper" elevation={3}>
                         <Stack spacing={2}>
                             <Chip label="바인더 관리 정보" color="primary"/>
-                            <TextField
-                            required
-                            variant="outlined"
-                            id="binder_year"
-                            name="binder_year"
-                            label="발행년도"
-                            value={values.binder_year}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            helperText={touched.binder_year ? errors.binder_year : ""}
-                            error={touched.binder_year && Boolean(errors.binder_year)}
-                            margin="dense"
-                            fullWidth
+                            <Autocomplete
+                            value={binderYear}
+                            onChange={(event, newValue) => {
+                            setBinderYear(newValue);
+                            }}
+                            disablePortal
+                            size="small"
+                            id="yearList"
+                            options={yearList.map((option) => option)}
+                            sx={{ flexGrow:1, marginRight:'10px'}}
+                            renderInput={(params) => <TextField {...params} color="primary" label="발행년도" />}
+                            />
+                            <Autocomplete
+                            value={mngTeam}
+                            onChange={(event, newValue) => {
+                                setMngTeam(newValue);
+                            }}
+                            disablePortal
+                            size="small"
+                            id="mngTeam"
+                            options={teamList.map((option) => option)}
+                            sx={{ flexGrow:1, marginRight:'10px'}}
+                            renderInput={(params) => <TextField {...params} color="primary" label="관리부서" />}
+                            />
+                            <Autocomplete
+                            value={bndLoc}
+                            onChange={(event, newValue) => {
+                                setBndLoc(newValue.split(" : ")[0]);
+                            }}
+                            disablePortal
+                            size="small"
+                            id="bndLoc"
+                            options={locList.map((option) => option.Location + " : " + option.Description)}
+                            sx={{ flexGrow:1, marginRight:'10px'}}
+                            renderInput={(params) => <TextField {...params} color="primary" label="바인더 위치" />}
                             />
                             <TextField
-                            required
-                            variant="outlined"
-                            id="mng_team"
-                            name="mng_team"
-                            label="관리부서"
-                            value={values.mng_team}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            helperText={touched.mng_team ? errors.mng_team : ""}
-                            error={touched.mng_team && Boolean(errors.mng_team)}
-                            margin="dense"
-                            fullWidth
-                            />
-                            <TextField
-                            required
-                            variant="outlined"
-                            id="binder_loc"
-                            name="binder_loc"
-                            label="바인더 위치"
-                            value={values.binder_loc}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            helperText={touched.binder_loc ? errors.binder_loc : ""}
-                            error={touched.binder_loc && Boolean(errors.binder_loc)}
-                            margin="dense"
-                            fullWidth
-                            />
-                            <TextField
-                            required
                             variant="outlined"
                             id="remark"
                             name="remark"
@@ -395,7 +432,7 @@ function AddBinder() {
                     <div style={{width:'100%', display:'flex', alignItems:'center', backdropFilter:'blur(10px)'}}>
                         <PostAddIcon color="primary"/>
                         <Typography variant="BUTTON" component="div" sx={{ flexGrow: 1, overflow:'hidden', marginLeft:'4px' }}>{(targetRowObj=="N/A")?"바인더 정보 추가":"바인더 정보 수정"}</Typography>
-                        <Button size="small" variant="contained" type="submit" form="postAddDoc" disabled={isSubmitting}>Submit</Button>
+                        <Button size="small" variant="contained" type="submit" form="postAddBinder" disabled={isSubmitting}>Submit</Button>
                         <Button style={{marginLeft:'1vw'}} size="small" variant="contained" onClick={async ()=>{
                         LoginCheck()
                         navigate(-1)

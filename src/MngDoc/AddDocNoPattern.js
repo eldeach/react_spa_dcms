@@ -119,7 +119,6 @@ function AddDocNoPattern() {
   //========================================================== [ADD form에서 추가] 수정할 row Oject state 넘겨받기 위한 코드
   const location = useLocation();
   const targetRowObj= (!location.state ? "N/A" : location.state.rowObj)
-  console.log(targetRowObj)
 
   async function LoginCheck(){
     let checkResult = await LoginSessionCheck("check",{})
@@ -161,7 +160,7 @@ function AddDocNoPattern() {
     
   }
 
-  async function putAddDocPattern(qryBody){
+  async function putEditDocPattern(qryBody){
     let ajaxData = await axios.put("/putadddocnopattern",qryBody)
     .then((res)=>res.data)
     .catch((err)=>{
@@ -209,7 +208,7 @@ function AddDocNoPattern() {
                 update_by:cookies.load('userInfo').user_account,
                 uuid_binary:targetRowObj.uuid_binary
             }
-            let ajaxData = await putAddDocPattern(qryBody)
+            let ajaxData = await putEditDocPattern(qryBody)
             console.log(ajaxData)
             }
 

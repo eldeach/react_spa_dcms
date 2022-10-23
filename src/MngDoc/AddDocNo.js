@@ -329,6 +329,13 @@ function AddDocNo() {
                   LoginCheck()
                   navigate(-1)
                   }}>Cancel</Button>
+                  {
+                    (targetRowObj=="N/A")?<Button style={{marginLeft:'1vw'}} size="small" variant="contained" onClick={async ()=>{
+                      LoginCheck()
+                      navigate('/adddocnomanual')
+                      }}>수동발번</Button>
+                      :<div/>
+                  }
               </div>
           </Paper>
         </Box>
