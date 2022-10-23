@@ -64,6 +64,8 @@ function AddDoc() {
         {abb:"IQ", att_name: "Installation Qualification"},
         {abb:"OQ", att_name: "Operational Qualification"},
         {abb:"PQ", att_name: "Performance Qualification"},
+        {abb:"STER", att_name: "Sterilization Qualification"},
+        {abb:"VHP", att_name: "VHP Qualification"},
         {abb:"Periodic", att_name: "Periodic Requalification"},
         {abb:"SFT", att_name: "System Functional Test"},
         {abb:"TAB", att_name: "Testing, Adjusting and Balancing"},
