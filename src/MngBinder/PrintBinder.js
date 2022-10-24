@@ -51,6 +51,7 @@ function PrintBinder(){
     const coverSide = [
     {side:"Front"},
     {side:"Side"},
+    {side:"File"},
     ]
 
 //========================================================== useNaviagte 선언
@@ -108,6 +109,11 @@ async function LoginCheck(){
             binderCoverWidth='20cm'
             writingModeStr = 'horizontal-tb'
         }
+        else if(props.binderSide=="File") {
+            qrCodeMarginStr='auto'
+            binderCoverWidth='15.5cm'
+            writingModeStr = 'horizontal-tb'
+        }
         else {
             qrCodeMarginStr='auto'
             binderCoverWidth = props.sideWidth+'cm'
@@ -116,11 +122,58 @@ async function LoginCheck(){
     
         return (
         <div ref={props.printRef}>
-            <div style={{marginLeft:'auto', marginRight:'auto', marginTop:'0.5cm', padding:'0.1cm', width:(binderCoverWidth), height:'28.6cm', textAlign:'center', border:'3px solid', borderColor:'#2196f3',boxSizing:'border-box'}}>
-                <Stack spacing={1}>
-                    <div style={{width:'99%', justifyItems:(props.binderSide=="Front"?'right':'center')}}>
-                        <div style={{display:'flex', justifyContent: (props.binderSide=="Front"?'flex-end':'center')}}>
-                            <div style={{width:'2.4cm', hieght:'2.8cm', textAlign:'center', marginTop:(props.binderSide=="Front"?'6px':'0px')}} >
+            {
+                (props.binderSide=="Front"||props.binderSide=="Side")?  
+                <div style={{marginLeft:'auto', marginRight:'auto', marginTop:'0.5cm', padding:'0.1cm', width:(binderCoverWidth), height:'28.6cm', textAlign:'center', border:'3px solid', borderColor:'#2196f3',boxSizing:'border-box'}}>
+                    <Stack spacing={1}>
+                        <div style={{width:'99%', justifyItems:(props.binderSide=="Front"?'right':'center')}}>
+                            <div style={{display:'flex', justifyContent: (props.binderSide=="Front"?'flex-end':'center')}}>
+                                <div style={{width:'2.4cm', hieght:'2.8cm', textAlign:'center', marginTop:(props.binderSide=="Front"?'6px':'0px')}} >
+                                    <Stack spacing={0}>
+                                        <div><QRCode value={targetRowObj.binder_no} quietZone='1' logoImage="public/logo192.png" size='80'  fgColor="#2196f3"/></div>
+                                        <div style={{fontSize:'3px'}}><Typography variant='inherit'>{targetRowObj.binder_no}</Typography></div>
+                                        <div style={{fontSize:'3px', fontWeight:'bold'}}><Typography variant='inherit'>{targetRowObj.mng_team+" / "+targetRowObj.binder_loc}</Typography></div>
+                                        <div style={{fontSize:'3px', fontWeight:'bold'}}><Typography variant='inherit'>{"문서 "+JSON.parse(targetRowObj.relateddoc).length+"건"}</Typography></div>
+                                    </Stack>
+                                </div>
+                            </div>
+                        </div>
+                        <div style={{height: (props.binderSide=="Front"?'10.5cm':'22cm')}}>
+                            {
+                                props.binderSide=="Front"?<div style={{height:'100px'}}/>:<div></div>
+                            }
+                            <div style={{writingMode:(writingModeStr), marginLeft:'auto', marginRight:'auto'}}>
+                                <Typography variant='h5'>{targetRowObj.binder_title}</Typography>
+                            </div>
+                        </div>
+                        {
+                            props.binderSide=="Front"?
+                            <div style={{ height:'3cm', display:'flex', flexWrap:'wrap', justifyContent:'center', overflow:'hidden',boxSizing:'border-box'}}>
+                                {
+                                    JSON.parse(targetRowObj.relateddoc).map((oneDoc,i)=>{
+                                        return <Chip icon={<DescriptionIcon />} size="small" color="primary" label={oneDoc.doc_no+"("+oneDoc.rev_no+")"}/>
+                                    })
+                                }
+                            </div>
+                            :<div></div>
+                        }
+                        <div style={{fontSize:'3px'}}>
+                            <Stack spacing={0}>
+                                <Typography variant='caption'>{targetRowObj.binder_year}</Typography>
+                                <Typography variant='caption'>{"CONFIDENTIAL"}</Typography>
+                                <Typography variant='caption'>{"OSONG PLANT"}</Typography>
+                                {
+                                    props.binderSide=="Front"?<Typography variant='caption'>{"Daewoong Pharmaceutical Co., Ltd"}</Typography>:<div></div>
+                                }
+                                <div style={{fontWeight:'bold'}}><Typography color="primary" variant='caption'>{"CDMS"}</Typography></div>
+                            </Stack>
+                        </div>
+                    </Stack>
+                </div>
+                :<div style={{display:'block'}}>
+                    <div style={{marginLeft:'auto', marginRight:'auto', marginTop:'0.5cm', padding:'0.1cm', width:(binderCoverWidth), height:'4cm', textAlign:'center', border:'3px solid', borderColor:'#2196f3',boxSizing:'border-box'}}>
+                        <Stack direction='row' spacing={1}>
+                            <div style={{width:'2.4cm', hieght:'2.8cm', textAlign:'center', marginTop:'6px', marginLeft:'6px'}} >
                                 <Stack spacing={0}>
                                     <div><QRCode value={targetRowObj.binder_no} quietZone='1' logoImage="public/logo192.png" size='80'  fgColor="#2196f3"/></div>
                                     <div style={{fontSize:'3px'}}><Typography variant='inherit'>{targetRowObj.binder_no}</Typography></div>
@@ -128,40 +181,52 @@ async function LoginCheck(){
                                     <div style={{fontSize:'3px', fontWeight:'bold'}}><Typography variant='inherit'>{"문서 "+JSON.parse(targetRowObj.relateddoc).length+"건"}</Typography></div>
                                 </Stack>
                             </div>
-                        </div>
-                    </div>
-                    <div style={{height: (props.binderSide=="Front"?'10.5cm':'22cm')}}>
-                        {
-                            props.binderSide=="Front"?<div style={{height:'100px'}}/>:<div></div>
-                        }
-                        <div style={{writingMode:(writingModeStr), marginLeft:'auto', marginRight:'auto'}}>
-                            <Typography variant='h5'>{targetRowObj.binder_title}</Typography>
-                        </div>
-                    </div>
-                    {
-                        props.binderSide=="Front"?
-                        <div style={{ height:'3cm', display:'flex', flexWrap:'wrap', justifyContent:'center', overflow:'hidden',boxSizing:'border-box'}}>
-                            {
-                                JSON.parse(targetRowObj.relateddoc).map((oneDoc,i)=>{
-                                    return <Chip icon={<DescriptionIcon />} size="small" color="primary" label={oneDoc.doc_no+"("+oneDoc.rev_no+")"}/>
-                                })
-                            }
-                        </div>
-                        :<div></div>
-                    }
-                    <div style={{fontSize:'3px'}}>
-                        <Stack spacing={0}>
-                            <Typography variant='caption'>{targetRowObj.binder_year}</Typography>
-                            <Typography variant='caption'>{"CONFIDENTIAL"}</Typography>
-                            <Typography variant='caption'>{"OSONG PLANT"}</Typography>
-                            {
-                                props.binderSide=="Front"?<Typography variant='caption'>{"Daewoong Pharmaceutical Co., Ltd"}</Typography>:<div></div>
-                            }
-                            <div style={{fontWeight:'bold'}}><Typography color="primary" variant='caption'>{"CDMS"}</Typography></div>
+                            <Stack spacing={1}>
+                                <Typography variant='subtitle1'>{targetRowObj.binder_title}</Typography>
+                                <div style={{ height:'3cm', display:'flex', flexWrap:'wrap', justifyContent:'center', overflow:'hidden',boxSizing:'border-box'}}>
+                                    {
+                                        JSON.parse(targetRowObj.relateddoc).map((oneDoc,i)=>{
+                                            return <Chip icon={<DescriptionIcon />} size="small" color="primary" label={oneDoc.doc_no+"("+oneDoc.rev_no+")"}/>
+                                        })
+                                    }
+                                </div>
+                            </Stack>
                         </Stack>
                     </div>
-                </Stack>
-            </div>
+                    <div style={{height:'5cm'}}/>
+                    <div style={{marginLeft:'auto', marginRight:'auto', marginTop:'0.5cm', padding:'0.1cm', width:'9cm', height:'2.5cm', textAlign:'center', border:'3px solid', borderColor:'#2196f3',boxSizing:'border-box'}}>
+                        <Stack direction='row' spacing={1}>
+                            <div style={{width:'2.4cm', hieght:'2.8cm', textAlign:'center', marginTop:'6px'}} >
+                                <Stack spacing={0}>
+                                    <div><QRCode value={targetRowObj.binder_no} quietZone='1' logoImage="public/logo192.png" size='50'  fgColor="#2196f3"/></div>
+                                    <div style={{fontSize:'1px'}}><Typography variant='inherit'>{targetRowObj.binder_no}</Typography></div>
+                                </Stack>
+                            </div>
+                            <Stack spacing={0}>
+                                <div style={{fontSize:'3px', fontWeight:'bold'}}><Typography variant='inherit'>{targetRowObj.mng_team+" / "+targetRowObj.binder_loc +" / "+"문서 "+JSON.parse(targetRowObj.relateddoc).length+"건"}</Typography></div>
+                                <Typography variant='caption'>{targetRowObj.binder_title}</Typography>
+                                <div style={{ height:'3cm', display:'flex', flexWrap:'wrap', justifyContent:'center', overflow:'hidden',boxSizing:'border-box'}}>
+                                    {
+                                        JSON.parse(targetRowObj.relateddoc).map((oneDoc,i)=>{
+                                            if(i>0){
+                                                return <div/>   
+                                            }
+                                            else{
+                                                return <Chip icon={<DescriptionIcon />} size="small" color="primary" label={oneDoc.doc_no+"("+oneDoc.rev_no+")"}/>
+                                            }
+                                        })
+                                    }
+                                    {
+                                        JSON.parse(targetRowObj.relateddoc).length>1?
+                                        <Chip icon={<DescriptionIcon />} size="small" color="primary" label={".."}/>
+                                        :<div/>
+                                    }
+                                </div>
+                            </Stack>
+                        </Stack>
+                    </div>
+                </div>
+            }
         </div>
         )
     }
@@ -215,7 +280,7 @@ async function LoginCheck(){
                         id="sideWidth"
                         size="small"
                         style={{marginLeft:'10px', width:'100px'}}
-                        disabled={(binderSide=="Front")}
+                        disabled={(binderSide=="Front"||binderSide=="File")}
                         freeSolo
                         onChange={(event, newValue) => {
                             setSideWidth(newValue);

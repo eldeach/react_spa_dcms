@@ -175,7 +175,10 @@ function AddBinder() {
       console.log(err)
     })
 
-    if(ajaxData.success) return ajaxData.result
+    if(ajaxData.success) {
+        alert("부여된 바인더번호 : "+ajaxData.binder_no)
+        return ajaxData.result
+    }
     else alert(ajaxData)
   }
 
@@ -203,7 +206,7 @@ function AddBinder() {
         onSubmit={async (values, {resetForm})=>{
             setIsSubmitting(true);
             if(!mngTeam||!bndKeyWord||!binderYear||!bndLoc||rdx.sel_doc.length<1){
-                alert("관리부서, 발행년도, 바인딩할 문서 선택이 되어야 합니다.")
+                alert("관리부서, 발행년도, 보관위치, 바인딩할 문서 선택이 되어야 합니다.")
             }
             else{
                 if(targetRowObj=="N/A"){
