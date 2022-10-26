@@ -44,6 +44,7 @@ function AddDocNoPattern() {
 
   const patternCode = [
     {elementName:"-"},
+    {elementName:"{4_year}"},
     {elementName:"{2_year}"},
     {elementName:"{3_serial_per_year}"}
   ]

@@ -216,7 +216,7 @@ function AddBinder() {
                         binder_year:binderYear,
                         mng_team:mngTeam,
                         binder_loc:bndLoc,
-                        current_loc:values.binder_loc,
+                        current_loc:bndLoc,
                         relateddoc: JSON.stringify(rdx.sel_doc),
                         binder_keyword:bndKeyWord,
                         remark:values.remark,
