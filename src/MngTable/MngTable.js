@@ -1137,6 +1137,7 @@ function MngTable(props) {
                       id="sign_user_pw"
                       name="sign_user_pw"
                       label="USER PW"
+                      type="password"
                       value={values.sign_user_pw}
                       onChange={handleChange}
                       onBlur={handleBlur}
