@@ -116,7 +116,7 @@ async function LoginCheck(){
         }
         else {
             qrCodeMarginStr='auto'
-            binderCoverWidth = props.sideWidth+'cm'
+            binderCoverWidth = (props.sideWidth-0.5)+'cm'
             writingModeStr = 'vertical-rl'
         }
     
@@ -138,14 +138,36 @@ async function LoginCheck(){
                                 </div>
                             </div>
                         </div>
-                        <div style={{height: (props.binderSide=="Front"?'10.5cm':'22cm')}}>
-                            {
-                                props.binderSide=="Front"?<div style={{height:'100px'}}/>:<div></div>
-                            }
-                            <div style={{writingMode:(writingModeStr), marginLeft:'auto', marginRight:'auto'}}>
-                                <Typography variant='h5'>{targetRowObj.binder_title}</Typography>
+                        {
+                            props.binderSide=="Front"?
+                            <div style={{height: '10.5cm', marginTop: '100px'}}>
+                                <div style={{marginLeft:'auto', marginRight:'auto'}}>
+                                    <Typography variant='h5'>{targetRowObj.binder_title}</Typography>
+                                </div>
                             </div>
-                        </div>
+                            :
+                            <div style={{height: '20cm', overflow:'hidden'}}>
+                                <div style={{writingMode: 'vertical-rl', marginLeft:'auto', marginRight:'auto'}}>
+                                    {
+                                        props.sideWidth==3?
+                                        <Typography variant='body2'>{targetRowObj.binder_title}</Typography>
+                                        :
+                                        (
+                                            props.sideWidth==5?
+                                            <Typography variant='body1'>{targetRowObj.binder_title}</Typography>
+                                            :
+                                            (
+                                                props.sideWidth==7?
+                                                <Typography variant='h5'>{targetRowObj.binder_title}</Typography>
+                                                :
+                                                <Typography variant='h5'>{targetRowObj.binder_title}</Typography>
+                                            )
+                                        )
+                                    }
+                                    
+                                </div>
+                            </div>
+                        }
                         {
                             props.binderSide=="Front"?
                             <div style={{ height:'3cm', display:'flex', flexWrap:'wrap', justifyContent:'center', overflow:'hidden',boxSizing:'border-box'}}>
@@ -155,13 +177,41 @@ async function LoginCheck(){
                                     })
                                 }
                             </div>
-                            :<div></div>
+                            :
+                            <div style={{ height:'80px', display:'block', alignContent:'center', boxSizing:'border-box'}}>
+                                {
+                                    JSON.parse(targetRowObj.relateddoc).map((oneDoc,i)=>{
+                                        if (i>1){
+                                            return <div/>
+                                        }
+                                        else{
+                                            if(props.sideWidth==3){
+                                                return <div style={{height:'24px', display:'flex', justifyContent:'center', alignItems:'center', borderRadius:'12px', backgroundColor:'#2196f3', color:'white', fontSize:'3px', lineHeight:'12px', marginBottom:'2px'}}>{oneDoc.doc_no+"("+oneDoc.rev_no+")"}</div>
+                                            }
+                                            else{
+                                                return <div><Chip icon={<DescriptionIcon />} size="small" color="primary" label={oneDoc.doc_no+"("+oneDoc.rev_no+")"}/></div>
+                                            }
+                                            
+                                        }
+
+                                    })
+                                }
+                                {
+                                    JSON.parse(targetRowObj.relateddoc).length>2?
+                                    (
+                                        props.sideWidth==3?
+                                        <div style={{height:'24px', display:'flex', justifyContent:'center', alignItems:'center', borderRadius:'12px', backgroundColor:'#2196f3', color:'white', fontSize:'3px'}}>{(JSON.parse(targetRowObj.relateddoc).length-2)+" more .."}</div>
+                                        :<div><Chip icon={<DescriptionIcon />} size="small" color="primary" label={(JSON.parse(targetRowObj.relateddoc).length-2)+" more .."}/></div>
+                                    )
+                                    :<div/>
+                                }
+                            </div>
                         }
-                        <div style={{fontSize:'3px'}}>
+                        <div style={{fontSize:'5px'}}>
                             <Stack spacing={0}>
-                                <Typography variant='caption'>{targetRowObj.binder_year}</Typography>
-                                <Typography variant='caption'>{"CONFIDENTIAL"}</Typography>
-                                <Typography variant='caption'>{"OSONG PLANT"}</Typography>
+                                <Typography variant='inherit'>{targetRowObj.binder_year}</Typography>
+                                <Typography variant='inherit'>{"CONFIDENTIAL"}</Typography>
+                                <Typography variant='inherit'>{"OSONG PLANT"}</Typography>
                                 {
                                     props.binderSide=="Front"?<Typography variant='caption'>{"Daewoong Pharmaceutical Co., Ltd"}</Typography>:<div></div>
                                 }

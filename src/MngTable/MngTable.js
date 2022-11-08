@@ -475,6 +475,7 @@ function MngTable(props) {
           if(columName=="qualAtt") tempMinWidth= 300
           if(columName=="valAtt") tempMinWidth= 300
           if(columName=="eqAtt") tempMinWidth= 300
+          if(columName=="csAtt") tempMinWidth= 300
           if(columName=="locAtt") tempMinWidth= 300
           if(columName=="prodAtt") tempMinWidth= 300
           if(columName=="eqmsAtt") tempMinWidth= 300
@@ -543,6 +544,15 @@ function MngTable(props) {
               <div style={{display:'flex', flexWrap:'wrap'}}>{
                 JSON.parse(params.value).map((oneItem,i)=>{
                   return <Tooltip title={"("+oneItem.eq_code+" / "+ oneItem.eq_code_alt+")"} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.eq_name}/></Tooltip>
+                })
+              }</div>
+            )})
+          }
+          else if (columName=="csAtt"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              <div style={{display:'flex', flexWrap:'wrap'}}>{
+                JSON.parse(params.value).map((oneItem,i)=>{
+                  return <Tooltip title={oneItem.cs_code} placement="top" arrow><Chip icon={<SettingsApplicationsOutlinedIcon />} size="small" color="primary" label={oneItem.cs_name}/></Tooltip>
                 })
               }</div>
             )})
@@ -854,8 +864,30 @@ function MngTable(props) {
                     if(pickRows.length==1){
                       let tempRow = pickRows[0]
                       let newRevNo
-                      if(!tempRow.last_rev_no&&tempRow.last_rev_no!=0) newRevNo=parseInt(pickRows[0].start_rev_no)
-                      else newRevNo=(parseInt(tempRow.last_rev_no)+1)
+                      let qryBodyDocNo={
+                        doc_no : tempRow.doc_no
+                      }
+                      let lastRevNoResult = await axios({
+                        method:"get",
+                        url:"/lastrevno",
+                        params:qryBodyDocNo,
+                        headers:{
+                            'Content-Type':'application/json'
+                        }})
+                        .then((res)=>{
+                          return res.data
+                        })
+                        .catch((err)=>console.log(err))
+                        console.log(lastRevNoResult)
+                      if(lastRevNoResult.result.length==0){
+                        newRevNo=parseInt(pickRows[0].start_rev_no)
+                      }
+                      else{
+                        if(!lastRevNoResult.result[0].last_rev_no&&lastRevNoResult.result[0].last_rev_no!=0) newRevNo=parseInt(pickRows[0].start_rev_no)
+                        else newRevNo=(parseInt(lastRevNoResult.result[0].last_rev_no)+1)
+                      }
+                      // if(!tempRow.last_rev_no&&tempRow.last_rev_no!=0) newRevNo=parseInt(pickRows[0].start_rev_no)
+                      // else newRevNo=(parseInt(tempRow.last_rev_no)+1)
                       dispatch(setSel_doc_no({doc_no:tempRow.doc_no, newRevNo:newRevNo}))
                       
                     }
