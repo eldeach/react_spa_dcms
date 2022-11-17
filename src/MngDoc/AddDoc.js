@@ -85,7 +85,7 @@ function AddDoc() {
         {abb:"OPV",att_name:"On-going Process Validation"},
         {abb:"CV",att_name:"Cleaning Validation"},
         {abb:"MV",att_name:"Method Validation"},
-        {abb:"VERF",att_name:"Verification"},
+        {abb:"VF",att_name:"Verification"},
         {abb:"CMV",att_name:"Cleaning Method Validation"},
         {abb:"RT",att_name:"Recovery Test"},
         {abb:"APV",att_name:"Aseptic Process Validation"},
