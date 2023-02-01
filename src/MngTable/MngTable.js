@@ -512,6 +512,16 @@ function MngTable(props) {
               params.value?<Chip icon={<UnpublishedOutlinedIcon />} size="small" color="expired" label={params.value}/>:<div></div>
             )})
           }
+          else if (columName=="start_date"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              params.value?<Chip icon={<CheckCircleOutlineOutlinedIcon />} size="small" color="primary" label={params.value}/>:<div></div>
+            )})
+          }
+          else if (columName=="completion_date"){
+            tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
+              params.value?<Chip icon={<CheckCircleOutlineOutlinedIcon />} size="small" color="primary" label={params.value}/>:<div></div>
+            )})
+          }
           else if (columName=="docAtt"){
             tempCol.push({field:columName,headerName:`${columName}`,minWidth:(tempMinWidth), flex:1, renderCell: (params) => (
               <div style={{display:'flex', flexWrap:'wrap'}}>{
@@ -700,6 +710,13 @@ function MngTable(props) {
 
             tempObjs["approval_date"] = moment(new Date(tempObjs["approval_date"])).format('YYYY-MM-DD');
             tempObjs["invalid_date"] = moment(new Date(tempObjs["invalid_date"])).format('YYYY-MM-DD');
+            tempObjs["start_date"] = moment(new Date(tempObjs["start_date"])).format('YYYY-MM-DD');
+            tempObjs["completion_date"] = moment(new Date(tempObjs["completion_date"])).format('YYYY-MM-DD');
+
+            if (tempObjs["start_date"]=="1970-01-01") tempObjs["start_date"]=""
+            if (tempObjs["completion_date"]=="1970-01-01") tempObjs["completion_date"]=""
+
+
 
             if (tempObjs["approval_date"]=="1970-01-01") tempObjs["approval_date"]=""
             if (tempObjs["invalid_date"]=="1970-01-01") tempObjs["invalid_date"]=""
@@ -727,6 +744,7 @@ function MngTable(props) {
       <Formik
         validationSchema={schema}
         onSubmit={async (values, {resetForm})=>{
+          LoginCheck()
           let para = {
             searchKeyWord: values.searchKeyWord,
           }

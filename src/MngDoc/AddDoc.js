@@ -41,8 +41,18 @@ function AddDoc() {
     let [appDate,setAppDate] = useState(null);
     let [invDate,setInvDate] = useState(null);
 
+    let [startDate,setStartDate] = useState(null);
+    let [completionDate,setCompletionDate] = useState(null);
+
     let [isProtocol,setIsProtocol] = useState(false);
-    let isProtocolHandleChange = (event) => {setIsProtocol(event.target.checked)}
+    let isProtocolHandleChange = (event) => {
+        if(startDate || completionDate){
+            alert('수행기간 필드는 실제 수행기간을 입력하는 필드입니다.\n수행기간 정보를 삭제 후 계획서로 구분 가능합니다.')
+        }
+        else{
+            setIsProtocol(event.target.checked)
+        } 
+    }
 
     const qualAttList=[
         {abb:"URS", att_name: "User Requirement Specification"},
@@ -275,6 +285,9 @@ function AddDoc() {
             if(!rdx.sel_doc_no.doc_no||!rdx.sel_tb_user.user_account||!appDate){
                 alert("문서번호 선택 또는 사용자 선택, 승인일이 입력되지 않았습니다.")
             }
+            else if((startDate && !completionDate)||(!startDate && completionDate)){
+                alert("수행기간은 시작일과 종료일 모두 입력해야합니다.\n수행기간이 하루이면 동일한 날짜로 시작일과 종료일을 입력해주세요.")
+            }
             else{
                 if(targetRowObj=="N/A"){
                     let qryBody = {
@@ -285,6 +298,8 @@ function AddDoc() {
                         written_by_team:rdx.sel_tb_user.user_team,
                         approval_date:moment(new Date(appDate)).format('YYYY-MM-DD'),
                         invalid_date:moment(new Date(invDate)).format('YYYY-MM-DD'),
+                        start_date:moment(new Date(startDate)).format('YYYY-MM-DD'),
+                        completion_date:moment(new Date(completionDate)).format('YYYY-MM-DD'),
                         docAtt: JSON.stringify(docAtt),
                         qualAtt: JSON.stringify(qualAtt),
                         valAtt: JSON.stringify(valAtt),
@@ -310,6 +325,8 @@ function AddDoc() {
                         written_by_team:rdx.sel_tb_user.user_team,
                         approval_date:moment(new Date(appDate)).format('YYYY-MM-DD'),
                         invalid_date:moment(new Date(invDate)).format('YYYY-MM-DD'),
+                        start_date:moment(new Date(startDate)).format('YYYY-MM-DD'),
+                        completion_date:moment(new Date(completionDate)).format('YYYY-MM-DD'),
                         docAtt: JSON.stringify(docAtt),
                         qualAtt: JSON.stringify(qualAtt),
                         valAtt: JSON.stringify(valAtt),
@@ -336,6 +353,8 @@ function AddDoc() {
                 setIsProtocol(false)
                 setAppDate(null)
                 setInvDate(null)
+                setStartDate(null)
+                setCompletionDate(null)
                 dispatch(setSel_doc_no({}))
                 dispatch(setSel_tb_user({}))
                 dispatch(setSelTmmsWholeAsset([]))
@@ -505,6 +524,70 @@ function AddDoc() {
                             margin="dense"
                             fullWidth
                             />
+                        </Stack>
+                    </Paper>
+                    <Paper className="seperate-paper" elevation={3}>
+                        <Stack spacing={2}>
+                            <Chip label="수행기간" color="primary"/>
+                            <div style={{width:'100%',display:'flex', marginTop:'20px'}}>
+                                <div style={{ flexGrow:1, display:'block', marginRight:'10px'}}>
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DatePicker
+                                        disabled={isProtocol}
+                                        fullWidth
+                                        label="Start Date"
+                                        inputFormat={"YYYY-MM-DD"}
+                                        mask={"____-__-__"}
+                                        value={startDate}
+                                        onChange={(newValue) => {
+                                            setStartDate(newValue);
+                                        }}
+                                        renderInput={(params) => <TextField {...params} color="primary"/>}
+                                        />
+                                    </LocalizationProvider>
+                                </div>
+                                <div style={{display:'flex',alignItems:'center',justifyContent:'center', marginLeft:'4px'}}>
+                                    <Button disabled={isProtocol} size="small" variant="contained" onClick={()=>{
+                                        setStartDate(new Date());
+                                    }}>오늘</Button>
+                                </div>
+                                <div style={{display:'flex',alignItems:'center',justifyContent:'center', marginLeft:'4px'}}>
+                                    <Button disabled={isProtocol} size="small" variant="contained" onClick={()=>{
+                                        setStartDate(null);
+                                    }}>삭제</Button>
+                                </div>
+                            </div>
+                            <div style={{width:'100%',display:'flex', marginTop:'20px'}}>
+                                <div style={{ flexGrow:1, display:'block', marginRight:'10px'}}>
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DatePicker
+                                        disabled={isProtocol}
+                                        fullWidth
+                                        label="Completion Date"
+                                        inputFormat={"YYYY-MM-DD"}
+                                        mask={"____-__-__"}
+                                        value={completionDate}
+                                        onChange={(newValue) => {
+                                            setCompletionDate(newValue);
+                                        }}
+                                        renderInput={(params) => <TextField {...params} color="primary"/>}
+                                        />
+                                    </LocalizationProvider>
+                                </div>
+                                <div style={{display:'flex',alignItems:'center',justifyContent:'center', marginLeft:'4px'}}>
+                                    <Button disabled={isProtocol} size="small" variant="contained" onClick={()=>{
+                                        setCompletionDate(new Date());
+                                    }}>오늘</Button>
+                                </div>
+                                <div style={{display:'flex',alignItems:'center',justifyContent:'center', marginLeft:'4px'}}>
+                                    <Button disabled={isProtocol} size="small" variant="contained" onClick={()=>{
+                                        setCompletionDate(null);
+                                    }}>삭제</Button>
+                                </div>
+                            </div>
+                            {
+                                isProtocol ? <Chip label="본 필드는 실제 수행기간을 입력하는 필드입니다." size="small" variant="outlined" color="info"/> : <div/>
+                            }
                         </Stack>
                     </Paper>
                     <Paper className="seperate-paper" elevation={3}>
