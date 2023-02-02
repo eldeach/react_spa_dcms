@@ -195,6 +195,12 @@ function AddDoc() {
         if(targetRowObj.invalid_date==0) setInvDate(null)
         else setInvDate(targetRowObj.invalid_date);
 
+        if(targetRowObj.imp_start_date==0) setStartDate(null)
+        else setStartDate(targetRowObj.imp_start_date);
+
+        if(targetRowObj.imp_completion_date==0) setCompletionDate(null)
+        else setCompletionDate(targetRowObj.imp_completion_date);
+
         if(targetRowObj.isprotocol=='1'){
             setIsProtocol(isProtocol=>true)
         }
@@ -285,7 +291,10 @@ function AddDoc() {
             if(!rdx.sel_doc_no.doc_no||!rdx.sel_tb_user.user_account||!appDate){
                 alert("문서번호 선택 또는 사용자 선택, 승인일이 입력되지 않았습니다.")
             }
-            else if((startDate && !completionDate)||(!startDate && completionDate)){
+            else if(startDate && !completionDate){
+                alert("수행기간은 시작일과 종료일 모두 입력해야합니다.\n수행기간이 하루이면 동일한 날짜로 시작일과 종료일을 입력해주세요.")
+            }
+            else if(!startDate && completionDate){
                 alert("수행기간은 시작일과 종료일 모두 입력해야합니다.\n수행기간이 하루이면 동일한 날짜로 시작일과 종료일을 입력해주세요.")
             }
             else{
@@ -298,8 +307,8 @@ function AddDoc() {
                         written_by_team:rdx.sel_tb_user.user_team,
                         approval_date:moment(new Date(appDate)).format('YYYY-MM-DD'),
                         invalid_date:moment(new Date(invDate)).format('YYYY-MM-DD'),
-                        start_date:moment(new Date(startDate)).format('YYYY-MM-DD'),
-                        completion_date:moment(new Date(completionDate)).format('YYYY-MM-DD'),
+                        imp_start_date:moment(new Date(startDate)).format('YYYY-MM-DD'),
+                        imp_completion_date:moment(new Date(completionDate)).format('YYYY-MM-DD'),
                         docAtt: JSON.stringify(docAtt),
                         qualAtt: JSON.stringify(qualAtt),
                         valAtt: JSON.stringify(valAtt),
@@ -325,8 +334,8 @@ function AddDoc() {
                         written_by_team:rdx.sel_tb_user.user_team,
                         approval_date:moment(new Date(appDate)).format('YYYY-MM-DD'),
                         invalid_date:moment(new Date(invDate)).format('YYYY-MM-DD'),
-                        start_date:moment(new Date(startDate)).format('YYYY-MM-DD'),
-                        completion_date:moment(new Date(completionDate)).format('YYYY-MM-DD'),
+                        imp_start_date:moment(new Date(startDate)).format('YYYY-MM-DD'),
+                        imp_completion_date:moment(new Date(completionDate)).format('YYYY-MM-DD'),
                         docAtt: JSON.stringify(docAtt),
                         qualAtt: JSON.stringify(qualAtt),
                         valAtt: JSON.stringify(valAtt),
@@ -540,7 +549,13 @@ function AddDoc() {
                                         mask={"____-__-__"}
                                         value={startDate}
                                         onChange={(newValue) => {
-                                            setStartDate(newValue);
+                                            let dateA = new Date(newValue)
+                                            let dateB = new Date(completionDate)
+                                            if((dateA.getTime()-dateB.getTime()>0)){
+                                                if(!completionDate) setStartDate(newValue);
+                                                else alert ("시작일은 종료일보다 앞서야합니다.")
+                                            }
+                                            else setStartDate(newValue);
                                         }}
                                         renderInput={(params) => <TextField {...params} color="primary"/>}
                                         />
@@ -548,7 +563,15 @@ function AddDoc() {
                                 </div>
                                 <div style={{display:'flex',alignItems:'center',justifyContent:'center', marginLeft:'4px'}}>
                                     <Button disabled={isProtocol} size="small" variant="contained" onClick={()=>{
-                                        setStartDate(new Date());
+                                        
+                                        let dateA = new Date(new Date())
+                                        let dateB = new Date(completionDate)
+                                        if((dateA.getTime()-dateB.getTime()>0)){
+                                            if(!completionDate) setStartDate(new Date());
+                                            else alert ("시작일은 종료일보다 앞서야합니다.")
+                                        }
+                                        else setStartDate(new Date());
+                                        
                                     }}>오늘</Button>
                                 </div>
                                 <div style={{display:'flex',alignItems:'center',justifyContent:'center', marginLeft:'4px'}}>
@@ -568,7 +591,13 @@ function AddDoc() {
                                         mask={"____-__-__"}
                                         value={completionDate}
                                         onChange={(newValue) => {
-                                            setCompletionDate(newValue);
+                                            let dateA = new Date(startDate)
+                                            let dateB = new Date(newValue)
+                                            if((dateA.getTime()-dateB.getTime()>0)){
+                                                alert ("시작일은 종료일보다 앞서야합니다.")
+                                            }
+                                            else setCompletionDate(newValue);
+                                            
                                         }}
                                         renderInput={(params) => <TextField {...params} color="primary"/>}
                                         />
@@ -576,7 +605,12 @@ function AddDoc() {
                                 </div>
                                 <div style={{display:'flex',alignItems:'center',justifyContent:'center', marginLeft:'4px'}}>
                                     <Button disabled={isProtocol} size="small" variant="contained" onClick={()=>{
-                                        setCompletionDate(new Date());
+                                        let dateA = new Date(startDate)
+                                        let dateB = new Date(new Date())
+                                        if((dateA.getTime()-dateB.getTime()>0)){
+                                            alert ("시작일은 종료일보다 앞서야합니다.")
+                                        }
+                                        else setCompletionDate(new Date());
                                     }}>오늘</Button>
                                 </div>
                                 <div style={{display:'flex',alignItems:'center',justifyContent:'center', marginLeft:'4px'}}>
@@ -585,6 +619,9 @@ function AddDoc() {
                                     }}>삭제</Button>
                                 </div>
                             </div>
+                            <Button disabled={isProtocol} size="small" variant="contained" onClick={()=>{
+                                setCompletionDate(startDate)
+                            }}>시작일에 종료일 맞추기</Button>
                             {
                                 isProtocol ? <Chip label="본 필드는 실제 수행기간을 입력하는 필드입니다." size="small" variant="outlined" color="info"/> : <div/>
                             }
