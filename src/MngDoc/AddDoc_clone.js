@@ -76,6 +76,7 @@ function AddDoc() {
         {abb:"PQ", att_name: "Performance Qualification"},
         {abb:"STER", att_name: "Sterilization Qualification"},
         {abb:"VHP", att_name: "VHP Qualification"},
+        {abb:"Initial", att_name: "Initial Qualification"},
         {abb:"Periodic", att_name: "Periodic Requalification"},
         {abb:"SFT", att_name: "System Functional Test"},
         {abb:"TAB", att_name: "Testing, Adjusting and Balancing"},
@@ -172,6 +173,7 @@ function AddDoc() {
   //========================================================== SlidePopup 작동 redux state 관련 선언
   let rdx = useSelector((state) => { return state } )
   let dispatch = useDispatch();
+  let [reLoad,setReLoad] = useState(false)
 
   //========================================================== [변수, 객체 선언][useEffect]
   useEffect(() => {
@@ -217,9 +219,30 @@ function AddDoc() {
         dispatch(setSelSapZmmr1010(JSON.parse(targetRowObj.prodAtt)))
         dispatch(setSelEqmsAtemplate(JSON.parse(targetRowObj.eqmsAtt)))
         dispatch(setSel_doc(JSON.parse(targetRowObj.relateddoc)))
+        setUserTeam(()=>targetRowObj.written_by_team)
     }
 
+    getTeams()
+
   },[]);
+
+
+  let [teamList, setTeamList]=useState([]);
+  let [userTeam,setUserTeam]=useState();
+  async function getTeams(){
+    let getTeamsResult = await axios.get("/getteams")
+    let teamTempList=[]
+    getTeamsResult.data.result.map((oneTeam,i)=>{
+        if(!oneTeam.user_team){
+        }
+        else
+        {
+            teamTempList.push(oneTeam.user_team)
+        }
+    })
+    setTeamList(teamTempList)
+  }
+
   //========================================================== [ADD form에서 추가] 수정할 row Oject state 넘겨받기 위한 코드
   const location = useLocation();
   const targetRowObj= (!location.state ? "N/A" : location.state.rowObj)
@@ -421,7 +444,7 @@ function AddDoc() {
                                 <Chip label="개정번호" color="primary"/>
                                 <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{rdx.sel_doc_no.newRevNo}</div></div>
                             </Stack>
-                            <div style={{height:"10px"}}/>
+                            {/* <div style={{height:"10px"}}/> */}
                             <Button size="small" variant="contained" onClick={()=>{
                             setPopUpPage(4) 
                             setModalTitle("요창자 선택")
@@ -435,6 +458,29 @@ function AddDoc() {
                             <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
                                 <Chip label="작성팀" color="primary"/>
                                 <div style={{flexGrow:1, display:'flex', justifyContent:'center', alignItems:'center'}}><div>{rdx.sel_tb_user.user_team}</div></div>
+                            </Stack>
+                            <Stack direction='row' divider={<Divider style={{marginLeft:'1vw',marginRight:'1vw'}} orientation="vertical" flexItem />}>
+                                <div style={{display:'flex',alignItems:'center',justifyContent:'center', marginLeft:'4px'}}>
+                                    <Chip label="작성팀 변경" color="primary"/>
+                                </div>
+                                <Autocomplete
+                                value={userTeam}
+                                onChange={(event, newValue) => {
+                                    setUserTeam(()=>newValue)
+                                }}
+                                disabled={!rdx.sel_tb_user.user_account}
+                                disablePortal
+                                size="small"
+                                id="mngTeam"
+                                options={teamList.map((option) => option)}
+                                sx={{ flexGrow:1, marginRight:'10px'}}
+                                renderInput={(params) => <TextField {...params} color="primary" label="작성팀" />}
+                                />
+                                <div style={{display:'flex',alignItems:'center',justifyContent:'center', marginLeft:'4px'}}>
+                                    <Button disabled={!rdx.sel_tb_user.user_account} size="small" variant="contained" onClick={()=>{
+                                            dispatch(setSel_tb_user({user_account:rdx.sel_tb_user.user_account, user_name:rdx.sel_tb_user.user_name, user_team:userTeam }))
+                                    }}>변경</Button>
+                                </div>
                             </Stack>
                             <FormControlLabel
                                 control={
