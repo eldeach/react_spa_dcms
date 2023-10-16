@@ -131,9 +131,9 @@ async function LoginCheck(){
                                 <div style={{width:'2.4cm', hieght:'2.8cm', textAlign:'center', marginTop:(props.binderSide=="Front"?'6px':'0px')}} >
                                     <Stack spacing={0}>
                                         <div><QRCode value={targetRowObj.binder_no} quietZone='1' logoImage="public/logo192.png" size='80'  fgColor="#2196f3"/></div>
-                                        <div style={{fontSize:'3px'}}><Typography variant='inherit'>{targetRowObj.binder_no}</Typography></div>
-                                        <div style={{fontSize:'3px', fontWeight:'bold'}}><Typography variant='inherit'>{targetRowObj.mng_team+" / "+targetRowObj.binder_loc}</Typography></div>
-                                        <div style={{fontSize:'3px', fontWeight:'bold'}}><Typography variant='inherit'>{"문서 "+JSON.parse(targetRowObj.relateddoc).length+"건"}</Typography></div>
+                                        <div style={{fontSize:'10px'}}><Typography variant='inherit'>{targetRowObj.binder_no}</Typography></div>
+                                        <div style={{fontSize:'10px', fontWeight:'bold'}}><Typography variant='inherit'>{targetRowObj.mng_team+" / "+targetRowObj.binder_loc}</Typography></div>
+                                        <div style={{fontSize:'10px', fontWeight:'bold'}}><Typography variant='inherit'>{"문서 "+JSON.parse(targetRowObj.relateddoc).length+"건"}</Typography></div>
                                     </Stack>
                                 </div>
                             </div>
@@ -186,7 +186,7 @@ async function LoginCheck(){
                                         }
                                         else{
                                             if(props.sideWidth==3){
-                                                return <div style={{height:'24px', display:'flex', justifyContent:'center', alignItems:'center', borderRadius:'12px', backgroundColor:'#2196f3', color:'white', fontSize:'3px', lineHeight:'12px', marginBottom:'2px'}}>{oneDoc.doc_no+"("+oneDoc.rev_no+")"}</div>
+                                                return <div style={{height:'24px', display:'flex', justifyContent:'center', alignItems:'center', borderRadius:'12px', backgroundColor:'#2196f3', color:'white', fontSize:'8px', lineHeight:'12px', marginBottom:'2px'}}>{oneDoc.doc_no+"("+oneDoc.rev_no+")"}</div>
                                             }
                                             else{
                                                 return <div><Chip icon={<DescriptionIcon />} size="small" color="primary" label={oneDoc.doc_no+"("+oneDoc.rev_no+")"}/></div>
@@ -207,7 +207,7 @@ async function LoginCheck(){
                                 }
                             </div>
                         }
-                        <div style={{fontSize:'5px'}}>
+                        <div style={{fontSize:'9px'}}>
                             <Stack spacing={0}>
                                 <Typography variant='inherit'>{targetRowObj.binder_year}</Typography>
                                 <Typography variant='inherit'>{"CONFIDENTIAL"}</Typography>
@@ -226,13 +226,15 @@ async function LoginCheck(){
                             <div style={{width:'2.4cm', hieght:'2.8cm', textAlign:'center', marginTop:'6px', marginLeft:'6px'}} >
                                 <Stack spacing={0}>
                                     <div><QRCode value={targetRowObj.binder_no} quietZone='1' logoImage="public/logo192.png" size='80'  fgColor="#2196f3"/></div>
-                                    <div style={{fontSize:'3px'}}><Typography variant='inherit'>{targetRowObj.binder_no}</Typography></div>
-                                    <div style={{fontSize:'3px', fontWeight:'bold'}}><Typography variant='inherit'>{targetRowObj.mng_team+" / "+targetRowObj.binder_loc}</Typography></div>
-                                    <div style={{fontSize:'3px', fontWeight:'bold'}}><Typography variant='inherit'>{"문서 "+JSON.parse(targetRowObj.relateddoc).length+"건"}</Typography></div>
+                                    <div style={{fontSize:'10px'}}><Typography variant='inherit'>{targetRowObj.binder_no}</Typography></div>
+                                    <div style={{fontSize:'10px', fontWeight:'bold'}}><Typography variant='inherit'>{targetRowObj.mng_team+" / "+targetRowObj.binder_loc}</Typography></div>
+                                    <div style={{fontSize:'10px', fontWeight:'bold'}}><Typography variant='inherit'>{"문서 "+JSON.parse(targetRowObj.relateddoc).length+"건"}</Typography></div>
                                 </Stack>
                             </div>
                             <Stack spacing={1}>
-                                <Typography variant='subtitle1'>{targetRowObj.binder_title}</Typography>
+                                <div style={{width: '12cm'}}>
+                                    <Typography variant='subtitle1'>{targetRowObj.binder_title}</Typography>
+                                </div>
                                 <div style={{ height:'3cm', display:'flex', flexWrap:'wrap', justifyContent:'center', overflow:'hidden',boxSizing:'border-box'}}>
                                     {
                                         JSON.parse(targetRowObj.relateddoc).map((oneDoc,i)=>{
@@ -249,11 +251,11 @@ async function LoginCheck(){
                             <div style={{width:'2.4cm', hieght:'2.8cm', textAlign:'center', marginTop:'6px'}} >
                                 <Stack spacing={0}>
                                     <div><QRCode value={targetRowObj.binder_no} quietZone='1' logoImage="public/logo192.png" size='50'  fgColor="#2196f3"/></div>
-                                    <div style={{fontSize:'1px'}}><Typography variant='inherit'>{targetRowObj.binder_no}</Typography></div>
+                                    <div style={{fontSize:'9px'}}><Typography variant='inherit'>{targetRowObj.binder_no}</Typography></div>
                                 </Stack>
                             </div>
                             <Stack spacing={0}>
-                                <div style={{fontSize:'3px', fontWeight:'bold'}}><Typography variant='inherit'>{targetRowObj.mng_team+" / "+targetRowObj.binder_loc +" / "+"문서 "+JSON.parse(targetRowObj.relateddoc).length+"건"}</Typography></div>
+                                <div style={{fontSize:'10px', fontWeight:'bold'}}><Typography variant='inherit'>{targetRowObj.mng_team+" / "+targetRowObj.binder_loc +" / "+"문서 "+JSON.parse(targetRowObj.relateddoc).length+"건"}</Typography></div>
                                 <Typography variant='caption'>{targetRowObj.binder_title}</Typography>
                                 <div style={{ height:'3cm', display:'flex', flexWrap:'wrap', justifyContent:'center', overflow:'hidden',boxSizing:'border-box'}}>
                                     {

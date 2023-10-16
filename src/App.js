@@ -380,7 +380,7 @@ function App() {
       <ThemeProvider theme={theme}>
           <Box sx={{ flexGrow: 1 }}>
             <AppBar position="fixed">
-              <Toolbar>
+              <Toolbar variant="dense">
                   <IconButton
                     size="large"
                     edge="start"
