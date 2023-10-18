@@ -200,7 +200,7 @@ async function LoginCheck(){
                                     JSON.parse(targetRowObj.relateddoc).length>2?
                                     (
                                         props.sideWidth==3?
-                                        <div style={{height:'24px', display:'flex', justifyContent:'center', alignItems:'center', borderRadius:'12px', backgroundColor:'#2196f3', color:'white', fontSize:'3px'}}>{(JSON.parse(targetRowObj.relateddoc).length-2)+" more .."}</div>
+                                        <div style={{height:'24px', display:'flex', justifyContent:'center', alignItems:'center', borderRadius:'12px', backgroundColor:'#2196f3', color:'white', fontSize:'8px'}}>{(JSON.parse(targetRowObj.relateddoc).length-2)+" more .."}</div>
                                         :<div><Chip icon={<DescriptionIcon />} size="small" color="primary" label={(JSON.parse(targetRowObj.relateddoc).length-2)+" more .."}/></div>
                                     )
                                     :<div/>
