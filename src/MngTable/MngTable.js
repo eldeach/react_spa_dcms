@@ -864,6 +864,7 @@ function MngTable(props) {
                 props.selectButton?
                 <Button style={{marginLeft:'5px'}} disabled={!props.tblCtrl} size="small" variant="outlined" onClick={async ()=>{
                   if(props.getUrlStr=="/getgroupwareuser"){
+                    console.log(pickRows.length)
                     if(pickRows.length==1){
                       dispatch(setSel_tb_user(pickRows[0]))
                     }
@@ -1024,9 +1025,9 @@ function MngTable(props) {
             getRowHeight={() => rowHtAuto?'auto':''}
             components={{ Toolbar:CustomToolbar}}
             onCellClick={(GridCellParams,event)=>{
-              setClickRow(clickRow=>GridCellParams.id)
+              setClickRow(GridCellParams.id)
             }}
-            onSelectionModelChange={(selectionModel,details)=>{
+            onRowSelectionModelChange={(selectionModel,details)=>{ // @7.1.1 버전 기준으로 수정 onSelectionModelChange => onRowSelectionModelChange
               if(props.getUrlStr=="/adddocno_getmngdocnopattern"){
                 let forceSelect=[]
                 selectionModel.map((oneRowId,i)=>{
